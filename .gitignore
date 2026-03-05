@@ -1,3 +1,5 @@
 # Ignore all tool outputs; these can be reproduced, they don't need to be tracked
 *.bak
 *.dbg
+*.vcd
+riscv_sim
