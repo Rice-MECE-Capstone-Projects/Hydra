@@ -4,5 +4,4 @@ feat(dft): implement ATPG scan-based fault coverage
 - Add run_scan_lite.do: QuestaSim run script
 - Fault model: stuck-at SA0/SA1 across 1604-bit scan chain
 - Fault coverage: 52.31% (113/216 sampled faults detected)
-- Note: scan_en hardwired to 0 in top-level wrapper; testbench
-  instantiates riscv32i_main directly to bypass limitation
+
