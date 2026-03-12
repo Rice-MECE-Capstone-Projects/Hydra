@@ -1,18 +1,7 @@
 `timescale 1ns/1ps
 
-// ================================================================
-// ATPG Testbench — 真正扫描流程
-// 流程：shift-in(1604) → capture(1) → shift-out(1604) → 比较
-// 故障模型：Stuck-At-0 / Stuck-At-1
-// 测试策略：每次只翻转目标bit，其余bit保持激励背景
-// 覆盖：pipeReg0[64:0]=65bit, pipeReg1~3[512:0]=513bit each
-// 总计：1604 x 2 = 3208 faults，分批测试节省时间
-// ================================================================
 module atpg_scan;
 
-// -------------------------------------------------------
-// DUT 端口
-// -------------------------------------------------------
 reg  clk, reset, enable_design, scan_en, scan_in;
 wire scan_out;
 
@@ -48,23 +37,15 @@ riscv32i_main dut (
 initial clk = 0;
 always #5 clk = ~clk;
 
-// -------------------------------------------------------
-// 常量
-// -------------------------------------------------------
 localparam CHAIN_LEN = 1604;
 
-// -------------------------------------------------------
-// 统计
-// -------------------------------------------------------
 integer total_tests, faults_detected, faults_missed;
 
-// 存储 shift-out 结果
+
 reg [CHAIN_LEN-1:0] golden_out;
 reg [CHAIN_LEN-1:0] faulty_out;
 
-// -------------------------------------------------------
-// 任务：复位
-// -------------------------------------------------------
+
 task do_reset;
     begin
         reset = 1; scan_en = 0; enable_design = 0; scan_in = 0;
@@ -75,10 +56,7 @@ task do_reset;
     end
 endtask
 
-// -------------------------------------------------------
-// 任务：shift-in 1604位激励
-// pattern: 1604位的激励向量，MSB先移入
-// -------------------------------------------------------
+
 task shift_in;
     input [CHAIN_LEN-1:0] pattern;
     integer i;
@@ -94,9 +72,7 @@ task shift_in;
     end
 endtask
 
-// -------------------------------------------------------
-// 任务：capture 1个时钟
-// -------------------------------------------------------
+
 task do_capture;
     begin
         scan_en = 0;
@@ -106,9 +82,7 @@ task do_capture;
     end
 endtask
 
-// -------------------------------------------------------
-// 任务：shift-out 1604位，存入输出数组
-// -------------------------------------------------------
+
 task shift_out;
     output [CHAIN_LEN-1:0] result;
     integer i;
@@ -124,12 +98,6 @@ task shift_out;
     end
 endtask
 
-// -------------------------------------------------------
-// 任务：完整测试一个故障
-// target_bit: 在1604位扫描链中的位置(0=pipeReg0[0])
-// fault_type: 0=SA0, 1=SA1
-// bg_pattern: 激励背景（1604位）
-// -------------------------------------------------------
 task test_fault;
     input integer      target_bit;
     input              fault_type;
@@ -141,15 +109,13 @@ task test_fault;
         total_tests = total_tests + 1;
         detected = 0;
 
-        // --- Step 1: Golden 流程（无故障）---
+     
         do_reset;
         shift_in(bg_pattern);
         do_capture;
         shift_out(golden_out);
 
-        // --- Step 2: 注入故障（修改激励中目标bit）---
-        // SA0：无论激励是什么，目标bit强制为0
-        // SA1：无论激励是什么，目标bit强制为1
+    
         faulty_pattern = bg_pattern;
         faulty_pattern[target_bit] = fault_type ? 1'b1 : 1'b0;
 
@@ -158,7 +124,7 @@ task test_fault;
         do_capture;
         shift_out(faulty_out);
 
-        // --- Step 3: 比较 ---
+        // compare
         if (faulty_out !== golden_out)
             detected = 1;
 
@@ -169,9 +135,6 @@ task test_fault;
     end
 endtask
 
-// -------------------------------------------------------
-// 主流程
-// -------------------------------------------------------
 integer b;
 reg [CHAIN_LEN-1:0] pat_zeros;
 reg [CHAIN_LEN-1:0] pat_ones;
@@ -190,15 +153,15 @@ initial begin
     faults_detected = 0;
     faults_missed   = 0;
 
-    // 初始化激励pattern
+  
     pat_zeros = {CHAIN_LEN{1'b0}};
     pat_ones  = {CHAIN_LEN{1'b1}};
-    // 交替 01
+    
     begin : init_alt
         integer k;
         for (k = 0; k < CHAIN_LEN; k = k + 1) begin
-            pat_alt01[k] = k[0];       // 偶数位=0，奇数位=1
-            pat_alt10[k] = ~k[0];      // 偶数位=1，奇数位=0
+            pat_alt01[k] = k[0];      
+            pat_alt10[k] = ~k[0];     
         end
     end
     patterns[0] = pat_zeros;
@@ -210,12 +173,10 @@ initial begin
     enable_design = 0; scan_in = 0;
     #20;
 
-    // 遍历所有1604个bit，SA0+SA1
-    // 对每个故障尝试4种pattern，检测到即停止
     for (b = 0; b < CHAIN_LEN; b = b + 1) begin
         fault_already_detected = 0;
 
-        // SA1：用全0背景（能看出被强制成1）
+        
         if (!fault_already_detected) begin
             total_tests = total_tests + 1;
             begin : sa1_test
@@ -223,7 +184,7 @@ initial begin
                 reg det;
                 det = 0;
                 fp = pat_zeros;
-                fp[b] = 1'b1;  // SA1故障：该位强制为1
+                fp[b] = 1'b1; 
                 do_reset;
                 shift_in(pat_zeros);
                 do_capture;
@@ -241,14 +202,13 @@ initial begin
             end
         end
 
-        // SA0：用全1背景（能看出被强制成0）
         fault_already_detected = 0;
         begin : sa0_test
             reg [CHAIN_LEN-1:0] fp, go, fo;
             reg det;
             det = 0;
             fp = pat_ones;
-            fp[b] = 1'b0;  // SA0故障：该位强制为0
+            fp[b] = 1'b0;  
             total_tests = total_tests + 1;
             do_reset;
             shift_in(pat_ones);
@@ -265,7 +225,6 @@ initial begin
                 faults_missed = faults_missed + 1;
         end
 
-        // 每100个bit打印进度
         if ((b % 100) == 99)
             $display("Progress: bit %0d/%0d, detected=%0d/%0d",
                      b+1, CHAIN_LEN, faults_detected, total_tests);

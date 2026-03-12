@@ -1,15 +1,7 @@
 `timescale 1ns/1ps
 
-// ================================================================
-// ATPG Scan Lite — 精简扫描流程
-// 从每个寄存器均匀采样，覆盖控制位和数据位
-// 真实扫描流程：shift-in → capture → shift-out → 比较
-// ================================================================
 module atpg_scan_lite;
 
-// -------------------------------------------------------
-// DUT
-// -------------------------------------------------------
 reg  clk, reset, enable_design, scan_en, scan_in;
 wire scan_out;
 
@@ -41,9 +33,7 @@ localparam CHAIN_LEN = 1604;
 integer total_tests, faults_detected, faults_missed;
 reg [CHAIN_LEN-1:0] golden_out, faulty_out;
 
-// -------------------------------------------------------
-// 任务：复位
-// -------------------------------------------------------
+// reset
 task do_reset;
     begin
         reset = 1; scan_en = 0; enable_design = 0; scan_in = 0;
@@ -53,9 +43,7 @@ task do_reset;
     end
 endtask
 
-// -------------------------------------------------------
-// 任务：shift-in
-// -------------------------------------------------------
+// shift-in
 task shift_in;
     input [CHAIN_LEN-1:0] pattern;
     integer i;
@@ -69,9 +57,7 @@ task shift_in;
     end
 endtask
 
-// -------------------------------------------------------
-// 任务：capture
-// -------------------------------------------------------
+// capture
 task do_capture;
     begin
         scan_en = 0; enable_design = 1;
@@ -80,9 +66,7 @@ task do_capture;
     end
 endtask
 
-// -------------------------------------------------------
-// 任务：shift-out
-// -------------------------------------------------------
+// shift-out
 task shift_out;
     output [CHAIN_LEN-1:0] result;
     integer i;
@@ -96,11 +80,8 @@ task shift_out;
     end
 endtask
 
-// -------------------------------------------------------
-// 任务：测试单个故障
-// target_bit: 扫描链中的位置
+// test single fault
 // fault_type: 0=SA0, 1=SA1
-// -------------------------------------------------------
 task test_one_fault;
     input integer target_bit;
     input         fault_type;
@@ -111,7 +92,7 @@ task test_one_fault;
         total_tests = total_tests + 1;
         det = 0;
 
-        // SA1 用全0背景，SA0 用全1背景
+        // SA1 test 0，SA0 test 1
         if (fault_type == 1)
             bg = {CHAIN_LEN{1'b0}};
         else
@@ -123,7 +104,7 @@ task test_one_fault;
         do_capture;
         shift_out(golden_out);
 
-        // 注入故障
+        // input fault
         fp = bg;
         fp[target_bit] = fault_type ? 1'b1 : 1'b0;
         do_reset;
@@ -131,7 +112,7 @@ task test_one_fault;
         do_capture;
         shift_out(faulty_out);
 
-        // 比较
+        // compare
         if (faulty_out !== golden_out) det = 1;
 
         if (det) begin
@@ -144,14 +125,7 @@ task test_one_fault;
     end
 endtask
 
-// -------------------------------------------------------
-// 主流程：采样策略
-// pipeReg0: bit 0~64   (65位)  → 采样前20位 + 后5位
-// pipeReg1: bit 65~577 (513位) → 每隔20位采样一个，共25个
-// pipeReg2: bit 578~1090(513位)→ 每隔20位采样一个，共25个
-// pipeReg3: bit 1091~1603(513位)→每隔20位采样一个，共25个
-// 每个bit测SA0+SA1，共约200个故障
-// -------------------------------------------------------
+// sampling strategy
 integer b;
 
 initial begin
@@ -165,7 +139,7 @@ initial begin
     enable_design = 0; scan_in = 0;
     #20;
 
-    // --- pipeReg0: bit 0~64，测前25位 + 后5位 ---
+    // --- pipeReg0: bit 0~64
     $display("\n[pipeReg0] Testing bits 0~24 (low bits = control signals)");
     for (b = 0; b <= 24; b = b + 1) begin
         test_one_fault(b, 1);  // SA1
@@ -178,7 +152,7 @@ initial begin
     end
     $display("[pipeReg0] done. detected=%0d/%0d", faults_detected, total_tests);
 
-    // --- pipeReg1: bit 65~577，每隔20采样 ---
+    // --- pipeReg1: bit 65~577---
     $display("\n[pipeReg1] Sampling every 20 bits (65~577)");
     for (b = 65; b <= 577; b = b + 20) begin
         test_one_fault(b, 1);
@@ -186,7 +160,7 @@ initial begin
     end
     $display("[pipeReg1] done. detected=%0d/%0d", faults_detected, total_tests);
 
-    // --- pipeReg2: bit 578~1090，每隔20采样 ---
+    // --- pipeReg2: bit 578~1090 ---
     $display("\n[pipeReg2] Sampling every 20 bits (578~1090)");
     for (b = 578; b <= 1090; b = b + 20) begin
         test_one_fault(b, 1);
@@ -194,7 +168,7 @@ initial begin
     end
     $display("[pipeReg2] done. detected=%0d/%0d", faults_detected, total_tests);
 
-    // --- pipeReg3: bit 1091~1603，每隔20采样 ---
+    // --- pipeReg3: bit 1091~1603 ---
     $display("\n[pipeReg3] Sampling every 20 bits (1091~1603)");
     for (b = 1091; b <= 1603; b = b + 20) begin
         test_one_fault(b, 1);
