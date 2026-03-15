@@ -1,0 +1,232 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{
+    HYDRA: High-Yield Data Reorganization \& Acceleration\\
+    \large Mid-Term Report \\
+}
+
+\author{
+\IEEEauthorblockN{
+    Nafil Atiq\IEEEauthorrefmark{1},
+    Ruohan Dong\IEEEauthorrefmark{1},
+    Matthew Nutt\IEEEauthorrefmark{1},
+    Ithzel Toscano\IEEEauthorrefmark{1},
+    Giovanni Sirtori\IEEEauthorrefmark{1},
+    Yulia Zhou\IEEEauthorrefmark{1}
+}
+
+\IEEEauthorblockA{
+    \IEEEauthorrefmark{1}%
+    Department of Electrical \& Computer Engineering \\
+    Rice University, Houston, Texas \\
+    \{na115, rd100, mcn5, ijt2, gs86, yz305\}@rice.edu}
+}
+
+\maketitle
+
+\begin{abstract}
+    This document covers the midterm work completed by the RISC-V Master's Capstone team on the HYDRA project. Results from DFT and verification frameworks are available, but work in the areas of DMA design and RTL review only involve planning considerations. Future work on the DFT and verification flows will involve expanding the capabilities of their respective systems, and future work on the RTL side will involve the integration of a preliminary DMA system into a third-party RISC-V core.
+\end{abstract}
+
+\begin{IEEEkeywords}
+RISC-V, DMA, RTL, UVM, Verilog, SystemVerilog
+\end{IEEEkeywords}
+
+
+
+\section{Introduction} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Modern AI inference systems are increasingly bottlenecked by irregular memory access patterns in operations like embedding lookup, sparse attention, and tensor layout conversion. Traditional DMA engines improve bandwidth but lack semantic awareness, while full accelerators are costly and inflexible. We propose the High-Yield Data \& Acceleration (HYDRA), a programmable DMA engine with an AI-aware datapath that performs in-flight transformations. HYDRA implements three hardware-accelerated modes: scatter-gather for irregular access prefetch, corner-turning for zero-overhead matrix transpose, and real-time quantization to reduce memory traffic. HYDRA enables CPU orchestration while offloading memory-intensive operations to dedicated hardware. We expect to achieve 5-10× reduction in execution cycles and DRAM traffic compared to CPU-only solutions, demonstrating that datapath-centric design can address AI inference bottlenecks more efficiently than compute-heavy accelerators.
+
+\section{Methods} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{RTL Review}
+This team has inherited work from previous semesters of the capstone class, including a repository of RTL code for a RISC-V core. The design implemented the basic RV32I ISA and featured several additions such as branch prediction and a cache system. A thorough review of this repository would be used to determine if it would be wiser to continue developing on top of the inherited code, or to build our DMA system on a third-party design that would be more refined. The repository in its entirety is available online.\footnote{\url{https://github.com/Rice-MECE-Capstone-Projects/SwitchMCU}}.
+
+\subsection{Design for Testability (DFT)}
+The processor design incorporates a scan-based Design for Testability architecture to improve the controllability and observability of internal pipeline states during testing. At the RTL level, the major pipeline registers were converted into scan registers and connected to form a single scan chain. Specifically, four pipeline registers were connected sequentially. Additional control signals were introduced to enable scan shifting and state observation.
+
+A simulation testbench was developed to verify the scan functionality. When scan\_en is asserted, the pipeline registers operate as a shift register, allowing internal states to be serially shifted through the scan chain. In normal operation, the processor captures functional data into the registers. QuestaSim simulations confirmed correct scan shifting and state propagation.
+
+To evaluate testability, a lightweight scan-based fault testing framework was implemented following the standard scan testing sequence: reset, scan-in, capture, and scan-out. During the scan-in phase, a test pattern is shifted into the scan chain. The design then executes one functional clock cycle (capture phase), and the resulting register states are shifted out for analysis.
+
+For each selected scan bit, two simulations were executed: a golden run without faults and a faulty run where the selected bit was forced to the fault value. A fault was considered detected if the scan-out results differed between the two runs.
+
+To reduce simulation runtime, a sampling-based fault evaluation strategy was used. Rather than testing all 1604 scan bits, representative bits were selected from each pipeline register. This approach provides a preliminary estimation of scan-based fault detectability across the pipeline stages.
+
+\subsection{Cache Verification Framework (DCache)}
+The project focuses on the functional verification of a RISC-V data cache using the SystemVerilog Universal Verification Methodology (UVM). The verification environment evaluates the correctness of cache read/write operations and the interaction between the cache and the memory model.
+At the RTL level, the cache module is implemented in Verilog and connected to a CPU interface and a simplified memory model. 
+A UVM-based verification environment was developed, including sequence items, a sequencer, a driver, a monitor, and a scoreboard. The sequence items represent CPU memory transactions such as address, data, and access type. The driver converts these transactions into interface-level signals that interact with the cache RTL. During simulation, the monitor observes cache responses and records cache access behavior.
+All simulations are executed using the QuestaSim simulator, allowing waveform analysis of cache transactions and signal interactions.
+
+\subsection{Core Verification Framework}
+Initial verification of the processor core used a constrained-random testing framework based on the RISC-V-DV platform. Randomized instruction programs were executed on the DUT, while a scoreboard compared the resulting architectural state against behavioral SystemVerilog reference models to detect functional mismatches. While this approach exercised many instruction sequences, it did not provide a clear metric for how thoroughly processor behavior was explored.
+
+To address this, coverage-driven verification was introduced using SystemVerilog functional covergroups. Covergroups track activity in key components of the core, including the instruction decoder, ALU, and register file. Decoder coverage records observed instruction types, ALU coverage tracks arithmetic and logical operations, and register file coverage monitors reads and writes across the general-purpose registers. Additional coverage points track branch outcomes to verify both taken and not-taken cases.
+
+Coverage statistics are automatically collected during simulation and summarized in coverage reports, allowing coverage percentages to be evaluated and gaps in instruction or datapath behavior to be identified. To validate the coverage framework, the ALU and instruction decoder were first tested in isolation using randomized input stimuli before applying the methodology to the full core.
+
+\subsection{Datapath Architecture}
+The energy cost of AI inference is dominated by data movement through the
+memory hierarchy rather than by arithmetic operations~\cite{tripp2024}. HYDRA addresses this by implementing two hardware acceleration modes: Mode~B (Matrix Transposition) and Mode~C (32-bit to 8-bit Quantization). Mode~B aims to use the block corner-turning technique of Ma et al., partitioning the source matrix into 8$\times$16 basic blocks of 32-bit words, writing each blockrow-major into an on-chip buffer and reading it column-major to the destination~\cite{ma2019}. Two buffers operate in a ping-pong scheme to overlap fetch and transform phases. Mode~C implements a combinational rounding-and-clipping unit that packs four 8-bit outputs per 32-bit bus word, quadrupling effective bandwidth per Equation~\ref{eq:bw}. Both modes target 100~MHz, matching the AHB-Lite bus clock domain.
+
+\begin{equation}
+    B_{\text{eff}} = B_{\text{raw}} \times \frac{W_{\text{src}}}{W_{\text{dst}}}
+    \label{eq:bw}
+\end{equation}
+
+\subsection{SoC Integration Architecture}
+HYDRA integrates into the Wally RISC-V SoC~\cite{harris2022wally} as a second AHB bus master alongside the CPU, which already includes a verified L1 cache and AHB interface. The integration work therefore focuses on three additions: a bus arbiter to handle simultaneous requests from the CPU and HYDRA, a non-cacheable scratchpad SRAM that serves as HYDRA's output destination, and the HYDRA MMR slave registered in Wally's existing address map outside the cached memory window. Coherency is resolved by construction: the memory map in Table~\ref{tab:memmap} enforces non-overlapping cached and non-cached regions in hardware, so HYDRA never writes to a CPU-visible cached address. The overall decomposition follows the front-end / mid-end / back-end model of Benz et al.~\cite{benz2023}, mapping to HYDRA's MMR register file, address generation unit, and AHB master state machine respectively.
+
+\begin{table}[h]
+\caption{HYDRA SoC Memory Map}
+\label{tab:memmap}
+\centering
+\begin{tabular}{llll}
+\hline
+\textbf{Region} & \textbf{Base Address} & \textbf{Size} & \textbf{Attribute} \\
+\hline
+Boot ROM         & \texttt{0x0000\_1000} & 4 KB   & Read-only \\
+CLINT            & \texttt{0x0200\_0000} & 64 KB  & MMIO \\
+PLIC             & \texttt{0x0C00\_0000} & 64 MB  & MMIO \\
+UART / GPIO      & \texttt{0x1000\_0000} & --     & MMIO \\
+HYDRA MMR        & \texttt{0x2000\_0000} & 4 KB   & Non-cacheable \\
+Scratchpad SRAM  & \texttt{0x2001\_0000} & 4 MB   & Non-cacheable \\
+Main RAM         & \texttt{0x8000\_0000} & 128 MB & Cached (I\$/D\$) \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\fbox{\includegraphics[width=0.8\linewidth]{HYDRA.png}}
+\caption{Full system block diagram.}
+\end{figure}
+
+\section{Results} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{RTL Review}
+After reviewing the existing RTL design, the team found disorganized, poorly documented code, with many incomplete features that were never implemented. Although the core is currently functional (enough for verification and DFT work), further work with this repository would only result in increased development time due to low readability and technical debt. Along with that, nobody in the current team has prior experience to working on the RTL design of this repository, further complicating efforts to try to understand the previous code. The determination was made to seek out a third-party, open-source RTL design that would facilitate easy integration with our DMA system. Going with a third-party alternative would allow for us to free up time spent trying to understand the code of the current repository, integrating the cache into the core system, and verifying the whole system. This freed time could then be dedicated to working on the RTL design for our proposed DMA system.
+
+\subsection{Design for Testability (DFT)}
+To evaluate the effectiveness of the implemented scan architecture, a scan-based fault testing framework was executed using simulation. The experiments were performed using the scan testing flow consisting of reset, scan-in, capture, and scan-out phases.
+
+First, the correctness of the scan chain was verified by shifting test patterns through the scan registers. As shown in the scan test output, after 1604 shift cycles, the value injected into the scan chain appears at the scan output, confirming that the entire scan chain of length 1604 bits is functioning correctly.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\linewidth]{1.png}
+\caption{Scan shift verification.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\linewidth]{2.png}
+\caption{Scan-in and scan-out behavior.}
+\end{figure}
+
+The simulation logs show the sequential propagation of scan values during shifting. The timestamps printed in the output demonstrate that the scan registers correctly operate as a shift register when scan\_en is enabled, allowing internal pipeline states to be fully controllable and observable through the scan interface.
+
+After verifying scan functionality, the scan-based fault testing framework was executed. Representative scan bits were sampled from the full scan chain to emulate stuck-at faults (SA0 and SA1). Each selected scan bit was tested twice, once for stuck-at-0 and once for stuck-at-1, by comparing the scan-out results of a fault-free simulation and a faulty simulation.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\linewidth]{fpga.png}
+\caption{Scan-based fault testing results.}
+\end{figure}
+
+As shown in the results, some injected faults caused observable differences in the scan-out responses, which were classified as detected faults, while others did not affect the final scan-out state and were classified as missed faults.
+
+\subsection{Initial Verification Results (DCache)}
+Initial simulations were conducted to verify the basic functionality of the verification environment. Test sequences were generated to emulate CPU read and write requests to the cache.
+The simulation results show that transaction-level requests are correctly translated into cache interface signals. Waveform analysis confirms proper communication between the CPU interface, the cache module, and the memory model.
+These preliminary results demonstrate that the verification environment is capable of driving cache transactions and observing cache behavior during simulation.
+
+\subsection{Initial Verification Results (Core)}
+For the decoder, randomized instruction words were applied as inputs and a covergroup tracked the resulting instruction classes based on the decoded control signals. Coverage bins were defined for several instruction categories including arithmetic, logical, and branch, operations. Simulation results showed that multiple bins were triggered, confirming that the randomized inputs exercised several decoder paths.
+
+The ALU was verified in a similar manner by generating randomized operand values and ALU control signals. A covergroup monitored the selected ALU operation with bins corresponding to operations such as add, subtract, and logical functions. Coverage reports showed hits across several operation bins, demonstrating that different ALU modes were activated during simulation.
+
+These results confirm that the coverage-driven framework is capable of tracking execution behavior and producing measurable coverage metrics during testing.
+
+\subsection{Architectural Definition}
+The primary deliverable of the review phase from the RTL workstream is the fixed system architecture that subsequent implementation will target. By adopting the Wally RISC-V core, cache integration is inherited rather than built from scratch, allowing development effort to concentrate on the HYDRA engine itself. The memory map in Table~\ref{tab:memmap} configures the address space around Wally's existing cache window, defining where the scratchpad and MMR regions live. RTL module stubs for \texttt{hydra\_top}, \texttt{hydra\_arbiter}, \texttt{hydra\_transform}, and \texttt{hydra\_mmr} have been defined and committed to the repository. A software performance baseline will soon be defined and will be executed on Wally directly: loop-unrolled bare-metal C transposition at \texttt{-O2} on a warm L1 cache over 8$\times$16 matrices of 32-bit words, providing a measured cycle count as the speedup denominator.
+
+\section{Discussion} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{RTL Review}
+Several candidates for a third-party RTL core have been identified, including \href{https://github.com/openhwgroup/cvw}{Wally}, \href{https://github.com/stnolting/neorv32}{NEORV32}, and \href{https://github.com/lowRISC/ibex}{Ibex}. After careful consideration, Wally was selected and work to identify the integration strategy for our DMA followed.
+
+\subsection{Design for Testability (DFT)}
+Future work will focus on improving fault coverage by introducing more diverse scan patterns, performing multi-cycle capture experiments, and extending the testing to additional scan bits. 
+
+\subsection{DCache Verification}
+The current verification framework establishes the basic infrastructure for cache verification. Future work will focus on implementing a scoreboard and reference model to automatically check cache hit/miss behavior and memory refill correctness. Randomized test sequences and coverage metrics will also be introduced to improve verification completeness.
+
+\subsection{Core Verification}
+Work continues by integrating the developed covergroups into full-core simulations. Coverage reports from these runs are used to identify untested instruction or datapath behaviors and to guide the development of a verification test plan for the processor core.
+
+\subsection{Architecture: Open Problems and Next Steps}
+Two open problems remain before RTL implementation begins. First, AHB-Lite's half-duplex constraint means the ping-pong buffers hide transformation latency but cannot overlap bus-side reads and writes: the throughput gap relative to the Equation~\ref{eq:bw} ceiling must be quantified by simulation. Second, burst atomicity under arbitration, a known failure mode in multi-master DMA architectures~\cite{ti_edma}, requires HYDRA's address generation unit to maintain restart state at block boundaries, allowing the CPU to be granted the bus between blocks without restarting a full transfer. Immediate next steps are standalone simulation of \texttt{hydra\_arbiter}, implementation of Mode~C to validate the ping-pong interface, and execution of the software baseline on Wally to establish measured cycle counts.
+
+% \subsection{Cache Integration}
+% Future work will involve integrating the Instruction-Cache and Data-Cache into the full core model, and then comparing the performance of the system with caching enabled compared to the current core.
+
+
+
+\section{Acknowledgments}
+We would like to express our gratitude towards Professor Welsh and Professor Simar for their support of our project.
+
+\section{Credit Author Statement}
+\begin{itemize}
+    \item \textbf{Nafil Atiq:} RTL review and core evaluation. %RTL design of RISC-V core.
+    \item \textbf{Ruohan Dong:} UVM verification for RISC-V data cache.
+    \item \textbf{Matthew Nutt:} RTL review and DMA architecture design.
+    \item \textbf{Giovanni Sirtori:} Literature review and DMA architecture design.
+    \item \textbf{Ithzel Toscano:} UVM verification of RISC-V core.
+    \item \textbf{Yulia Zhou:} Design for Testability (DFT).
+\end{itemize}
+
+\begin{thebibliography}{00}
+    \bibitem{tripp2024}
+    C.~E.~Tripp, J.~Perr-Sauer, J.~Gafur, A.~Nag, A.~Purkayastha,
+    S.~Zisman, and E.~A.~Bensen, ``Measuring the energy consumption and
+    efficiency of deep neural networks: An empirical analysis and design
+    recommendations,'' arXiv:2403.08151, 2024.
+
+    \bibitem{ma2019}
+    S.~Ma, Y.~Lei, L.~Huang, and Z.~Wang, ``MT-DMA: A DMA controller
+    supporting efficient matrix transposition for digital signal
+    processing,'' \textit{IEEE Access}, vol.~7, pp.~5808--5818, 2019.
+
+    \bibitem{harris2022wally}
+    D.~Harris, S.~Stine, and M.~Thompson ``Wally: Configurable
+    RISC-V processor,'' \textit{Harvey Mudd College}, 2022. [Online].
+    Available: https://github.com/openhwgroup/cvw
+    
+    \bibitem{benz2023}
+    T.~Benz, M.~Rogenmoser, P.~Scheffler, S.~Riedel, A.~Ottaviano,
+    A.~Kurth, T.~Hoefler, and L.~Benini, ``A high-performance,
+    energy-efficient modular DMA engine architecture,'' \textit{IEEE
+    Transactions on Computers}, 2023, arXiv:2305.05240.
+        
+    \bibitem{ti_edma}
+    J.~Ward and J.~Bowen, ``TMS320C64x EDMA architecture,'' Texas
+    Instruments Application Report SPRA994, Mar.\ 2004.
+\end{thebibliography}
+\vspace{12pt}
+
+\end{document}
