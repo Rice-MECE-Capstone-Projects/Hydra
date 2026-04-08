@@ -1,6 +1,3 @@
-# run_scan_lite.do
-# 用法：vsim -do run_scan_lite.do -batch < /dev/null > atpg_scan_lite_out.txt 2>&1
-
 vlib work
 vmap work work
 
