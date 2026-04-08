@@ -5,3 +5,21 @@ feat(dft): implement ATPG scan-based fault coverage
 - Fault model: stuck-at SA0/SA1 across 1604-bit scan chain
 - Fault coverage: 52.31% (113/216 sampled faults detected)
 
+feat(dft): improve ATPG scan-based fault coverage for pipeline stages
+
+- Expand scan bit sampling across pipeReg0/1/2 for better coverage evaluation
+- Add diverse random test patterns beyond deterministic all-0/all-1 patterns
+- Improve sampled fault coverage from 52.31% to 69.51%
+- Add multi-iteration randomized ATPG experiment (3 iterations × 5 patterns)
+- Evaluate marginal benefit of repeated random testing
+- Observed coverage of 64.63% under iterative random strategy
+- Conclude that diversified patterns contribute more than repeated iterations
+
+feat(dft): investigate pipeline register 3 observability issue
+
+- Create dedicated pipeReg3 debug testbench
+- Perform shift-in / 1-cycle capture / shift-out fault diagnosis
+- Identify functional overwrite during capture stage
+- Confirm scan chain connectivity is correct
+- Root cause: pipeReg3 fault effect overwritten by functional datapath update
+- Mark pipeReg3 as low-observability structure under current RTL
