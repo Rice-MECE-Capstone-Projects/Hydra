@@ -14,7 +14,7 @@ vlog debug.v
 vlog riscv32i.v
 vlog atpg_scan_lite.v
 
-vsim -voptargs=+acc -t 1ps work.atpg
+vsim -voptargs=+acc -t 1ps work.atpg_scan_lite
 
 run -all
 quit -f
