@@ -1,6 +1,3 @@
-# run_scan.do — ATPG 真正扫描流程
-# 用法：vsim -do run_scan.do -batch < /dev/null > atpg_scan_out.txt 2>&1
-
 vlib work
 vmap work work
 
