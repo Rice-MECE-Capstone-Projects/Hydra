@@ -1,3 +1,11 @@
+feat(dft): integrate scan chain into RISC-V pipeline design
+
+- Add scan_en, scan_in, and scan_out ports to riscv32i_main
+- Insert scan path across 1604-bit pipeline register chain
+- Connect pipeline stage registers into serial scan architecture
+- Verify scan chain connectivity and shift behavior in simulation
+- Confirm correct shift-in / shift-out functionality
+
 feat(dft): implement ATPG scan-based fault coverage 
 
 - Add atpg_scan_lite.v: real scan flow testbench (shift-in/capture/shift-out)
