@@ -1,4 +1,4 @@
-# Scan-Based DFT and RTL-Level ATPG Framework
+# Scan-Based DFT and ATPG Framework
 
 ## Overview
 
