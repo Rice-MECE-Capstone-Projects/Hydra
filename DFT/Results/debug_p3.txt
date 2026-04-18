@@ -1,0 +1,231 @@
+Reading pref.tcl
+
+# 2023.2
+
+# vsim -debugDB -voptargs=""+acc"" -c atpg_pr3_debug_fields_tb -do "run -all; quit" 
+# Start time: 17:40:59 on Apr 16,2026
+# ** Note: (vsim-8009) Loading existing optimized design _opt
+# //  Questa Sim-64
+# //  Version 2023.2 linux_x86_64 Apr 11 2023
+# //
+# //  Copyright 1991-2023 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading work.atpg_pr3_debug_fields_tb(fast)
+# Loading work.riscv32i_main(fast)
+# Loading work.pc(fast)
+# Loading work.ins_mem(fast)
+# Loading work.debug(fast)
+# Loading work.debug(fast__1)
+# Loading work.debug(fast__2)
+# Loading work.debug(fast__3)
+# Loading work.decode(fast)
+# Loading work.reg_file(fast)
+# Loading work.branch_prediction(fast)
+# Loading work.execute(fast)
+# Loading work.dataMem(fast)
+# Loading work.end_write(fast)
+# Loading work.hazard(fast)
+# ** Note: (vsim-8716) Reusing existing debug database vsim.dbg.
+# run -all
+# === pipeReg3 field-level root-cause debug ===
+# TARGET_BIT = 1161, FAULT_TYPE = SA0
+# 
+# === GOLDEN RUN ===
+# Golden after shift_in:
+#   pipeReg3 = 1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+#   local_bit_index=70 value=1
+# --------------------------------------------------
+# [BEFORE_CAPTURE] pipeReg3                = 1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+# [BEFORE_CAPTURE] pipeReg3_wire           = zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzZ00000000ffffffffffffffff00000000ffffffffffffffffffffffffffffffff3ff0f9Zzffffffffffffffffffffffff
+# [BEFORE_CAPTURE] PC_reg                  = ffffffff
+# [BEFORE_CAPTURE] instruct                = ffffffff
+# [BEFORE_CAPTURE] alu_res1                = ffffffff
+# [BEFORE_CAPTURE] load_reg                = 1
+# [BEFORE_CAPTURE] jump_en                 = 1
+# [BEFORE_CAPTURE] branch_en               = 1
+# [BEFORE_CAPTURE] reg_write_en            = 1
+# [BEFORE_CAPTURE] LD_ready                = 1
+# [BEFORE_CAPTURE] SD_ready                = 1
+# [BEFORE_CAPTURE] rd                      = 1f
+# [BEFORE_CAPTURE] operand_amt             = f
+# [BEFORE_CAPTURE] opRs1_reg               = 1f
+# [BEFORE_CAPTURE] opRs2_reg               = 7f
+# [BEFORE_CAPTURE] op1_reg                 = ffffffff
+# [BEFORE_CAPTURE] op2_reg                 = ffffffff
+# [BEFORE_CAPTURE] immediate               = ffffffff
+# [BEFORE_CAPTURE] alu_res2                = ffffffff
+# [BEFORE_CAPTURE] rd_data                 = ffffffff
+# [BEFORE_CAPTURE] Single_Instruction      = ffffffffffffffff
+# [BEFORE_CAPTURE] data_mem_loaded         = ffffffff
+# [BEFORE_CAPTURE] branch_predicted        = 1
+# [BEFORE_CAPTURE] wire.PC_reg             = ffffffff
+# [BEFORE_CAPTURE] wire.instruct           = ffffffff
+# [BEFORE_CAPTURE] wire.alu_res1           = ffffffff
+# [BEFORE_CAPTURE] wire.load_reg           = 0
+# [BEFORE_CAPTURE] wire.reg_write_en       = 1
+# [BEFORE_CAPTURE] wire.rd                 = 1f
+# [BEFORE_CAPTURE] wire.op1_reg            = ffffffff
+# [BEFORE_CAPTURE] wire.op2_reg            = ffffffff
+# [BEFORE_CAPTURE] wire.immediate          = ffffffff
+# [BEFORE_CAPTURE] wire.alu_res2           = ffffffff
+# [BEFORE_CAPTURE] wire.data_mem_loaded    = 00000000
+# [BEFORE_CAPTURE] wire.branch_predicted   = 1
+# [BEFORE_CAPTURE] stage3_MEM_valid        = 1
+# [BEFORE_CAPTURE] stage2_EXEC_valid       = 1
+# [BEFORE_CAPTURE] enable_design           = 0
+# [BEFORE_CAPTURE] delete_reg1_reg2_reg    = 0
+# [BEFORE_CAPTURE] load_into_reg           = 0
+# [BEFORE_CAPTURE] write_reg_file_wire_s2  = 1
+# [AFTER_CAPTURE] pipeReg3                = zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzZ00000000ffffffffffffffff00000000ffffffffffffffffffffffffffffffff3ff0f9Zzffffffffffffffffffffffff
+# [AFTER_CAPTURE] pipeReg3_wire           = zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzZ00000000ffffffffffffffff0000000000000000ffffffffffffffffffffffff3ff0f9Zz00000000ffffffffffffffff
+# [AFTER_CAPTURE] PC_reg                  = ffffffff
+# [AFTER_CAPTURE] instruct                = ffffffff
+# [AFTER_CAPTURE] alu_res1                = ffffffff
+# [AFTER_CAPTURE] load_reg                = 0
+# [AFTER_CAPTURE] jump_en                 = 0
+# [AFTER_CAPTURE] branch_en               = 0
+# [AFTER_CAPTURE] reg_write_en            = 1
+# [AFTER_CAPTURE] LD_ready                = 0
+# [AFTER_CAPTURE] SD_ready                = 0
+# [AFTER_CAPTURE] rd                      = 1f
+# [AFTER_CAPTURE] operand_amt             = 0
+# [AFTER_CAPTURE] opRs1_reg               = 1f
+# [AFTER_CAPTURE] opRs2_reg               = 1f
+# [AFTER_CAPTURE] op1_reg                 = ffffffff
+# [AFTER_CAPTURE] op2_reg                 = ffffffff
+# [AFTER_CAPTURE] immediate               = ffffffff
+# [AFTER_CAPTURE] alu_res2                = ffffffff
+# [AFTER_CAPTURE] rd_data                 = 00000000
+# [AFTER_CAPTURE] Single_Instruction      = ffffffffffffffff
+# [AFTER_CAPTURE] data_mem_loaded         = 00000000
+# [AFTER_CAPTURE] branch_predicted        = 1
+# [AFTER_CAPTURE] wire.PC_reg             = ffffffff
+# [AFTER_CAPTURE] wire.instruct           = ffffffff
+# [AFTER_CAPTURE] wire.alu_res1           = 00000000
+# [AFTER_CAPTURE] wire.load_reg           = 0
+# [AFTER_CAPTURE] wire.reg_write_en       = 1
+# [AFTER_CAPTURE] wire.rd                 = 1f
+# [AFTER_CAPTURE] wire.op1_reg            = ffffffff
+# [AFTER_CAPTURE] wire.op2_reg            = ffffffff
+# [AFTER_CAPTURE] wire.immediate          = ffffffff
+# [AFTER_CAPTURE] wire.alu_res2           = 00000000
+# [AFTER_CAPTURE] wire.data_mem_loaded    = 00000000
+# [AFTER_CAPTURE] wire.branch_predicted   = 1
+# [AFTER_CAPTURE] stage3_MEM_valid        = 1
+# [AFTER_CAPTURE] stage2_EXEC_valid       = 1
+# [AFTER_CAPTURE] enable_design           = 1
+# [AFTER_CAPTURE] delete_reg1_reg2_reg    = 0
+# [AFTER_CAPTURE] load_into_reg           = 0
+# [AFTER_CAPTURE] write_reg_file_wire_s2  = 1
+# --------------------------------------------------
+# Golden before shift_out:
+#   pipeReg3 = zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzZ00000000ffffffffffffffff00000000ffffffffffffffffffffffffffffffff3ff0f9Zzffffffffffffffffffffffff
+# 
+# === FAULTY RUN ===
+# Faulty after shift_in:
+#   pipeReg3 = 1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffbfffffffffffffffff
+#   local_bit_index=70 value=0
+# --------------------------------------------------
+# [BEFORE_CAPTURE] pipeReg3                = 1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffbfffffffffffffffff
+# [BEFORE_CAPTURE] pipeReg3_wire           = zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzZ00000000ffffffffffffffff00000000ffffffffffffffffffffffffffffffff3ff0f9Zzffffffffffffffffffffffff
+# [BEFORE_CAPTURE] PC_reg                  = ffffffff
+# [BEFORE_CAPTURE] instruct                = ffffffff
+# [BEFORE_CAPTURE] alu_res1                = ffffffbf
+# [BEFORE_CAPTURE] load_reg                = 1
+# [BEFORE_CAPTURE] jump_en                 = 1
+# [BEFORE_CAPTURE] branch_en               = 1
+# [BEFORE_CAPTURE] reg_write_en            = 1
+# [BEFORE_CAPTURE] LD_ready                = 1
+# [BEFORE_CAPTURE] SD_ready                = 1
+# [BEFORE_CAPTURE] rd                      = 1f
+# [BEFORE_CAPTURE] operand_amt             = f
+# [BEFORE_CAPTURE] opRs1_reg               = 1f
+# [BEFORE_CAPTURE] opRs2_reg               = 7f
+# [BEFORE_CAPTURE] op1_reg                 = ffffffff
+# [BEFORE_CAPTURE] op2_reg                 = ffffffff
+# [BEFORE_CAPTURE] immediate               = ffffffff
+# [BEFORE_CAPTURE] alu_res2                = ffffffff
+# [BEFORE_CAPTURE] rd_data                 = ffffffff
+# [BEFORE_CAPTURE] Single_Instruction      = ffffffffffffffff
+# [BEFORE_CAPTURE] data_mem_loaded         = ffffffff
+# [BEFORE_CAPTURE] branch_predicted        = 1
+# [BEFORE_CAPTURE] wire.PC_reg             = ffffffff
+# [BEFORE_CAPTURE] wire.instruct           = ffffffff
+# [BEFORE_CAPTURE] wire.alu_res1           = ffffffff
+# [BEFORE_CAPTURE] wire.load_reg           = 0
+# [BEFORE_CAPTURE] wire.reg_write_en       = 1
+# [BEFORE_CAPTURE] wire.rd                 = 1f
+# [BEFORE_CAPTURE] wire.op1_reg            = ffffffff
+# [BEFORE_CAPTURE] wire.op2_reg            = ffffffff
+# [BEFORE_CAPTURE] wire.immediate          = ffffffff
+# [BEFORE_CAPTURE] wire.alu_res2           = ffffffff
+# [BEFORE_CAPTURE] wire.data_mem_loaded    = 00000000
+# [BEFORE_CAPTURE] wire.branch_predicted   = 1
+# [BEFORE_CAPTURE] stage3_MEM_valid        = 1
+# [BEFORE_CAPTURE] stage2_EXEC_valid       = 1
+# [BEFORE_CAPTURE] enable_design           = 0
+# [BEFORE_CAPTURE] delete_reg1_reg2_reg    = 0
+# [BEFORE_CAPTURE] load_into_reg           = 0
+# [BEFORE_CAPTURE] write_reg_file_wire_s2  = 1
+# [AFTER_CAPTURE] pipeReg3                = zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzZ00000000ffffffffffffffff00000000ffffffffffffffffffffffffffffffff3ff0f9Zzffffffffffffffffffffffff
+# [AFTER_CAPTURE] pipeReg3_wire           = zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzZ00000000ffffffffffffffff0000000000000000ffffffffffffffffffffffff3ff0f9Zz00000000ffffffffffffffff
+# [AFTER_CAPTURE] PC_reg                  = ffffffff
+# [AFTER_CAPTURE] instruct                = ffffffff
+# [AFTER_CAPTURE] alu_res1                = ffffffff
+# [AFTER_CAPTURE] load_reg                = 0
+# [AFTER_CAPTURE] jump_en                 = 0
+# [AFTER_CAPTURE] branch_en               = 0
+# [AFTER_CAPTURE] reg_write_en            = 1
+# [AFTER_CAPTURE] LD_ready                = 0
+# [AFTER_CAPTURE] SD_ready                = 0
+# [AFTER_CAPTURE] rd                      = 1f
+# [AFTER_CAPTURE] operand_amt             = 0
+# [AFTER_CAPTURE] opRs1_reg               = 1f
+# [AFTER_CAPTURE] opRs2_reg               = 1f
+# [AFTER_CAPTURE] op1_reg                 = ffffffff
+# [AFTER_CAPTURE] op2_reg                 = ffffffff
+# [AFTER_CAPTURE] immediate               = ffffffff
+# [AFTER_CAPTURE] alu_res2                = ffffffff
+# [AFTER_CAPTURE] rd_data                 = 00000000
+# [AFTER_CAPTURE] Single_Instruction      = ffffffffffffffff
+# [AFTER_CAPTURE] data_mem_loaded         = 00000000
+# [AFTER_CAPTURE] branch_predicted        = 1
+# [AFTER_CAPTURE] wire.PC_reg             = ffffffff
+# [AFTER_CAPTURE] wire.instruct           = ffffffff
+# [AFTER_CAPTURE] wire.alu_res1           = 00000000
+# [AFTER_CAPTURE] wire.load_reg           = 0
+# [AFTER_CAPTURE] wire.reg_write_en       = 1
+# [AFTER_CAPTURE] wire.rd                 = 1f
+# [AFTER_CAPTURE] wire.op1_reg            = ffffffff
+# [AFTER_CAPTURE] wire.op2_reg            = ffffffff
+# [AFTER_CAPTURE] wire.immediate          = ffffffff
+# [AFTER_CAPTURE] wire.alu_res2           = 00000000
+# [AFTER_CAPTURE] wire.data_mem_loaded    = 00000000
+# [AFTER_CAPTURE] wire.branch_predicted   = 1
+# [AFTER_CAPTURE] stage3_MEM_valid        = 1
+# [AFTER_CAPTURE] stage2_EXEC_valid       = 1
+# [AFTER_CAPTURE] enable_design           = 1
+# [AFTER_CAPTURE] delete_reg1_reg2_reg    = 0
+# [AFTER_CAPTURE] load_into_reg           = 0
+# [AFTER_CAPTURE] write_reg_file_wire_s2  = 1
+# --------------------------------------------------
+# Faulty before shift_out:
+#   pipeReg3 = zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzZ00000000ffffffffffffffff00000000ffffffffffffffffffffffffffffffff3ff0f9Zzffffffffffffffffffffffff
+# 
+# === COMPARISON ===
+# golden_out = zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzZ00000000ffffffffffffffff00000000ffffffffffffffffffffffffffffffff3ff0f9Zzffffffffffffffffffffffffzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz800000007fffffffffffffff80000000000000007fffffffffffffffffffffff9ff87c8zZ00000007fffffffffffffff8000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002600000000
+# faulty_out = zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzZ00000000ffffffffffffffff00000000ffffffffffffffffffffffffffffffff3ff0f9Zzffffffffffffffffffffffffzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz800000007fffffffffffffff80000000000000007fffffffffffffffffffffff9ff87c8zZ00000007fffffffffffffff8000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002600000000
+# RESULT: MISSED
+# ** Note: $finish    : atpg_pr3_debug_fields_tb.v(259)
+#    Time: 64236 ns  Iteration: 0  Instance: /atpg_pr3_debug_fields_tb
+# End time: 17:40:59 on Apr 16,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
