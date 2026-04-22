@@ -1,5 +1,50 @@
-# Ignore all tool outputs; these can be reproduced, they don't need to be tracked
+# Simulation
+*.vcd
+*.vvp
+*.wlf
+*.wdb
+*.ucdb
+*.log
+*.vstf
+transcript
+vsim.wlf
+questa.ini
+modelsim.ini
+
+# Synthesis — DC
+*.ddc
+*.svf
+*.mr
+*.syn
+*.pvl
+command.log
+default.svf
+filenames*.log
+
+# Innovus
+*.enc
+*.enc.dat/
+innovus.log*
+innovus.cmd*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+sim_build/
+results.xml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Generic
 *.bak
 *.dbg
-*.vcd
 riscv_sim
