@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+# wally — manage the Wally submodule and HYDRA patches.
+#
+# Usage:
+#   ./scripts/wally update      sync submodule and apply all patches
+#   ./scripts/wally save        regenerate patch files from current wally/ edits
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+WALLY="$REPO_ROOT/wally"
+PATCH_DIR="$REPO_ROOT/patch"
+
+# NOTE: add a line here when you start modifying a new Wally file.
+declare -A FILES=(
+  ["config_rv32gc.patch"]="config/rv32gc/config.vh"
+  ["wallypipelinedsoc.patch"]="src/wally/wallypipelinedsoc.sv"
+  ["uncore.patch"]="src/uncore/uncore.sv"
+  ["adrdecs.patch"]="src/mmu/adrdecs.sv"
+)
+
+cmd_update() {
+  echo "==> Syncing Wally submodule (top-level only)..."
+  git -C "$REPO_ROOT" submodule update --init
+
+  echo "==> Resetting Wally to pinned commit..."
+  git -C "$WALLY" checkout .
+
+  echo "==> Applying patches..."
+  APPLIED=0
+  for p in "$PATCH_DIR"/*.patch; do
+    [ -s "$p" ] || continue
+    git -C "$WALLY" apply --check "$p" 2>/dev/null || {
+      echo "    [skip] already applied or conflicts: $(basename "$p")"
+      continue
+    }
+    echo "    $(basename "$p")"
+    git -C "$WALLY" apply "$p"
+    APPLIED=$((APPLIED + 1))
+  done
+  echo "    $APPLIED patch(es) applied."
+  echo "==> Done."
+}
+
+cmd_save() {
+  echo "==> Saving patches from current Wally edits..."
+  CHANGED=0
+  for patch in "${!FILES[@]}"; do
+    wally_file="${FILES[$patch]}"
+    out="$PATCH_DIR/$patch"
+
+    # Skip if the file doesn't exist in the Wally tree yet
+    if [ ! -f "$WALLY/$wally_file" ]; then
+      echo "    [skip] not found in Wally: $wally_file"
+      continue
+    fi
+
+    diff_output=$(git -C "$WALLY" diff -- "$wally_file")
+
+    if [ -z "$diff_output" ]; then
+      continue
+    fi
+
+    echo "    $wally_file -> patch/$patch"
+    echo "$diff_output" > "$out"
+    CHANGED=$((CHANGED + 1))
+  done
+
+  if [ "$CHANGED" -eq 0 ]; then
+    echo "    No changes detected in tracked Wally files."
+  else
+    echo "==> $CHANGED patch file(s) saved. Don't forget to stage and commit them."
+  fi
+}
+
+case "$1" in
+  update) cmd_update ;;
+  save)   cmd_save   ;;
+  *)
+    echo "Usage: ./scripts/wally <command>"
+    echo ""
+    echo "Commands:"
+    echo "  update    sync Wally submodule and apply all patches"
+    echo "  save      regenerate patch files from current wally/ edits"
+    exit 1
+    ;;
+esac
