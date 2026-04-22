@@ -1,0 +1,19 @@
+diff --git a/config/rv32gc/config.vh b/config/rv32gc/config.vh
+index 890bc5208..5e041da9e 100644
+--- a/config/rv32gc/config.vh
++++ b/config/rv32gc/config.vh
+@@ -182,6 +182,14 @@ localparam logic [63:0] UART_RANGE       = 64'h00000007;
+ localparam logic PLIC_SUPPORTED = 1;
+ localparam logic [63:0] PLIC_BASE        = 64'h0C000000;
+ localparam logic [63:0] PLIC_RANGE       = 64'h03FFFFFF;
++// ==========================================================
++localparam logic HYDRA_SUPPORTED             = 1;
++localparam logic [63:0] HYDRA_MMR_BASE       = 64'h2000_0000;
++localparam logic [63:0] HYDRA_MMR_RANGE      = 64'h0000_0FFF;
++localparam logic [63:0] HYDRA_SCRATCH_BASE   = 64'h2001_0000;
++localparam logic [63:0] HYDRA_SCRATCH_RANGE  = 64'h003F_FFFF;
++localparam HYDRA_PLIC_ID                     = 32'd11;
++// ==========================================================
+ localparam logic SDC_SUPPORTED = 0;
+ localparam logic [63:0] SDC_BASE         = 64'h00013000;
+ localparam logic [63:0] SDC_RANGE        = 64'h00000FFF;
