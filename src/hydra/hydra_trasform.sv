@@ -1,8 +1,10 @@
-// HYDRA transformation datapath.
-
-// Implements the AHB master state machine and the dual-MBTB ping-pong
-// buffer for Mode B (matrix transposition) and the combinational
-// quantization pipeline for Mode C.
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+// hydra_transform.sv
+// Rice University — Project HYDRA
+// Author: Giovanni <gs86@rice.edu>
+// Description: Implements the AHB master state machine and the 
+// dual-MBTB ping-pong buffer for Mode B (matrix transposition) 
+// and the combinational quantization pipeline for Mode C.
 
 `timescale 1ns/1ps
 

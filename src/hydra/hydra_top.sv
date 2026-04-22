@@ -1,8 +1,11 @@
-// HYDRA: High-Yield Data Reorganization and Acceleration
-
-// Top-level integration module. Instantiates the arbiter, transform
-// datapath, and MMR register file. Connects to the Wally AHB-Lite bus
-// fabric as a second master alongside the CPU.
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+// hydra_top.sv
+// Rice University — Project HYDRA
+// Author: <name> <netID>@rice.edu
+// Description: Top-level integration module. Instantiates the 
+// arbiter, transform datapath, and MMR register file. Connects
+// to the Wally AHB-Lite bus fabric as a second master alongside 
+// the CPU.
 
 `timescale 1ns/1ps
 

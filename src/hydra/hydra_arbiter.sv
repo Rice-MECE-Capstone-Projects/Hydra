@@ -1,8 +1,11 @@
-// Static-priority bus arbiter.
-
-// CPU cache-fill bursts hold higher priority than HYDRA bulk transfers.
-// Grants the bus to HYDRA only when the CPU has not asserted its own
-// HBUSREQ, or after the CPU's current burst completes.
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+// hydra_arbiter.sv
+// Rice University — Project HYDRA
+// Author: <name> <netID>@rice.edu
+// Description: CPU cache-fill bursts hold higher priority than 
+// HYDRA bulk transfers. Grants the bus to HYDRA only when the 
+// CPU has not asserted its own HBUSREQ, or after the CPU's 
+// current burst completes.
 
 // Grant is registered to prevent combinational loops on HGRANT->HADDR.
 

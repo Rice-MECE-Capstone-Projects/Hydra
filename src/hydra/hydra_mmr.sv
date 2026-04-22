@@ -1,8 +1,10 @@
-// HYDRA Memory-Mapped Register file.
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+// hydra_mmr.sv
+// Rice University — Project HYDRA
+// Author: <name> <netID>@rice.edu
+// Description: Implements an AHB-Lite slave interface through 
+// which the host CPU programs transfer descriptors and reads status.
 
-// Implements an AHB-Lite slave interface through which the host CPU
-// programs transfer descriptors and reads status.
-//
 // Register map (word-addressed, 32-bit):
 //   Offset 0x00 : CTRL    [0]=START [1]=MODE[1:0] (W) / [3]=DONE (R)
 //   Offset 0x04 : SRC     source address
