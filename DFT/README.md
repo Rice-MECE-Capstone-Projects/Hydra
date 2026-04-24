@@ -1,102 +1,167 @@
-# Scan-Based DFT and ATPG Framework
+# Scan-Based DFT and RTL-Level ATPG Framework
 
 ## Overview
 
-This project implements a lightweight scan-based Design-for-Test (DFT) framework at the RTL level to evaluate fault coverage in a pipelined RISC-V processor. The goal is to analyze fault detectability, improve coverage using different strategies, and investigate structural testability limitations.
+This project implements a lightweight scan-based Design-for-Testability (DFT) framework at the RTL level for a pipelined RISC-V processor. The goal is to evaluate stuck-at fault coverage, improve test effectiveness through multiple ATPG strategies, and analyze structural testability limitations in different pipeline stages.
+
+The work focuses on scan-chain controllability, observability, fault injection, response comparison, and coverage improvement.
 
 ---
 
 ## Features
 
-- Scan chain-based fault injection and observation
-- RTL-level ATPG framework (shift / capture / shift-out)
-- Fault coverage evaluation (stuck-at faults)
-- Multiple coverage improvement strategies:
-  - Expanded scan sampling
-  - Multiple iterations
-  - Random pattern generation
-- Targeted debugging for low-testability structures (pipeline reg3)
+- RTL-level scan chain implementation
+- Scan shift / capture / shift-out testing flow
+- Stuck-at fault coverage evaluation
+- Multiple ATPG optimization strategies
+- Pipeline stage-level testability analysis
+- Root-cause debugging for low-coverage structures
+- QuestaSim simulation flow
 
 ---
 
 ## DFT Architecture
 
-The framework consists of three main components:
+The framework consists of the following components:
 
-1. **Pattern Generation**
-   - Deterministic patterns (all-0, all-1, alternating)
-   - Random pattern generation
+1. **Pattern Generator**
+   - Deterministic patterns
+   - Random patterns
 
-2. **Scan Control**
-   - Shift-in: load internal states
-   - Capture: run one cycle of functional logic
-   - Shift-out: observe response
+2. **Scan Controller**
+   - Shift-in test states
+   - Capture functional response
+   - Shift-out scan results
 
-3. **Fault Evaluation**
-   - Compare golden vs faulty outputs
-   - Determine fault detectability
+3. **Fault Comparator**
+   - Golden vs faulty response comparison
+
+4. **Coverage Evaluation**
+   - Fault detection statistics
+   - Coverage reporting
+
+---
+
+## Scan Chain Structure
+
+The processor pipeline registers are connected into one scan chain:
+
+```text
+Scan In -> pipeReg0 -> pipeReg1 -> pipeReg2 -> pipeReg3 -> Scan Out
+```
+
+Approximate chain length: **1604 bits**
 
 ---
 
 ## Methodology
 
-1. Build a scan-based ATPG framework at RTL level  
-2. Measure baseline fault coverage (52.31%)  
-3. Analyze coverage across pipeline stages  
-4. Identify low-testability structure (pipeline reg3)  
-5. Perform targeted debugging using waveform analysis  
-6. Apply coverage improvement strategies on reg0/1/2  
+1. Build RTL-level scan-based ATPG framework
+2. Measure baseline fault coverage
+3. Analyze coverage across pipeline stages
+4. Identify low-testability stage: pipeReg3
+5. Debug pipeReg3 using waveform analysis
+6. Improve coverage on pipeReg0, pipeReg1, and pipeReg2 using multiple strategies
 
 ---
 
 ## Results
 
-| Method                 | Coverage |
-|------------------------|----------|
-| Baseline               | 52.31%   |
-| Expanded Sampling      | 59.33%   |
-| Multiple Iterations    | 64.63%   |
-| Random Patterns        | 70.73%   |
+| Method | Coverage |
+|---|---:|
+| Baseline | 52.31% |
+| Expanded Sampling | 59.33% |
+| Multiple Iterations | 64.63% |
+| Random Patterns | 70.73% |
 
-Conclusion:
-- Coverage improves with pattern diversity
-- Random patterns provide the largest gain
-- Some faults remain undetected due to structural limitations
+### Key Observation
 
----
+Pipeline reg3 showed significantly lower fault coverage than earlier stages.
 
-## Key Insight
+Waveform debugging revealed that faults injected into pipeReg3 are overwritten during the capture phase:
 
-Pipeline reg3 shows significantly lower testability due to functional overwrite during capture**.  
-Injected faults are eliminated before they can propagate, leading to low observability.
+```verilog
+pipeReg3 <= pipeReg3_wire;
+```
 
----
-
-## Example Waveform Analysis
-
-Waveform analysis shows:
-- Fault is successfully injected during shift-in
-- During capture, functional logic overwrites register values
-- No observable difference remains after capture
-
----
-
-## Limitations
-
-- RTL-level fault injection (not gate-level ATPG)
-- Limited observability for certain pipeline stages
-- Strong functional updates reduce fault propagation
-
----
-
-## Future Work
-
-- Apply this methodology to new designs
+As a result, many injected faults disappear before becoming observable.
 
 ---
 
 ## How to Run
 
-### Compile
+This project was verified using **QuestaSim 2023.2**.
+
+### 1. Create Simulation Library
+
+```bash
+vlib work
+```
+
+### 2. Compile All RTL and Testbench Files
+
 ```bash
 vlog +define+SYNTHESIS +incdir+. *.v
+```
+
+This compiles processor RTL, scan logic, and ATPG testbenches.
+
+### 3. Run Baseline Coverage Test
+
+```bash
+vsim -c atpg_scan_lite -do "run -all; quit"
+```
+
+### 4. Run Expanded Sampling Test
+
+```bash
+vsim -c atpg_scan_lite_expand_sampling -do "run -all; quit"
+```
+
+### 5. Run Multiple Iteration Test
+
+```bash
+vsim -c atpg_scan_lite_iterations -do "run -all; quit"
+```
+
+### 6. Run Random Pattern Test
+
+```bash
+vsim -c atpg_scan_lite_random -do "run -all; quit"
+```
+
+### 7. Run Pipeline Reg3 Debug Test
+
+```bash
+vsim atpg_pr3_debug_fields_tb
+run -all
+```
+
+### 8. Open GUI Waveform Mode
+
+```bash
+vsim atpg_pr3_debug_fields_tb
+add wave *
+run -all
+```
+
+---
+
+## Expected Output
+
+- Baseline coverage near 52%
+- Improved coverage up to 70%
+- Waveform evidence showing pipeReg3 overwrite during capture
+
+---
+
+## Limitations
+
+- Certain stages have limited observability
+- Functional overwrite reduces fault propagation
+
+---
+
+## Future Work
+
+- Apply this methodology to new processor designs
