@@ -1,0 +1,257 @@
+QuestaSim-63 vcover 2023.2 Coverage Utility 2023.04 Apr 11 2023
+Start time: 01:47:44 on Apr 22,2026
+vcover report core_cov_smoke.ucdb -cvg -details 
+Coverage Report by instance with details
+
+=================================================================================
+=== Instance: /tb_smoke_riscv32i/dut/u_riscv32i_main/u_core_coverage
+=== Design Unit: work.core_coverage
+=================================================================================
+
+Covergroup Coverage:
+    Covergroups                      1        na        na    34.59%
+        Coverpoints/Crosses          4        na        na        na
+            Covergroup Bins        125        19       106    15.20%
+----------------------------------------------------------------------------------------------------------
+Covergroup                                             Metric       Goal       Bins    Status               
+                                                                                                         
+----------------------------------------------------------------------------------------------------------
+ TYPE /tb_smoke_riscv32i/dut/u_riscv32i_main/u_core_coverage/decoder_cg 
+                                                       34.59%        100          -    Uncovered            
+    covered/total bins:                                    19        125          -                      
+    missing/total bins:                                   106        125          -                      
+    % Hit:                                             15.20%        100          -                      
+    Coverpoint cp_opcode                               54.54%        100          -    Uncovered            
+        covered/total bins:                                 6         11          -                      
+        missing/total bins:                                 5         11          -                      
+        % Hit:                                         54.54%        100          -                      
+    Coverpoint cp_inst_typ                             77.77%        100          -    Uncovered            
+        covered/total bins:                                 7          9          -                      
+        missing/total bins:                                 2          9          -                      
+        % Hit:                                         77.77%        100          -                      
+    Coverpoint cp_branch_fun3                           0.00%        100          -    ZERO                 
+        covered/total bins:                                 0          6          -                      
+        missing/total bins:                                 6          6          -                      
+        % Hit:                                          0.00%        100          -                      
+    Cross x_opcode_insttyp                              6.06%        100          -    Uncovered            
+        covered/total bins:                                 6         99          -                      
+        missing/total bins:                                93         99          -                      
+        % Hit:                                          6.06%        100          -                      
+ Covergroup instance \/tb_smoke_riscv32i/dut/u_riscv32i_main/u_core_coverage/cg  
+                                                       34.59%        100          -    Uncovered            
+    covered/total bins:                                    19        125          -                      
+    missing/total bins:                                   106        125          -                      
+    % Hit:                                             15.20%        100          -                      
+    Coverpoint cp_opcode                               54.54%        100          -    Uncovered            
+        covered/total bins:                                 6         11          -                      
+        missing/total bins:                                 5         11          -                      
+        % Hit:                                         54.54%        100          -                      
+        bin r_type                                          0          1          -    ZERO                 
+        bin i_type_a                                      998          1          -    Covered              
+        bin b_type                                          0          1          -    ZERO                 
+        bin u_lui                                           1          1          -    Covered              
+        bin u_auipc                                         0          1          -    ZERO                 
+        bin j_type                                        497          1          -    Covered              
+        bin fence                                           2          1          -    Covered              
+        bin load                                            0          1          -    ZERO                 
+        bin store                                           1          1          -    Covered              
+        bin jalr                                            0          1          -    ZERO                 
+        bin system                                          2          1          -    Covered              
+    Coverpoint cp_inst_typ                             77.77%        100          -    Uncovered            
+        covered/total bins:                                 7          9          -                      
+        missing/total bins:                                 2          9          -                      
+        % Hit:                                         77.77%        100          -                      
+        bin r_type                                          0          1          -    ZERO                 
+        bin i_type                                        998          1          -    Covered              
+        bin i_sys                                           2          1          -    Covered              
+        bin s_type                                          1          1          -    Covered              
+        bin b_type                                          0          1          -    ZERO                 
+        bin u_type                                          1          1          -    Covered              
+        bin j_type                                        497          1          -    Covered              
+        bin f_type                                          2          1          -    Covered              
+        bin unknown                                       498          1          -    Covered              
+    Coverpoint cp_branch_fun3                           0.00%        100          -    ZERO                 
+        covered/total bins:                                 0          6          -                      
+        missing/total bins:                                 6          6          -                      
+        % Hit:                                          0.00%        100          -                      
+        bin beq                                             0          1          -    ZERO                 
+        bin bne                                             0          1          -    ZERO                 
+        bin blt                                             0          1          -    ZERO                 
+        bin bge                                             0          1          -    ZERO                 
+        bin bltu                                            0          1          -    ZERO                 
+        bin bgeu                                            0          1          -    ZERO                 
+    Cross x_opcode_insttyp                              6.06%        100          -    Uncovered            
+        covered/total bins:                                 6         99          -                      
+        missing/total bins:                                93         99          -                      
+        % Hit:                                          6.06%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <fence,f_type>                              2          1          -    Covered              
+            bin <j_type,j_type>                           497          1          -    Covered              
+            bin <u_lui,u_type>                              1          1          -    Covered              
+            bin <store,s_type>                              1          1          -    Covered              
+            bin <system,i_sys>                              2          1          -    Covered              
+            bin <i_type_a,i_type>                         998          1          -    Covered              
+            bin <jalr,*>                                    0          1          9    ZERO                 
+            bin <load,*>                                    0          1          9    ZERO                 
+            bin <u_auipc,*>                                 0          1          9    ZERO                 
+            bin <b_type,*>                                  0          1          9    ZERO                 
+            bin <r_type,*>                                  0          1          9    ZERO                 
+            bin <*,unknown>                                 0          1         11    ZERO                 
+            bin <*,b_type>                                  0          1         11    ZERO                 
+            bin <*,r_type>                                  0          1         11    ZERO                 
+            bin <system,f_type>                             0          1          1    ZERO                 
+            bin <store,f_type>                              0          1          1    ZERO                 
+            bin <j_type,f_type>                             0          1          1    ZERO                 
+            bin <u_lui,f_type>                              0          1          1    ZERO                 
+            bin <i_type_a,f_type>                           0          1          1    ZERO                 
+            bin <system,j_type>                             0          1          1    ZERO                 
+            bin <store,j_type>                              0          1          1    ZERO                 
+            bin <fence,j_type>                              0          1          1    ZERO                 
+            bin <u_lui,j_type>                              0          1          1    ZERO                 
+            bin <i_type_a,j_type>                           0          1          1    ZERO                 
+            bin <system,u_type>                             0          1          1    ZERO                 
+            bin <store,u_type>                              0          1          1    ZERO                 
+            bin <fence,u_type>                              0          1          1    ZERO                 
+            bin <j_type,u_type>                             0          1          1    ZERO                 
+            bin <i_type_a,u_type>                           0          1          1    ZERO                 
+            bin <system,s_type>                             0          1          1    ZERO                 
+            bin <fence,s_type>                              0          1          1    ZERO                 
+            bin <j_type,s_type>                             0          1          1    ZERO                 
+            bin <u_lui,s_type>                              0          1          1    ZERO                 
+            bin <i_type_a,s_type>                           0          1          1    ZERO                 
+            bin <store,i_sys>                               0          1          1    ZERO                 
+            bin <fence,i_sys>                               0          1          1    ZERO                 
+            bin <j_type,i_sys>                              0          1          1    ZERO                 
+            bin <u_lui,i_sys>                               0          1          1    ZERO                 
+            bin <i_type_a,i_sys>                            0          1          1    ZERO                 
+            bin <system,i_type>                             0          1          1    ZERO                 
+            bin <store,i_type>                              0          1          1    ZERO                 
+            bin <fence,i_type>                              0          1          1    ZERO                 
+            bin <j_type,i_type>                             0          1          1    ZERO                 
+            bin <u_lui,i_type>                              0          1          1    ZERO                 
+
+COVERGROUP COVERAGE:
+----------------------------------------------------------------------------------------------------------
+Covergroup                                             Metric       Goal       Bins    Status               
+                                                                                                         
+----------------------------------------------------------------------------------------------------------
+ TYPE /tb_smoke_riscv32i/dut/u_riscv32i_main/u_core_coverage/decoder_cg 
+                                                       34.59%        100          -    Uncovered            
+    covered/total bins:                                    19        125          -                      
+    missing/total bins:                                   106        125          -                      
+    % Hit:                                             15.20%        100          -                      
+    Coverpoint cp_opcode                               54.54%        100          -    Uncovered            
+        covered/total bins:                                 6         11          -                      
+        missing/total bins:                                 5         11          -                      
+        % Hit:                                         54.54%        100          -                      
+    Coverpoint cp_inst_typ                             77.77%        100          -    Uncovered            
+        covered/total bins:                                 7          9          -                      
+        missing/total bins:                                 2          9          -                      
+        % Hit:                                         77.77%        100          -                      
+    Coverpoint cp_branch_fun3                           0.00%        100          -    ZERO                 
+        covered/total bins:                                 0          6          -                      
+        missing/total bins:                                 6          6          -                      
+        % Hit:                                          0.00%        100          -                      
+    Cross x_opcode_insttyp                              6.06%        100          -    Uncovered            
+        covered/total bins:                                 6         99          -                      
+        missing/total bins:                                93         99          -                      
+        % Hit:                                          6.06%        100          -                      
+ Covergroup instance \/tb_smoke_riscv32i/dut/u_riscv32i_main/u_core_coverage/cg  
+                                                       34.59%        100          -    Uncovered            
+    covered/total bins:                                    19        125          -                      
+    missing/total bins:                                   106        125          -                      
+    % Hit:                                             15.20%        100          -                      
+    Coverpoint cp_opcode                               54.54%        100          -    Uncovered            
+        covered/total bins:                                 6         11          -                      
+        missing/total bins:                                 5         11          -                      
+        % Hit:                                         54.54%        100          -                      
+        bin r_type                                          0          1          -    ZERO                 
+        bin i_type_a                                      998          1          -    Covered              
+        bin b_type                                          0          1          -    ZERO                 
+        bin u_lui                                           1          1          -    Covered              
+        bin u_auipc                                         0          1          -    ZERO                 
+        bin j_type                                        497          1          -    Covered              
+        bin fence                                           2          1          -    Covered              
+        bin load                                            0          1          -    ZERO                 
+        bin store                                           1          1          -    Covered              
+        bin jalr                                            0          1          -    ZERO                 
+        bin system                                          2          1          -    Covered              
+    Coverpoint cp_inst_typ                             77.77%        100          -    Uncovered            
+        covered/total bins:                                 7          9          -                      
+        missing/total bins:                                 2          9          -                      
+        % Hit:                                         77.77%        100          -                      
+        bin r_type                                          0          1          -    ZERO                 
+        bin i_type                                        998          1          -    Covered              
+        bin i_sys                                           2          1          -    Covered              
+        bin s_type                                          1          1          -    Covered              
+        bin b_type                                          0          1          -    ZERO                 
+        bin u_type                                          1          1          -    Covered              
+        bin j_type                                        497          1          -    Covered              
+        bin f_type                                          2          1          -    Covered              
+        bin unknown                                       498          1          -    Covered              
+    Coverpoint cp_branch_fun3                           0.00%        100          -    ZERO                 
+        covered/total bins:                                 0          6          -                      
+        missing/total bins:                                 6          6          -                      
+        % Hit:                                          0.00%        100          -                      
+        bin beq                                             0          1          -    ZERO                 
+        bin bne                                             0          1          -    ZERO                 
+        bin blt                                             0          1          -    ZERO                 
+        bin bge                                             0          1          -    ZERO                 
+        bin bltu                                            0          1          -    ZERO                 
+        bin bgeu                                            0          1          -    ZERO                 
+    Cross x_opcode_insttyp                              6.06%        100          -    Uncovered            
+        covered/total bins:                                 6         99          -                      
+        missing/total bins:                                93         99          -                      
+        % Hit:                                          6.06%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <fence,f_type>                              2          1          -    Covered              
+            bin <j_type,j_type>                           497          1          -    Covered              
+            bin <u_lui,u_type>                              1          1          -    Covered              
+            bin <store,s_type>                              1          1          -    Covered              
+            bin <system,i_sys>                              2          1          -    Covered              
+            bin <i_type_a,i_type>                         998          1          -    Covered              
+            bin <jalr,*>                                    0          1          9    ZERO                 
+            bin <load,*>                                    0          1          9    ZERO                 
+            bin <u_auipc,*>                                 0          1          9    ZERO                 
+            bin <b_type,*>                                  0          1          9    ZERO                 
+            bin <r_type,*>                                  0          1          9    ZERO                 
+            bin <*,unknown>                                 0          1         11    ZERO                 
+            bin <*,b_type>                                  0          1         11    ZERO                 
+            bin <*,r_type>                                  0          1         11    ZERO                 
+            bin <system,f_type>                             0          1          1    ZERO                 
+            bin <store,f_type>                              0          1          1    ZERO                 
+            bin <j_type,f_type>                             0          1          1    ZERO                 
+            bin <u_lui,f_type>                              0          1          1    ZERO                 
+            bin <i_type_a,f_type>                           0          1          1    ZERO                 
+            bin <system,j_type>                             0          1          1    ZERO                 
+            bin <store,j_type>                              0          1          1    ZERO                 
+            bin <fence,j_type>                              0          1          1    ZERO                 
+            bin <u_lui,j_type>                              0          1          1    ZERO                 
+            bin <i_type_a,j_type>                           0          1          1    ZERO                 
+            bin <system,u_type>                             0          1          1    ZERO                 
+            bin <store,u_type>                              0          1          1    ZERO                 
+            bin <fence,u_type>                              0          1          1    ZERO                 
+            bin <j_type,u_type>                             0          1          1    ZERO                 
+            bin <i_type_a,u_type>                           0          1          1    ZERO                 
+            bin <system,s_type>                             0          1          1    ZERO                 
+            bin <fence,s_type>                              0          1          1    ZERO                 
+            bin <j_type,s_type>                             0          1          1    ZERO                 
+            bin <u_lui,s_type>                              0          1          1    ZERO                 
+            bin <i_type_a,s_type>                           0          1          1    ZERO                 
+            bin <store,i_sys>                               0          1          1    ZERO                 
+            bin <fence,i_sys>                               0          1          1    ZERO                 
+            bin <j_type,i_sys>                              0          1          1    ZERO                 
+            bin <u_lui,i_sys>                               0          1          1    ZERO                 
+            bin <i_type_a,i_sys>                            0          1          1    ZERO                 
+            bin <system,i_type>                             0          1          1    ZERO                 
+            bin <store,i_type>                              0          1          1    ZERO                 
+            bin <fence,i_type>                              0          1          1    ZERO                 
+            bin <j_type,i_type>                             0          1          1    ZERO                 
+            bin <u_lui,i_type>                              0          1          1    ZERO                 
+
+TOTAL COVERGROUP COVERAGE: 34.59%  COVERGROUP TYPES: 1
+
+Total Coverage By Instance (filtered view): 34.59%
+
+End time: 01:47:44 on Apr 22,2026, Elapsed time: 0:00:00
+Errors: 0, Warnings: 0
