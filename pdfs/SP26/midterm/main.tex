@@ -22,8 +22,8 @@
     Nafil Atiq\IEEEauthorrefmark{1},
     Ruohan Dong\IEEEauthorrefmark{1},
     Matthew Nutt\IEEEauthorrefmark{1},
-    Ithzel Toscano\IEEEauthorrefmark{1},
     Giovanni Sirtori\IEEEauthorrefmark{1},
+    Ithzel Toscano\IEEEauthorrefmark{1},
     Yulia Zhou\IEEEauthorrefmark{1}
 }
 
@@ -31,7 +31,7 @@
     \IEEEauthorrefmark{1}%
     Department of Electrical \& Computer Engineering \\
     Rice University, Houston, Texas \\
-    \{na115, rd100, mcn5, ijt2, gs86, yz305\}@rice.edu}
+    \{na115, rd100, mcn5, gs86, ijt2, yz305\}@rice.edu}
 }
 
 \maketitle
@@ -112,7 +112,7 @@ Main RAM         & \texttt{0x8000\_0000} & 128 MB & Cached (I\$/D\$) \\
 
 \begin{figure}[h]
 \centering
-\fbox{\includegraphics[width=0.8\linewidth]{HYDRA.png}}
+\fbox{\includegraphics[width=0.8\linewidth]{figures/HYDRA_diag.png}}
 \caption{Full system block diagram.}
 \end{figure}
 
@@ -128,13 +128,13 @@ First, the correctness of the scan chain was verified by shifting test patterns 
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.8\linewidth]{1.png}
+\includegraphics[width=0.8\linewidth]{midterm/figures/ATPG_verif.png}
 \caption{Scan shift verification.}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.8\linewidth]{2.png}
+\includegraphics[width=0.8\linewidth]{figures/ATPG_scan.png}
 \caption{Scan-in and scan-out behavior.}
 \end{figure}
 
@@ -144,7 +144,7 @@ After verifying scan functionality, the scan-based fault testing framework was e
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.8\linewidth]{fpga.png}
+\includegraphics[width=0.8\linewidth]{figures/ATPG_fpga.png}
 \caption{Scan-based fault testing results.}
 \end{figure}
 
