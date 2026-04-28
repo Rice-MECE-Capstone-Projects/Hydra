@@ -1,0 +1,1008 @@
+m255
+K4
+z2
+Z0 !s12c _opt1
+Z1 !s99 nomlopt
+Z2 !s12c _opt2
+R1
+R0
+R1
+R2
+R1
+Z3 !s12c _opt
+R1
+R3
+R1
+R0
+R1
+R2
+R1
+R2
+R1
+R3
+R1
+R3
+R1
+R0
+R1
+R3
+R1
+R3
+R1
+R0
+R1
+R3
+R1
+R2
+R1
+R2
+R1
+R0
+R1
+R2
+R1
+R0
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R2
+R1
+R2
+R1
+R3
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R3
+R1
+!s11f MIXED_VERSIONS
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z4 d/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE
+T_opt
+!s110 1777273485
+VMd9WQQ>b0o?TKbkcjK6SL0
+Z5 04 17 4 work tb_smoke_riscv32i fast 0
+=1-d09466164d60-69ef0a8d-7c9b-27a163
+R1
+Z6 !s12b OEM100
+Z7 !s124 OEM100
+Z8 o-quiet -auto_acc_if_foreign -work work
+Z9 tCvgOpt 0
+n@_opt
+Z10 OL;O;2023.2;77
+R4
+T_opt1
+!s110 1777352152
+VlZ1[DnnS1XRc0dD<gDKY^2
+R5
+=1-d094661828ee-69f03dd7-dd4b8-2c762d
+R1
+R6
+R7
+R8
+R9
+n@_opt1
+R10
+T_opt2
+!s110 1777352014
+Ve?X_HjC@<:9J1Ven38:3R3
+R5
+=1-d094661828ee-69f03d4e-5d395-2c7349
+R1
+R6
+R7
+o-quiet -auto_acc_if_foreign -work work -debugdb
+R9
+n@_opt2
+R10
+R4
+valu_scoreboard
+2/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/alu_scoreboard.sv
+Z11 DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
+!s110 1777351840
+!i10b 1
+!s100 QQ?AlQKjcc_9ImYR@KTiV3
+IPYe0gWhj<^H0J7B>NcOW33
+S1
+Z12 d/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE
+w1777351052
+8/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/alu_scoreboard.sv
+F/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/alu_scoreboard.sv
+!i122 691
+L0 3 118
+Z13 VDg1SIo80bB@j0V0VzS_@n1
+Z14 OL;L;2023.2;77
+r1
+!s85 0
+31
+!s108 1777351840.000000
+!s107 /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/alu_scoreboard.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/alu_scoreboard.sv|
+!i113 0
+Z15 o-work work -sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R9
+vbram_ins
+Z16 2/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/tb_smoke_riscv32i.sv
+R11
+Z17 DXx4 work 14 golden_alu_pkg 0 22 b0A99CZO>Lk]fNzG?e_cV2
+Z18 DXx4 work 25 tb_smoke_riscv32i_sv_unit 0 22 U<ccQzCNiGdKWJR1:N=TO0
+Z19 !s110 1777351846
+R13
+r1
+!s85 0
+!i10b 1
+!s100 XQ7@=II6EK5Tn=<OOH]^N0
+IlNB0`[6Ie5HbC3z]78FYm3
+Z20 !s105 tb_smoke_riscv32i_sv_unit
+S1
+R12
+Z21 w1777351701
+Z22 8/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/tb_smoke_riscv32i.sv
+Z23 F/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/tb_smoke_riscv32i.sv
+!i122 703
+L0 326 41
+R14
+31
+Z24 !s108 1777351846.000000
+Z25 !s107 /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/tb_smoke_riscv32i.sv|
+Z26 !s90 -reportprogress|300|-work|work|-vopt|-sv|/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/tb_smoke_riscv32i.sv|
+!i113 0
+R15
+R9
+vbram_mem
+R16
+R11
+R17
+R18
+R19
+R13
+r1
+!s85 0
+!i10b 1
+!s100 _k_]O5U8i1G^d_h_gzK1X0
+I6=zD<i_f`CLeXYL`oa0MH0
+R20
+S1
+R12
+R21
+R22
+R23
+!i122 703
+L0 281 40
+R14
+31
+R24
+R25
+R26
+!i113 0
+R15
+R9
+vbranch_prediction
+2/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE/branch_prediction.v
+!s110 1764477145
+!i10b 1
+!s100 6LzfV?R1Udi:^GcaWNAz?3
+ImzHHYzb9EP1eF[2gZY23c0
+R4
+w1764440570
+8/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE/branch_prediction.v
+F/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE/branch_prediction.v
+!i122 243
+L0 2 110
+R13
+R14
+r1
+!s85 0
+31
+!s108 1764477145.000000
+!s107 /storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE/branch_prediction.v|
+!s90 -reportprogress|300|-work|work|-vopt|+incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE|+incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE_TB|-stats=none|/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE/branch_prediction.v|
+!i113 0
+Z27 o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Z28 !s92 -work work +incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE +incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE_TB -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R9
+vbranch_scoreboard
+2/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/verification/TOP_CORE/branch_scoreboard.sv
+R11
+!s110 1777347867
+!i10b 1
+!s100 OjL2=BYYgkYY5cUcN9[mk0
+I8;;dzBblFJnjK:co5doEP0
+S1
+Z29 d/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/verification/TOP_CORE
+w1777347626
+8/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/verification/TOP_CORE/branch_scoreboard.sv
+F/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/verification/TOP_CORE/branch_scoreboard.sv
+!i122 689
+L0 3 104
+R13
+R14
+r1
+!s85 0
+31
+Z30 !s108 1777347867.000000
+!s107 /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/verification/TOP_CORE/branch_scoreboard.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/verification/TOP_CORE/branch_scoreboard.sv|
+!i113 0
+R15
+R9
+vcore_coverage
+2/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_coverage.sv
+R11
+!s110 1777351841
+!i10b 1
+!s100 ZPfHehFLTizGznhEYL`WM1
+IITQSecW@Z]BAbF=gL;4mA0
+S1
+R12
+w1777351269
+8/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_coverage.sv
+F/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_coverage.sv
+!i122 694
+L0 119 166
+R13
+R14
+r1
+!s85 0
+31
+Z31 !s108 1777351841.000000
+!s107 /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_coverage.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_coverage.sv|
+!i113 0
+R15
+R9
+Ycore_if
+2/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_if.sv
+R11
+Z32 !s110 1777351842
+!i10b 1
+!s100 Y3T3YC=EHd>g;WD<UB5X53
+IVfh7bh3Ji070=ESP5]A?c3
+S1
+R12
+w1777351564
+8/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_if.sv
+F/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_if.sv
+!i122 695
+Z33 L0 1 0
+R13
+R14
+r1
+!s85 0
+31
+R31
+!s107 /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_if.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_if.sv|
+!i113 0
+R15
+R9
+Xcore_smoke_test_pkg
+2/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test_pkg.sv
+Z34 !s115 core_if
+R11
+Z35 DXx6 mtiUvm 7 uvm_pkg 0 22 8V[`8]Q0W57le7Z>zYaAj1
+Z36 !s110 1777351844
+!i10b 1
+!s100 BUR^B@Pn56Qd;f0hJaQ>c1
+IGJ@emFl1SiXmS]9O2F5Nj2
+S1
+R12
+w1777351614
+8/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test_pkg.sv
+F/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test_pkg.sv
+Z37 F/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/uvm_macros.svh
+Z38 F/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_version_defines.svh
+Z39 F/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_message_defines.svh
+Z40 F/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_phase_defines.svh
+Z41 F/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_object_defines.svh
+Z42 F/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_printer_defines.svh
+Z43 F/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_tlm_defines.svh
+Z44 F/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/tlm1/uvm_tlm_imps.svh
+Z45 F/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_sequence_defines.svh
+Z46 F/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_callback_defines.svh
+Z47 F/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_reg_defines.svh
+Z48 F/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_deprecated_defines.svh
+Z49 F/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test.sv
+!i122 697
+R33
+VGJ@emFl1SiXmS]9O2F5Nj2
+R14
+r1
+!s85 0
+31
+!s108 1777351843.000000
+!s107 /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test.sv|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_deprecated_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_reg_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_callback_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_sequence_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/tlm1/uvm_tlm_imps.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_tlm_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_printer_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_object_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_phase_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_message_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_version_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/uvm_macros.svh|/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test_pkg.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test_pkg.sv|
+!i113 0
+R15
+R9
+Xcore_smoke_test_sv_unit
+2/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test.sv
+R34
+R11
+R35
+R32
+VhGk`EYEGE@DljBG?T5=cz1
+r1
+!s85 0
+!i10b 1
+!s100 cPn?XnH2Rab0CZdGI3c8l1
+IhGk`EYEGE@DljBG?T5=cz1
+!i103 1
+S1
+R12
+w1777351461
+8/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test.sv
+R49
+R37
+R38
+R39
+R40
+R41
+R42
+R43
+R44
+R45
+R46
+R47
+R48
+!i122 696
+L0 5 0
+R14
+31
+!s108 1777351842.000000
+!s107 /clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_deprecated_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_reg_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_callback_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_sequence_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/tlm1/uvm_tlm_imps.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_tlm_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_printer_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_object_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_phase_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_message_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_version_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/uvm_macros.svh|/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test.sv|
+!i113 0
+R15
+R9
+vdataMem
+Z50 2/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/riscv32i.v
+R19
+!i10b 1
+!s100 eU;Kc1Vd>85=A9:3d>_k61
+IS_VYKZ;53OoHki:GM6W0g0
+R12
+Z51 w1777350842
+Z52 8/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/riscv32i.v
+Z53 F/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/riscv32i.v
+!i122 702
+L0 2030 211
+R13
+R14
+r1
+!s85 0
+31
+R24
+Z54 !s107 /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/riscv32i.v|
+Z55 !s90 -reportprogress|300|-work|work|-vopt|/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/riscv32i.v|
+!i113 0
+R27
+R9
+ndata@mem
+vdecode
+R50
+R19
+!i10b 1
+!s100 PfdV^g8eN]o9N>bH@i=iJ1
+IC`8SZCe`<hO0La2l;:f5T2
+R12
+R51
+R52
+R53
+!i122 702
+L0 901 403
+R13
+R14
+r1
+!s85 0
+31
+R24
+R54
+R55
+!i113 0
+R27
+R9
+vdecoder_scoreboard
+2/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/decoder_scoreboard.sv
+R11
+R36
+!i10b 1
+!s100 gh9]8XXLWXk`?XlzaXT:g3
+IG9TLQWG9G<AfX>[21k_0m2
+S1
+R12
+w1777350965
+8/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/decoder_scoreboard.sv
+F/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/decoder_scoreboard.sv
+!i122 698
+L0 1 73
+R13
+R14
+r1
+!s85 0
+31
+!s108 1777351844.000000
+!s107 /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/decoder_scoreboard.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/decoder_scoreboard.sv|
+!i113 0
+R15
+R9
+vend_write
+R50
+R19
+!i10b 1
+!s100 BY]Aba_029JM_lECAGUkZ3
+ICgh:i1>:9CWA>>WcacCi50
+R12
+R51
+R52
+R53
+!i122 702
+L0 2245 50
+R13
+R14
+r1
+!s85 0
+31
+R24
+R54
+R55
+!i113 0
+R27
+R9
+vexecute
+R50
+R19
+!i10b 1
+!s100 GMDX01:d=H:nENGFkUGiD0
+I9SL;dFLTRY[?dN`H;E@oa3
+R12
+R51
+R52
+R53
+!i122 702
+L0 1391 577
+R13
+R14
+r1
+!s85 0
+31
+R24
+R54
+R55
+!i113 0
+R27
+R9
+Xgolden_alu_pkg
+2/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/golden_alu_pkg.sv
+R11
+Z56 !s110 1777351845
+!i10b 1
+!s100 X4PKGXmfZFSUcD3P14WM?3
+Ib0A99CZO>Lk]fNzG?e_cV2
+S1
+R12
+w1777351030
+8/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/golden_alu_pkg.sv
+F/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/golden_alu_pkg.sv
+!i122 699
+Z57 L0 122 0
+Vb0A99CZO>Lk]fNzG?e_cV2
+R14
+r1
+!s85 0
+31
+Z58 !s108 1777351845.000000
+!s107 /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/golden_alu_pkg.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/golden_alu_pkg.sv|
+!i113 0
+R15
+R9
+Xgolden_decoder_pkg
+2/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/golden_decocder.sv
+R11
+R56
+!i10b 1
+!s100 2aR@>OU]g97ZR?mzZDHe;3
+IEQl=UTimC=dS7<QUm8T6i1
+S1
+R12
+w1777350874
+8/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/golden_decocder.sv
+F/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/golden_decocder.sv
+!i122 700
+R57
+VEQl=UTimC=dS7<QUm8T6i1
+R14
+r1
+!s85 0
+31
+R58
+!s107 /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/golden_decocder.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/golden_decocder.sv|
+!i113 0
+R15
+R9
+vhazard
+R50
+R19
+!i10b 1
+!s100 ^LOU34Q<zmCLTBTPnfBK42
+I]=9[m:LQE?emKBbDho?<X0
+R12
+R51
+R52
+R53
+!i122 702
+L0 2301 88
+R13
+R14
+r1
+!s85 0
+31
+R24
+R54
+R55
+!i113 0
+R27
+R9
+vins_mem
+R50
+R19
+!i10b 1
+!s100 QFa3LMD09iRMM[UNnQNAU2
+I`_cS[G4IgE5cbljeBOk=K3
+R12
+R51
+R52
+R53
+!i122 702
+L0 859 34
+R13
+R14
+r1
+!s85 0
+31
+R24
+R54
+R55
+!i113 0
+R27
+R9
+vins_mem_model
+2/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/ins_mem_model.sv
+R11
+R56
+!i10b 1
+!s100 jnKfk6ZFnd`i4jC^>WS]91
+I4_MGK9ld9[:>h<]:09CZH2
+S1
+R12
+w1777351538
+8/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/ins_mem_model.sv
+F/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/ins_mem_model.sv
+!i122 701
+L0 1 18
+R13
+R14
+r1
+!s85 0
+31
+R58
+!s107 /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/ins_mem_model.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/ins_mem_model.sv|
+!i113 0
+R15
+R9
+vinst_mem_bram_wrapper
+Z59 2/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE/riscv32i.v
+Z60 !s110 1764477147
+!i10b 1
+!s100 PZzS]>OZKQA6j6=^=7<JB2
+IWFg3]EOBVGBL:PLLMnb9>0
+R4
+Z61 w1764440608
+Z62 8/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE/riscv32i.v
+Z63 F/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE/riscv32i.v
+!i122 251
+L0 781 80
+R13
+R14
+r1
+!s85 0
+31
+Z64 !s108 1764477147.000000
+Z65 !s107 /storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE/params.vh|/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE/riscv32i.v|
+Z66 !s90 -reportprogress|300|-work|work|-vopt|+incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE|+incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE_TB|-stats=none|/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE/riscv32i.v|
+!i113 0
+R27
+R28
+R9
+vinst_mem_bram_wrapper_test_purpoeses
+!s110 1764370119
+!i10b 1
+!s100 70m=:oIh=<jgINGNePabn1
+IBE<ACS94e`cN_jMNH>^Qn2
+R4
+w1764367593
+R62
+R63
+!i122 24
+L0 938 110
+R13
+R14
+r1
+!s85 0
+31
+!s108 1764370119.000000
+R65
+R66
+!i113 0
+R27
+R28
+R9
+vpc
+R50
+R19
+!i10b 1
+!s100 ;Tb`=>[F@UcWPY3Z6TnDY0
+ICM3IAieO>XG8gDg`mU7>80
+R12
+R51
+R52
+R53
+!i122 702
+L0 1971 46
+R13
+R14
+r1
+!s85 0
+31
+R24
+R54
+R55
+!i113 0
+R27
+R9
+vpulse_generator
+R50
+R19
+!i10b 1
+!s100 ;lzegNUadkSMP>VG@=z<N2
+Im0I4R^_C5YS3UH;`aMX2l0
+R12
+R51
+R52
+R53
+!i122 702
+L0 837 18
+R13
+R14
+r1
+!s85 0
+31
+R24
+R54
+R55
+!i113 0
+R27
+R9
+vreg_file
+R50
+R19
+!i10b 1
+!s100 YKHBh;T4;4>ULPCVCXk@a1
+I4kLa5Vi2P7H[zNmg_kKeZ1
+R12
+R51
+R52
+R53
+!i122 702
+L0 1320 67
+R13
+R14
+r1
+!s85 0
+31
+R24
+R54
+R55
+!i113 0
+R27
+R9
+vriscv32i
+R50
+R19
+!i10b 1
+!s100 FY4@?Q>?XnXF1c0hiG>m:3
+IzcYi6aBoLJVQF`QHGbBLm0
+R12
+R51
+R52
+R53
+!i122 702
+L0 142 140
+R13
+R14
+r1
+!s85 0
+31
+R24
+R54
+R55
+!i113 0
+R27
+R9
+vriscv32i_main
+R50
+R19
+!i10b 1
+!s100 oBNEGLkcG8zTejHUfPT7j3
+I00MaSGR7@?7[ESe0aV6Gg2
+R12
+R51
+R52
+R53
+!i122 702
+L0 286 548
+R13
+R14
+r1
+!s85 0
+31
+R24
+R54
+R55
+!i113 0
+R27
+R9
+vriscv32iTB
+2/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE/riscv32iTB.v
+!s110 1764478932
+!i10b 1
+!s100 gYb;3>2?=[m]LkeHZY`D53
+I83o<G0Z2UzmTa>C9e8Foz1
+R4
+w1764440614
+8/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE/riscv32iTB.v
+F/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE/riscv32iTB.v
+!i122 263
+L0 3 211
+R13
+R14
+r1
+!s85 0
+31
+!s108 1764478931.000000
+!s107 /storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE/riscv32iTB.v|
+!s90 -reportprogress|300|-work|work|-vopt|+incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE|+incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE_TB|-stats=none|/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE/riscv32iTB.v|
+!i113 0
+R27
+R28
+R9
+nriscv32i@t@b
+vtb_decoder_scoreboard
+2/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/tb_smoke_riscv32i.sv
+R11
+DXx4 work 18 golden_decoder_pkg 0 22 S>nIQ_fG2=g^>Q;O2TK?P3
+!s110 1777347868
+!i10b 1
+!s100 ;AH[FTY5XkmFVbn^fBLnj3
+I?3hf@@>KHki<6M5_mX4Xe2
+S1
+R29
+w1777347768
+8/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/tb_smoke_riscv32i.sv
+F/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/tb_smoke_riscv32i.sv
+!i122 690
+L0 3 148
+R13
+R14
+r1
+!s85 0
+31
+R30
+!s107 /storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/tb_smoke_riscv32i.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/tb_smoke_riscv32i.sv|
+!i113 0
+R15
+R9
+Xtb_decoder_scoreboard_sv_unit
+2/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/tb_decoder_scoreboard.sv
+R11
+DXx4 work 18 golden_decoder_pkg 0 22 DRT=9734HnODT6MJ`QT5m3
+!s110 1764560392
+V1F61VdcRZdnKg3SdK92De0
+r1
+!s85 0
+!i10b 1
+!s100 DX<7KWV:RJFJC[U::aFi=2
+I1F61VdcRZdnKg3SdK92De0
+!i103 1
+S1
+R4
+w1764560382
+8/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/tb_decoder_scoreboard.sv
+F/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/tb_decoder_scoreboard.sv
+!i122 320
+Z67 L0 3 0
+R14
+31
+!s108 1764560392.000000
+!s107 /storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/tb_decoder_scoreboard.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|+incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE|-stats=none|/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/tb_decoder_scoreboard.sv|
+!i113 0
+R15
+!s92 -work work -sv +incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R9
+vtb_smoke_riscv32i
+R16
+R11
+R17
+R18
+R19
+R13
+r1
+!s85 0
+!i10b 1
+!s100 0e6De_LgAn?<dh^YN9DXg1
+IZ8]^=KV@3GEQkj_V=65oU2
+R20
+S1
+R12
+R21
+R22
+R23
+!i122 703
+L0 4 272
+R14
+31
+R24
+R25
+R26
+!i113 0
+R15
+R9
+Xtb_smoke_riscv32i_sv_unit
+R16
+R11
+R17
+R19
+VU<ccQzCNiGdKWJR1:N=TO0
+r1
+!s85 0
+!i10b 1
+!s100 mI`1?nJRimfkaba=B4^HH2
+IU<ccQzCNiGdKWJR1:N=TO0
+!i103 1
+S1
+R12
+R21
+R22
+R23
+!i122 703
+L0 2 0
+R14
+31
+R24
+R25
+R26
+!i113 0
+R15
+R9
+vtb_top
+Z68 2/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE_TB/tb_top.sv
+R11
+R35
+Z69 DXx4 work 19 core_smoke_test_pkg 0 22 nAE6eW?R0W>D@MOPhzmSU1
+DXx4 work 14 tb_top_sv_unit 0 22 HMV7a_=mWiH`WEXIjzNPB1
+Z70 !s110 1777347857
+R13
+r1
+!s85 0
+!i10b 1
+!s100 E1jS]SVZQ3hQUGT4?f_PM1
+IBYK@J>fN]a;^11hRRVBl93
+!s105 tb_top_sv_unit
+S1
+R29
+Z71 w1764476549
+Z72 8/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE_TB/tb_top.sv
+Z73 F/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE_TB/tb_top.sv
+!i122 678
+L0 8 86
+R14
+31
+Z74 !s108 1777347856.000000
+Z75 !s107 /storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE_TB/core_if.sv|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_deprecated_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_reg_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_callback_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_sequence_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/tlm1/uvm_tlm_imps.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_tlm_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_printer_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_object_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_phase_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_message_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_version_defines.svh|/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/uvm_macros.svh|/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE_TB/tb_top.sv|
+Z76 !s90 -reportprogress|300|-work|work|-vopt|-sv|+incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE|+incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE_TB|-stats=none|/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE_TB/tb_top.sv|
+!i113 0
+R15
+Z77 !s92 -work work -sv +incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE +incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE_TB -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R9
+Xtb_top_sv_unit
+R68
+R11
+R35
+R69
+R70
+VHMV7a_=mWiH`WEXIjzNPB1
+r1
+!s85 0
+!i10b 1
+!s100 3FMgGTlR1V:`b;5;DOYYR0
+IHMV7a_=mWiH`WEXIjzNPB1
+!i103 1
+S1
+R29
+R71
+R72
+R73
+R37
+R38
+R39
+R40
+R41
+R42
+R43
+R44
+R45
+R46
+R47
+R48
+F/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE_TB/core_if.sv
+!i122 678
+R67
+R14
+31
+R74
+R75
+R76
+!i113 0
+R15
+R77
+R9
+vtimed_pulse
+R59
+R60
+!i10b 1
+!s100 `@Z`Ed`m4`dYdY@2WN6]33
+IbfaJ^]mY[^LQ0YIV;QeEg1
+R4
+R61
+R62
+R63
+!i122 251
+L0 865 98
+R13
+R14
+r1
+!s85 0
+31
+R64
+R65
+R66
+!i113 0
+R27
+R28
+R9

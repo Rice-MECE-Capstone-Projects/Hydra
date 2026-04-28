@@ -74,14 +74,11 @@ Top level modules:
 
 } {} {}} /storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/tb_smoke_riscv32i.sv {1 {vlog -work work -vopt -sv -stats=none /storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/tb_smoke_riscv32i.sv
 QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
--- Compiling package tb_smoke_riscv32i_sv_unit
--- Importing package golden_alu_pkg
--- Compiling module tb_smoke_riscv32i
--- Compiling module bram_mem
--- Compiling module bram_ins
+-- Compiling module tb_decoder_scoreboard
+-- Importing package golden_decoder_pkg
 
 Top level modules:
-	tb_smoke_riscv32i
+	tb_decoder_scoreboard
 
 } {} {}} /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/verification/TOP_CORE/alu_scoreboard.sv {1 {vlog -work work -vopt -sv -stats=none /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/verification/TOP_CORE/alu_scoreboard.sv
 QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
