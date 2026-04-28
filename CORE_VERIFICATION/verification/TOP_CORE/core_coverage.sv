@@ -116,16 +116,23 @@
 
 `endif
 
-
 module core_coverage (
-    input logic       clk,
-    input logic       reset,
-    input logic       valid,
+    input logic        clk,
+    input logic        reset,
+    input logic        valid,
 
     // decoder signals
-    input logic [6:0] opcode,
-    input logic [6:0] inst_typ,
-    input logic [2:0] fun3
+    input logic [6:0]  opcode,
+    input logic [6:0]  inst_typ,
+    input logic [2:0]  fun3,
+
+    // ALU / execute signals
+    input logic [63:0] single_instruction,
+    input logic [31:0] alu_result_1,
+    input logic [31:0] alu_result_2,
+    input logic        branch_taken,
+    input logic        jump_taken,
+    input logic        reg_write
 );
 
     covergroup decoder_cg @(posedge clk iff (valid && !reset));
@@ -170,6 +177,108 @@ module core_coverage (
 
     endgroup
 
-    decoder_cg cg = new();
+
+    covergroup alu_cg @(posedge clk iff (valid && !reset));
+
+        cp_alu_instruction : coverpoint single_instruction {
+            bins add_sub[] = {
+                `inst_ADD,
+                `inst_SUB,
+                `inst_ADDI
+            };
+
+            bins logic_ops[] = {
+                `inst_XOR,
+                `inst_OR,
+                `inst_AND,
+                `inst_XORI,
+                `inst_ORI,
+                `inst_ANDI
+            };
+
+            bins shift_ops[] = {
+                `inst_SLL,
+                `inst_SRL,
+                `inst_SRA,
+                `inst_SLLI,
+                `inst_SRLI,
+                `inst_SRAI
+            };
+
+            bins compare_ops[] = {
+                `inst_SLT,
+                `inst_SLTU,
+                `inst_SLTI,
+                `inst_SLTIU
+            };
+
+            bins mem_addr_ops[] = {
+                `inst_LB,
+                `inst_LH,
+                `inst_LW,
+                `inst_LBU,
+                `inst_LHU,
+                `inst_SB,
+                `inst_SH,
+                `inst_SW
+            };
+
+            bins branch_ops[] = {
+                `inst_BEQ,
+                `inst_BNE,
+                `inst_BLT,
+                `inst_BGE,
+                `inst_BLTU,
+                `inst_BGEU
+            };
+
+            bins jump_ops[] = {
+                `inst_JAL,
+                `inst_JALR
+            };
+
+            bins upper_ops[] = {
+                `inst_LUI,
+                `inst_AUIPC
+            };
+        }
+
+        cp_alu_result_1 : coverpoint alu_result_1 {
+            bins zero     = {32'h0000_0000};
+            bins one      = {32'h0000_0001};
+            bins positive = {[32'h0000_0002:32'h7fff_ffff]};
+            bins negative = {[32'h8000_0000:32'hffff_ffff]};
+        }
+
+        cp_alu_result_2 : coverpoint alu_result_2 {
+            bins zero     = {32'h0000_0000};
+            bins positive = {[32'h0000_0001:32'h7fff_ffff]};
+            bins negative = {[32'h8000_0000:32'hffff_ffff]};
+        }
+
+        cp_branch_taken : coverpoint branch_taken {
+            bins not_taken = {1'b0};
+            bins taken     = {1'b1};
+        }
+
+        cp_jump_taken : coverpoint jump_taken {
+            bins no_jump = {1'b0};
+            bins jump    = {1'b1};
+        }
+
+        cp_reg_write : coverpoint reg_write {
+            bins no_write = {1'b0};
+            bins write    = {1'b1};
+        }
+
+        x_alu_instr_result : cross cp_alu_instruction, cp_alu_result_1;
+        x_branch_taken     : cross cp_alu_instruction, cp_branch_taken;
+        x_reg_write        : cross cp_alu_instruction, cp_reg_write;
+
+    endgroup
+
+
+    decoder_cg cg     = new();
+    alu_cg     alucg = new();
 
 endmodule
