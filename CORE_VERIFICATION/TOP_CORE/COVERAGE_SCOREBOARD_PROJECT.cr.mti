@@ -1,0 +1,157 @@
+/storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test_pkg.sv {1 {vlog -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test_pkg.sv
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+Start time: 23:50:43 on Apr 27,2026
+vlog -reportprogress 300 -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test_pkg.sv 
+-- Compiling package core_smoke_test_pkg
+-- Importing package mtiUvm.uvm_pkg (uvm-1.1d Built-in)
+** Note: (vlog-2286) /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test_pkg.sv(4): Using implicit +incdir+/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src from import uvm_pkg
+
+Top level modules:
+	--none--
+End time: 23:50:44 on Apr 27,2026, Elapsed time: 0:00:01
+
+} {} {}} /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/bram_mem.sv {1 {vlog -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/bram_mem.sv
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+Start time: 23:50:40 on Apr 27,2026
+vlog -reportprogress 300 -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/bram_mem.sv 
+-- Compiling module bram_mem
+
+Top level modules:
+	bram_mem
+End time: 23:50:41 on Apr 27,2026, Elapsed time: 0:00:01
+
+} {} {}} /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/ins_mem_model.sv {1 {vlog -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/ins_mem_model.sv
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+Start time: 23:50:45 on Apr 27,2026
+vlog -reportprogress 300 -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/ins_mem_model.sv 
+-- Compiling module ins_mem_model
+
+Top level modules:
+	ins_mem_model
+End time: 23:50:45 on Apr 27,2026, Elapsed time: 0:00:00
+
+} {} {}} /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/decoder_scoreboard.sv {1 {vlog -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/decoder_scoreboard.sv
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+Start time: 23:50:44 on Apr 27,2026
+vlog -reportprogress 300 -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/decoder_scoreboard.sv 
+-- Compiling module decoder_scoreboard
+
+Top level modules:
+	decoder_scoreboard
+End time: 23:50:44 on Apr 27,2026, Elapsed time: 0:00:00
+
+} {} {}} /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/riscv32i.v {1 {vlog -work work -vopt /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/riscv32i.v
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+Start time: 23:50:46 on Apr 27,2026
+vlog -reportprogress 300 -work work -vopt /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/riscv32i.v 
+-- Compiling module riscv32i
+-- Compiling module riscv32i_main
+-- Compiling module pulse_generator
+-- Compiling module ins_mem
+-- Compiling module decode
+-- Compiling module reg_file
+-- Compiling module execute
+-- Compiling module pc
+-- Compiling module dataMem
+-- Compiling module end_write
+-- Compiling module hazard
+
+Top level modules:
+	riscv32i
+End time: 23:50:46 on Apr 27,2026, Elapsed time: 0:00:00
+
+} {} {}} /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/golden_alu_pkg.sv {1 {vlog -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/golden_alu_pkg.sv
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+Start time: 23:50:45 on Apr 27,2026
+vlog -reportprogress 300 -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/golden_alu_pkg.sv 
+-- Compiling package golden_alu_pkg
+
+Top level modules:
+	--none--
+End time: 23:50:45 on Apr 27,2026, Elapsed time: 0:00:00
+
+} {} {}} /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_coverage.sv {1 {vlog -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_coverage.sv
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+Start time: 23:50:41 on Apr 27,2026
+vlog -reportprogress 300 -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_coverage.sv 
+-- Compiling module core_coverage
+
+Top level modules:
+	core_coverage
+End time: 23:50:41 on Apr 27,2026, Elapsed time: 0:00:00
+
+} {} {}} /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/alu_scoreboard.sv {1 {vlog -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/alu_scoreboard.sv
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+Start time: 23:50:40 on Apr 27,2026
+vlog -reportprogress 300 -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/alu_scoreboard.sv 
+-- Compiling module alu_scoreboard
+
+Top level modules:
+	alu_scoreboard
+End time: 23:50:40 on Apr 27,2026, Elapsed time: 0:00:00
+
+} {} {}} /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test.sv {1 {vlog -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test.sv
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+Start time: 23:50:42 on Apr 27,2026
+vlog -reportprogress 300 -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test.sv 
+** Note: (vlog-2286) /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test.sv(4): Using implicit +incdir+/clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src from import uvm_pkg
+** Warning: /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_smoke_test.sv(5): (vlog-13233) Design unit "core_smoke_test_sv_unit" already exists and will be overwritten. Overwriting SystemVerilog $unit with different source files.
+-- Compiling package core_smoke_test_sv_unit
+-- Importing package mtiUvm.uvm_pkg (uvm-1.1d Built-in)
+
+Top level modules:
+	--none--
+End time: 23:50:43 on Apr 27,2026, Elapsed time: 0:00:01
+
+} {} {}} /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_if.sv {1 {vlog -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_if.sv
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+Start time: 23:50:41 on Apr 27,2026
+vlog -reportprogress 300 -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/core_if.sv 
+-- Compiling interface core_if
+
+Top level modules:
+	--none--
+End time: 23:50:42 on Apr 27,2026, Elapsed time: 0:00:01
+
+} {} {}} /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/tb_smoke_riscv32i.sv {1 {vlog -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/tb_smoke_riscv32i.sv
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+Start time: 23:50:46 on Apr 27,2026
+vlog -reportprogress 300 -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/tb_smoke_riscv32i.sv 
+** Warning: /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/tb_smoke_riscv32i.sv(2): (vlog-13233) Design unit "tb_smoke_riscv32i_sv_unit" already exists and will be overwritten. Overwriting SystemVerilog $unit with different source files.
+-- Compiling package tb_smoke_riscv32i_sv_unit
+-- Importing package golden_alu_pkg
+-- Compiling module tb_smoke_riscv32i
+-- Compiling module bram_mem
+-- Compiling module bram_ins
+
+Top level modules:
+	tb_smoke_riscv32i
+End time: 23:50:46 on Apr 27,2026, Elapsed time: 0:00:00
+
+} {} {}} /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/branch_scoreboard.sv {1 {vlog -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/branch_scoreboard.sv
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+Start time: 23:50:41 on Apr 27,2026
+vlog -reportprogress 300 -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/branch_scoreboard.sv 
+End time: 23:50:41 on Apr 27,2026, Elapsed time: 0:00:00
+
+} {} {}} /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/golden_decocder.sv {1 {vlog -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/golden_decocder.sv
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+Start time: 23:50:45 on Apr 27,2026
+vlog -reportprogress 300 -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/golden_decocder.sv 
+-- Compiling package golden_decoder_pkg
+
+Top level modules:
+	--none--
+End time: 23:50:45 on Apr 27,2026, Elapsed time: 0:00:00
+
+} {} {}} /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/bram_ins.sv {1 {vlog -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/bram_ins.sv
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+Start time: 23:50:40 on Apr 27,2026
+vlog -reportprogress 300 -work work -vopt -sv /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/TOP_CORE/project_files/bram_ins.sv 
+-- Compiling module bram_ins
+
+Top level modules:
+	bram_ins
+End time: 23:50:40 on Apr 27,2026, Elapsed time: 0:00:00
+
+} {} {}}

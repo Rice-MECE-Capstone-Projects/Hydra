@@ -1,0 +1,919 @@
+QuestaSim-64 vcover 2023.2 Coverage Utility 2023.04 Apr 11 2023
+Start time: 16:12:07 on Apr 27,2026
+vcover report -details core_alu_decoder.ucdb 
+Coverage Report by instance with details
+
+=================================================================================
+=== Instance: /tb_smoke_riscv32i/dut/u_riscv32i_main/u_core_coverage
+=== Design Unit: work.core_coverage
+=================================================================================
+
+Covergroup Coverage:
+    Covergroups                      2        na        na    64.69%
+        Coverpoints/Crosses         13        na        na        na
+            Covergroup Bins        471       108       363    22.92%
+----------------------------------------------------------------------------------------------------------
+Covergroup                                             Metric       Goal       Bins    Status               
+                                                                                                         
+----------------------------------------------------------------------------------------------------------
+ TYPE /tb_smoke_riscv32i/dut/u_riscv32i_main/u_core_coverage/decoder_cg 
+                                                       67.17%        100          -    Uncovered            
+    covered/total bins:                                    31        125          -                      
+    missing/total bins:                                    94        125          -                      
+    % Hit:                                             24.80%        100          -                      
+    Coverpoint cp_opcode                               81.81%        100          -    Uncovered            
+        covered/total bins:                                 9         11          -                      
+        missing/total bins:                                 2         11          -                      
+        % Hit:                                         81.81%        100          -                      
+    Coverpoint cp_inst_typ                             77.77%        100          -    Uncovered            
+        covered/total bins:                                 7          9          -                      
+        missing/total bins:                                 2          9          -                      
+        % Hit:                                         77.77%        100          -                      
+    Coverpoint cp_branch_fun3                         100.00%        100          -    Covered              
+        covered/total bins:                                 6          6          -                      
+        missing/total bins:                                 0          6          -                      
+        % Hit:                                        100.00%        100          -                      
+    Cross x_opcode_insttyp                              9.09%        100          -    Uncovered            
+        covered/total bins:                                 9         99          -                      
+        missing/total bins:                                90         99          -                      
+        % Hit:                                          9.09%        100          -                      
+ Covergroup instance \/tb_smoke_riscv32i/dut/u_riscv32i_main/u_core_coverage/cg  
+                                                       67.17%        100          -    Uncovered            
+    covered/total bins:                                    31        125          -                      
+    missing/total bins:                                    94        125          -                      
+    % Hit:                                             24.80%        100          -                      
+    Coverpoint cp_opcode                               81.81%        100          -    Uncovered            
+        covered/total bins:                                 9         11          -                      
+        missing/total bins:                                 2         11          -                      
+        % Hit:                                         81.81%        100          -                      
+        bin r_type                                          4          1          -    Covered              
+        bin i_type_a                                       97          1          -    Covered              
+        bin b_type                                         24          1          -    Covered              
+        bin u_lui                                           1          1          -    Covered              
+        bin u_auipc                                         8          1          -    Covered              
+        bin j_type                                         28          1          -    Covered              
+        bin fence                                           0          1          -    ZERO                 
+        bin load                                           50          1          -    Covered              
+        bin store                                          56          1          -    Covered              
+        bin jalr                                           14          1          -    Covered              
+        bin system                                          0          1          -    ZERO                 
+    Coverpoint cp_inst_typ                             77.77%        100          -    Uncovered            
+        covered/total bins:                                 7          9          -                      
+        missing/total bins:                                 2          9          -                      
+        % Hit:                                         77.77%        100          -                      
+        bin r_type                                          4          1          -    Covered              
+        bin i_type                                        161          1          -    Covered              
+        bin i_sys                                           0          1          -    ZERO                 
+        bin s_type                                         56          1          -    Covered              
+        bin b_type                                         24          1          -    Covered              
+        bin u_type                                          9          1          -    Covered              
+        bin j_type                                         28          1          -    Covered              
+        bin f_type                                          0          1          -    ZERO                 
+        bin unknown                                        33          1          -    Covered              
+    Coverpoint cp_branch_fun3                         100.00%        100          -    Covered              
+        covered/total bins:                                 6          6          -                      
+        missing/total bins:                                 0          6          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin beq                                            14          1          -    Covered              
+        bin bne                                             2          1          -    Covered              
+        bin blt                                             2          1          -    Covered              
+        bin bge                                             2          1          -    Covered              
+        bin bltu                                            2          1          -    Covered              
+        bin bgeu                                            2          1          -    Covered              
+    Cross x_opcode_insttyp                              9.09%        100          -    Uncovered            
+        covered/total bins:                                 9         99          -                      
+        missing/total bins:                                90         99          -                      
+        % Hit:                                          9.09%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <j_type,j_type>                            28          1          -    Covered              
+            bin <u_auipc,u_type>                            8          1          -    Covered              
+            bin <u_lui,u_type>                              1          1          -    Covered              
+            bin <b_type,b_type>                            24          1          -    Covered              
+            bin <store,s_type>                             56          1          -    Covered              
+            bin <jalr,i_type>                              14          1          -    Covered              
+            bin <load,i_type>                              50          1          -    Covered              
+            bin <i_type_a,i_type>                          97          1          -    Covered              
+            bin <r_type,r_type>                             4          1          -    Covered              
+            bin <system,*>                                  0          1          9    ZERO                 
+            bin <fence,*>                                   0          1          9    ZERO                 
+            bin <*,unknown>                                 0          1         11    ZERO                 
+            bin <*,f_type>                                  0          1         11    ZERO                 
+            bin <*,i_sys>                                   0          1         11    ZERO                 
+            bin <jalr,j_type>                               0          1          1    ZERO                 
+            bin <store,j_type>                              0          1          1    ZERO                 
+            bin <load,j_type>                               0          1          1    ZERO                 
+            bin <u_auipc,j_type>                            0          1          1    ZERO                 
+            bin <u_lui,j_type>                              0          1          1    ZERO                 
+            bin <b_type,j_type>                             0          1          1    ZERO                 
+            bin <i_type_a,j_type>                           0          1          1    ZERO                 
+            bin <r_type,j_type>                             0          1          1    ZERO                 
+            bin <jalr,u_type>                               0          1          1    ZERO                 
+            bin <store,u_type>                              0          1          1    ZERO                 
+            bin <load,u_type>                               0          1          1    ZERO                 
+            bin <j_type,u_type>                             0          1          1    ZERO                 
+            bin <b_type,u_type>                             0          1          1    ZERO                 
+            bin <i_type_a,u_type>                           0          1          1    ZERO                 
+            bin <r_type,u_type>                             0          1          1    ZERO                 
+            bin <jalr,b_type>                               0          1          1    ZERO                 
+            bin <store,b_type>                              0          1          1    ZERO                 
+            bin <load,b_type>                               0          1          1    ZERO                 
+            bin <j_type,b_type>                             0          1          1    ZERO                 
+            bin <u_auipc,b_type>                            0          1          1    ZERO                 
+            bin <u_lui,b_type>                              0          1          1    ZERO                 
+            bin <i_type_a,b_type>                           0          1          1    ZERO                 
+            bin <r_type,b_type>                             0          1          1    ZERO                 
+            bin <jalr,s_type>                               0          1          1    ZERO                 
+            bin <load,s_type>                               0          1          1    ZERO                 
+            bin <j_type,s_type>                             0          1          1    ZERO                 
+            bin <u_auipc,s_type>                            0          1          1    ZERO                 
+            bin <u_lui,s_type>                              0          1          1    ZERO                 
+            bin <b_type,s_type>                             0          1          1    ZERO                 
+            bin <i_type_a,s_type>                           0          1          1    ZERO                 
+            bin <r_type,s_type>                             0          1          1    ZERO                 
+            bin <store,i_type>                              0          1          1    ZERO                 
+            bin <j_type,i_type>                             0          1          1    ZERO                 
+            bin <u_auipc,i_type>                            0          1          1    ZERO                 
+            bin <u_lui,i_type>                              0          1          1    ZERO                 
+            bin <b_type,i_type>                             0          1          1    ZERO                 
+            bin <r_type,i_type>                             0          1          1    ZERO                 
+            bin <jalr,r_type>                               0          1          1    ZERO                 
+            bin <store,r_type>                              0          1          1    ZERO                 
+            bin <load,r_type>                               0          1          1    ZERO                 
+            bin <j_type,r_type>                             0          1          1    ZERO                 
+            bin <u_auipc,r_type>                            0          1          1    ZERO                 
+            bin <u_lui,r_type>                              0          1          1    ZERO                 
+            bin <b_type,r_type>                             0          1          1    ZERO                 
+            bin <i_type_a,r_type>                           0          1          1    ZERO                 
+ TYPE /tb_smoke_riscv32i/dut/u_riscv32i_main/u_core_coverage/alu_cg 
+                                                       62.21%        100          -    Uncovered            
+    covered/total bins:                                    77        346          -                      
+    missing/total bins:                                   269        346          -                      
+    % Hit:                                             22.25%        100          -                      
+    Coverpoint cp_alu_instruction                      37.83%        100          -    Uncovered            
+        covered/total bins:                                14         37          -                      
+        missing/total bins:                                23         37          -                      
+        % Hit:                                         37.83%        100          -                      
+    Coverpoint cp_alu_result_1                        100.00%        100          -    Covered              
+        covered/total bins:                                 4          4          -                      
+        missing/total bins:                                 0          4          -                      
+        % Hit:                                        100.00%        100          -                      
+    Coverpoint cp_alu_result_2                         66.66%        100          -    Uncovered            
+        covered/total bins:                                 2          3          -                      
+        missing/total bins:                                 1          3          -                      
+        % Hit:                                         66.66%        100          -                      
+    Coverpoint cp_branch_taken                        100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+    Coverpoint cp_jump_taken                          100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+    Coverpoint cp_reg_write                           100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+    Cross x_alu_instr_result                           13.51%        100          -    Uncovered            
+        covered/total bins:                                20        148          -                      
+        missing/total bins:                               128        148          -                      
+        % Hit:                                         13.51%        100          -                      
+    Cross x_branch_taken                               20.27%        100          -    Uncovered            
+        covered/total bins:                                15         74          -                      
+        missing/total bins:                                59         74          -                      
+        % Hit:                                         20.27%        100          -                      
+    Cross x_reg_write                                  21.62%        100          -    Uncovered            
+        covered/total bins:                                16         74          -                      
+        missing/total bins:                                58         74          -                      
+        % Hit:                                         21.62%        100          -                      
+ Covergroup instance \/tb_smoke_riscv32i/dut/u_riscv32i_main/u_core_coverage/alucg  
+                                                       62.21%        100          -    Uncovered            
+    covered/total bins:                                    77        346          -                      
+    missing/total bins:                                   269        346          -                      
+    % Hit:                                             22.25%        100          -                      
+    Coverpoint cp_alu_instruction                      37.83%        100          -    Uncovered            
+        covered/total bins:                                14         37          -                      
+        missing/total bins:                                23         37          -                      
+        % Hit:                                         37.83%        100          -                      
+        bin add_sub[1]                                      0          1          -    ZERO                 
+        bin add_sub[2]                                      4          1          -    Covered              
+        bin add_sub[1024]                                  93          1          -    Covered              
+        bin logic_ops[4]                                    0          1          -    ZERO                 
+        bin logic_ops[8]                                    0          1          -    ZERO                 
+        bin logic_ops[16]                                   0          1          -    ZERO                 
+        bin logic_ops[2048]                                 0          1          -    ZERO                 
+        bin logic_ops[4096]                                 0          1          -    ZERO                 
+        bin logic_ops[8192]                                 0          1          -    ZERO                 
+        bin shift_ops[32]                                   0          1          -    ZERO                 
+        bin shift_ops[64]                                   0          1          -    ZERO                 
+        bin shift_ops[128]                                  0          1          -    ZERO                 
+        bin shift_ops[16384]                                0          1          -    ZERO                 
+        bin shift_ops[32768]                                0          1          -    ZERO                 
+        bin shift_ops[65536]                                0          1          -    ZERO                 
+        bin compare_ops[256]                                0          1          -    ZERO                 
+        bin compare_ops[512]                                0          1          -    ZERO                 
+        bin compare_ops[131072]                             0          1          -    ZERO                 
+        bin compare_ops[262144]                             0          1          -    ZERO                 
+        bin mem_addr_ops[524288]                            0          1          -    ZERO                 
+        bin mem_addr_ops[1048576]                           0          1          -    ZERO                 
+        bin mem_addr_ops[2097152]                          53          1          -    Covered              
+        bin mem_addr_ops[4194304]                           0          1          -    ZERO                 
+        bin mem_addr_ops[8388608]                           0          1          -    ZERO                 
+        bin mem_addr_ops[16777216]                          0          1          -    ZERO                 
+        bin mem_addr_ops[33554432]                          0          1          -    ZERO                 
+        bin mem_addr_ops[67108864]                         50          1          -    Covered              
+        bin branch_ops[134217728]                           7          1          -    Covered              
+        bin branch_ops[268435456]                           1          1          -    Covered              
+        bin branch_ops[536870912]                           2          1          -    Covered              
+        bin branch_ops[1073741824]                          2          1          -    Covered              
+        bin branch_ops[2147483648]                          2          1          -    Covered              
+        bin branch_ops[4294967296]                          2          1          -    Covered              
+        bin jump_ops[8589934592]                           18          1          -    Covered              
+        bin jump_ops[17179869184]                           7          1          -    Covered              
+        bin upper_ops[34359738368]                          1          1          -    Covered              
+        bin upper_ops[68719476736]                          7          1          -    Covered              
+    Coverpoint cp_alu_result_1                        100.00%        100          -    Covered              
+        covered/total bins:                                 4          4          -                      
+        missing/total bins:                                 0          4          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin zero                                           83          1          -    Covered              
+        bin one                                            36          1          -    Covered              
+        bin positive                                      190          1          -    Covered              
+        bin negative                                        6          1          -    Covered              
+    Coverpoint cp_alu_result_2                         66.66%        100          -    Uncovered            
+        covered/total bins:                                 2          3          -                      
+        missing/total bins:                                 1          3          -                      
+        % Hit:                                         66.66%        100          -                      
+        bin zero                                          275          1          -    Covered              
+        bin positive                                       40          1          -    Covered              
+        bin negative                                        0          1          -    ZERO                 
+    Coverpoint cp_branch_taken                        100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin not_taken                                     304          1          -    Covered              
+        bin taken                                          11          1          -    Covered              
+    Coverpoint cp_jump_taken                          100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin no_jump                                       290          1          -    Covered              
+        bin jump                                           25          1          -    Covered              
+    Coverpoint cp_reg_write                           100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin no_write                                      150          1          -    Covered              
+        bin write                                         165          1          -    Covered              
+    Cross x_alu_instr_result                           13.51%        100          -    Uncovered            
+        covered/total bins:                                20        148          -                      
+        missing/total bins:                               128        148          -                      
+        % Hit:                                         13.51%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <upper_ops[34359738368],negative>           1          1          -    Covered              
+            bin <add_sub[1024],negative>                    4          1          -    Covered              
+            bin <add_sub[2],negative>                       1          1          -    Covered              
+            bin <upper_ops[68719476736],positive>           7          1          -    Covered              
+            bin <jump_ops[17179869184],positive>            7          1          -    Covered              
+            bin <jump_ops[8589934592],positive>            18          1          -    Covered              
+            bin <mem_addr_ops[67108864],positive>          50          1          -    Covered              
+            bin <mem_addr_ops[2097152],positive>           53          1          -    Covered              
+            bin <add_sub[1024],positive>                   53          1          -    Covered              
+            bin <add_sub[2],positive>                       2          1          -    Covered              
+            bin <branch_ops[4294967296],one>                2          1          -    Covered              
+            bin <branch_ops[2147483648],one>                1          1          -    Covered              
+            bin <branch_ops[268435456],one>                 1          1          -    Covered              
+            bin <branch_ops[134217728],one>                 7          1          -    Covered              
+            bin <add_sub[1024],one>                        25          1          -    Covered              
+            bin <branch_ops[2147483648],zero>               1          1          -    Covered              
+            bin <branch_ops[1073741824],zero>               2          1          -    Covered              
+            bin <branch_ops[536870912],zero>                2          1          -    Covered              
+            bin <add_sub[1024],zero>                       11          1          -    Covered              
+            bin <add_sub[2],zero>                           1          1          -    Covered              
+            bin <mem_addr_ops[33554432],*>                  0          1          4    ZERO                 
+            bin <mem_addr_ops[16777216],*>                  0          1          4    ZERO                 
+            bin <mem_addr_ops[8388608],*>                   0          1          4    ZERO                 
+            bin <mem_addr_ops[4194304],*>                   0          1          4    ZERO                 
+            bin <mem_addr_ops[1048576],*>                   0          1          4    ZERO                 
+            bin <mem_addr_ops[524288],*>                    0          1          4    ZERO                 
+            bin <compare_ops[262144],*>                     0          1          4    ZERO                 
+            bin <compare_ops[131072],*>                     0          1          4    ZERO                 
+            bin <compare_ops[512],*>                        0          1          4    ZERO                 
+            bin <compare_ops[256],*>                        0          1          4    ZERO                 
+            bin <shift_ops[65536],*>                        0          1          4    ZERO                 
+            bin <shift_ops[32768],*>                        0          1          4    ZERO                 
+            bin <shift_ops[16384],*>                        0          1          4    ZERO                 
+            bin <shift_ops[128],*>                          0          1          4    ZERO                 
+            bin <shift_ops[64],*>                           0          1          4    ZERO                 
+            bin <shift_ops[32],*>                           0          1          4    ZERO                 
+            bin <logic_ops[8192],*>                         0          1          4    ZERO                 
+            bin <logic_ops[4096],*>                         0          1          4    ZERO                 
+            bin <logic_ops[2048],*>                         0          1          4    ZERO                 
+            bin <logic_ops[16],*>                           0          1          4    ZERO                 
+            bin <logic_ops[8],*>                            0          1          4    ZERO                 
+            bin <logic_ops[4],*>                            0          1          4    ZERO                 
+            bin <add_sub[1],*>                              0          1          4    ZERO                 
+            bin <upper_ops[68719476736],negative>           0          1          1    ZERO                 
+            bin <jump_ops[17179869184],negative>            0          1          1    ZERO                 
+            bin <jump_ops[8589934592],negative>             0          1          1    ZERO                 
+            bin <branch_ops[4294967296],negative>           0          1          1    ZERO                 
+            bin <branch_ops[2147483648],negative>           0          1          1    ZERO                 
+            bin <branch_ops[1073741824],negative>           0          1          1    ZERO                 
+            bin <branch_ops[536870912],negative>            0          1          1    ZERO                 
+            bin <branch_ops[268435456],negative>            0          1          1    ZERO                 
+            bin <branch_ops[134217728],negative>            0          1          1    ZERO                 
+            bin <mem_addr_ops[67108864],negative>           0          1          1    ZERO                 
+            bin <mem_addr_ops[2097152],negative>            0          1          1    ZERO                 
+            bin <upper_ops[34359738368],positive>           0          1          1    ZERO                 
+            bin <branch_ops[4294967296],positive>           0          1          1    ZERO                 
+            bin <branch_ops[2147483648],positive>           0          1          1    ZERO                 
+            bin <branch_ops[1073741824],positive>           0          1          1    ZERO                 
+            bin <branch_ops[536870912],positive>            0          1          1    ZERO                 
+            bin <branch_ops[268435456],positive>            0          1          1    ZERO                 
+            bin <branch_ops[134217728],positive>            0          1          1    ZERO                 
+            bin <upper_ops[68719476736],one>                0          1          1    ZERO                 
+            bin <upper_ops[34359738368],one>                0          1          1    ZERO                 
+            bin <jump_ops[17179869184],one>                 0          1          1    ZERO                 
+            bin <jump_ops[8589934592],one>                  0          1          1    ZERO                 
+            bin <branch_ops[1073741824],one>                0          1          1    ZERO                 
+            bin <branch_ops[536870912],one>                 0          1          1    ZERO                 
+            bin <mem_addr_ops[67108864],one>                0          1          1    ZERO                 
+            bin <mem_addr_ops[2097152],one>                 0          1          1    ZERO                 
+            bin <add_sub[2],one>                            0          1          1    ZERO                 
+            bin <upper_ops[68719476736],zero>               0          1          1    ZERO                 
+            bin <upper_ops[34359738368],zero>               0          1          1    ZERO                 
+            bin <jump_ops[17179869184],zero>                0          1          1    ZERO                 
+            bin <jump_ops[8589934592],zero>                 0          1          1    ZERO                 
+            bin <branch_ops[4294967296],zero>               0          1          1    ZERO                 
+            bin <branch_ops[268435456],zero>                0          1          1    ZERO                 
+            bin <branch_ops[134217728],zero>                0          1          1    ZERO                 
+            bin <mem_addr_ops[67108864],zero>               0          1          1    ZERO                 
+            bin <mem_addr_ops[2097152],zero>                0          1          1    ZERO                 
+    Cross x_branch_taken                               20.27%        100          -    Uncovered            
+        covered/total bins:                                15         74          -                      
+        missing/total bins:                                59         74          -                      
+        % Hit:                                         20.27%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <branch_ops[4294967296],taken>              2          1          -    Covered              
+            bin <branch_ops[2147483648],taken>              1          1          -    Covered              
+            bin <branch_ops[268435456],taken>               1          1          -    Covered              
+            bin <branch_ops[134217728],taken>               7          1          -    Covered              
+            bin <upper_ops[68719476736],not_taken>          7          1          -    Covered              
+            bin <upper_ops[34359738368],not_taken>          1          1          -    Covered              
+            bin <jump_ops[17179869184],not_taken>           7          1          -    Covered              
+            bin <jump_ops[8589934592],not_taken>           18          1          -    Covered              
+            bin <branch_ops[2147483648],not_taken>          1          1          -    Covered              
+            bin <branch_ops[1073741824],not_taken>          2          1          -    Covered              
+            bin <branch_ops[536870912],not_taken>           2          1          -    Covered              
+            bin <mem_addr_ops[67108864],not_taken>         50          1          -    Covered              
+            bin <mem_addr_ops[2097152],not_taken>          53          1          -    Covered              
+            bin <add_sub[1024],not_taken>                  93          1          -    Covered              
+            bin <add_sub[2],not_taken>                      4          1          -    Covered              
+            bin <mem_addr_ops[33554432],*>                  0          1          2    ZERO                 
+            bin <mem_addr_ops[16777216],*>                  0          1          2    ZERO                 
+            bin <mem_addr_ops[8388608],*>                   0          1          2    ZERO                 
+            bin <mem_addr_ops[4194304],*>                   0          1          2    ZERO                 
+            bin <mem_addr_ops[1048576],*>                   0          1          2    ZERO                 
+            bin <mem_addr_ops[524288],*>                    0          1          2    ZERO                 
+            bin <compare_ops[262144],*>                     0          1          2    ZERO                 
+            bin <compare_ops[131072],*>                     0          1          2    ZERO                 
+            bin <compare_ops[512],*>                        0          1          2    ZERO                 
+            bin <compare_ops[256],*>                        0          1          2    ZERO                 
+            bin <shift_ops[65536],*>                        0          1          2    ZERO                 
+            bin <shift_ops[32768],*>                        0          1          2    ZERO                 
+            bin <shift_ops[16384],*>                        0          1          2    ZERO                 
+            bin <shift_ops[128],*>                          0          1          2    ZERO                 
+            bin <shift_ops[64],*>                           0          1          2    ZERO                 
+            bin <shift_ops[32],*>                           0          1          2    ZERO                 
+            bin <logic_ops[8192],*>                         0          1          2    ZERO                 
+            bin <logic_ops[4096],*>                         0          1          2    ZERO                 
+            bin <logic_ops[2048],*>                         0          1          2    ZERO                 
+            bin <logic_ops[16],*>                           0          1          2    ZERO                 
+            bin <logic_ops[8],*>                            0          1          2    ZERO                 
+            bin <logic_ops[4],*>                            0          1          2    ZERO                 
+            bin <add_sub[1],*>                              0          1          2    ZERO                 
+            bin <upper_ops[68719476736],taken>              0          1          1    ZERO                 
+            bin <upper_ops[34359738368],taken>              0          1          1    ZERO                 
+            bin <jump_ops[17179869184],taken>               0          1          1    ZERO                 
+            bin <jump_ops[8589934592],taken>                0          1          1    ZERO                 
+            bin <branch_ops[1073741824],taken>              0          1          1    ZERO                 
+            bin <branch_ops[536870912],taken>               0          1          1    ZERO                 
+            bin <mem_addr_ops[67108864],taken>              0          1          1    ZERO                 
+            bin <mem_addr_ops[2097152],taken>               0          1          1    ZERO                 
+            bin <add_sub[1024],taken>                       0          1          1    ZERO                 
+            bin <add_sub[2],taken>                          0          1          1    ZERO                 
+            bin <branch_ops[4294967296],not_taken>          0          1          1    ZERO                 
+            bin <branch_ops[268435456],not_taken>           0          1          1    ZERO                 
+            bin <branch_ops[134217728],not_taken>           0          1          1    ZERO                 
+    Cross x_reg_write                                  21.62%        100          -    Uncovered            
+        covered/total bins:                                16         74          -                      
+        missing/total bins:                                58         74          -                      
+        % Hit:                                         21.62%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <upper_ops[68719476736],write>              7          1          -    Covered              
+            bin <upper_ops[34359738368],write>              1          1          -    Covered              
+            bin <jump_ops[8589934592],write>                8          1          -    Covered              
+            bin <mem_addr_ops[2097152],write>              53          1          -    Covered              
+            bin <add_sub[1024],write>                      92          1          -    Covered              
+            bin <add_sub[2],write>                          4          1          -    Covered              
+            bin <jump_ops[17179869184],no_write>            7          1          -    Covered              
+            bin <jump_ops[8589934592],no_write>            10          1          -    Covered              
+            bin <branch_ops[4294967296],no_write>           2          1          -    Covered              
+            bin <branch_ops[2147483648],no_write>           2          1          -    Covered              
+            bin <branch_ops[1073741824],no_write>           2          1          -    Covered              
+            bin <branch_ops[536870912],no_write>            2          1          -    Covered              
+            bin <branch_ops[268435456],no_write>            1          1          -    Covered              
+            bin <branch_ops[134217728],no_write>            7          1          -    Covered              
+            bin <mem_addr_ops[67108864],no_write>          50          1          -    Covered              
+            bin <add_sub[1024],no_write>                    1          1          -    Covered              
+            bin <mem_addr_ops[33554432],*>                  0          1          2    ZERO                 
+            bin <mem_addr_ops[16777216],*>                  0          1          2    ZERO                 
+            bin <mem_addr_ops[8388608],*>                   0          1          2    ZERO                 
+            bin <mem_addr_ops[4194304],*>                   0          1          2    ZERO                 
+            bin <mem_addr_ops[1048576],*>                   0          1          2    ZERO                 
+            bin <mem_addr_ops[524288],*>                    0          1          2    ZERO                 
+            bin <compare_ops[262144],*>                     0          1          2    ZERO                 
+            bin <compare_ops[131072],*>                     0          1          2    ZERO                 
+            bin <compare_ops[512],*>                        0          1          2    ZERO                 
+            bin <compare_ops[256],*>                        0          1          2    ZERO                 
+            bin <shift_ops[65536],*>                        0          1          2    ZERO                 
+            bin <shift_ops[32768],*>                        0          1          2    ZERO                 
+            bin <shift_ops[16384],*>                        0          1          2    ZERO                 
+            bin <shift_ops[128],*>                          0          1          2    ZERO                 
+            bin <shift_ops[64],*>                           0          1          2    ZERO                 
+            bin <shift_ops[32],*>                           0          1          2    ZERO                 
+            bin <logic_ops[8192],*>                         0          1          2    ZERO                 
+            bin <logic_ops[4096],*>                         0          1          2    ZERO                 
+            bin <logic_ops[2048],*>                         0          1          2    ZERO                 
+            bin <logic_ops[16],*>                           0          1          2    ZERO                 
+            bin <logic_ops[8],*>                            0          1          2    ZERO                 
+            bin <logic_ops[4],*>                            0          1          2    ZERO                 
+            bin <add_sub[1],*>                              0          1          2    ZERO                 
+            bin <jump_ops[17179869184],write>               0          1          1    ZERO                 
+            bin <branch_ops[4294967296],write>              0          1          1    ZERO                 
+            bin <branch_ops[2147483648],write>              0          1          1    ZERO                 
+            bin <branch_ops[1073741824],write>              0          1          1    ZERO                 
+            bin <branch_ops[536870912],write>               0          1          1    ZERO                 
+            bin <branch_ops[268435456],write>               0          1          1    ZERO                 
+            bin <branch_ops[134217728],write>               0          1          1    ZERO                 
+            bin <mem_addr_ops[67108864],write>              0          1          1    ZERO                 
+            bin <upper_ops[68719476736],no_write>           0          1          1    ZERO                 
+            bin <upper_ops[34359738368],no_write>           0          1          1    ZERO                 
+            bin <mem_addr_ops[2097152],no_write>            0          1          1    ZERO                 
+            bin <add_sub[2],no_write>                       0          1          1    ZERO                 
+
+COVERGROUP COVERAGE:
+----------------------------------------------------------------------------------------------------------
+Covergroup                                             Metric       Goal       Bins    Status               
+                                                                                                         
+----------------------------------------------------------------------------------------------------------
+ TYPE /tb_smoke_riscv32i/dut/u_riscv32i_main/u_core_coverage/decoder_cg 
+                                                       67.17%        100          -    Uncovered            
+    covered/total bins:                                    31        125          -                      
+    missing/total bins:                                    94        125          -                      
+    % Hit:                                             24.80%        100          -                      
+    Coverpoint cp_opcode                               81.81%        100          -    Uncovered            
+        covered/total bins:                                 9         11          -                      
+        missing/total bins:                                 2         11          -                      
+        % Hit:                                         81.81%        100          -                      
+    Coverpoint cp_inst_typ                             77.77%        100          -    Uncovered            
+        covered/total bins:                                 7          9          -                      
+        missing/total bins:                                 2          9          -                      
+        % Hit:                                         77.77%        100          -                      
+    Coverpoint cp_branch_fun3                         100.00%        100          -    Covered              
+        covered/total bins:                                 6          6          -                      
+        missing/total bins:                                 0          6          -                      
+        % Hit:                                        100.00%        100          -                      
+    Cross x_opcode_insttyp                              9.09%        100          -    Uncovered            
+        covered/total bins:                                 9         99          -                      
+        missing/total bins:                                90         99          -                      
+        % Hit:                                          9.09%        100          -                      
+ Covergroup instance \/tb_smoke_riscv32i/dut/u_riscv32i_main/u_core_coverage/cg  
+                                                       67.17%        100          -    Uncovered            
+    covered/total bins:                                    31        125          -                      
+    missing/total bins:                                    94        125          -                      
+    % Hit:                                             24.80%        100          -                      
+    Coverpoint cp_opcode                               81.81%        100          -    Uncovered            
+        covered/total bins:                                 9         11          -                      
+        missing/total bins:                                 2         11          -                      
+        % Hit:                                         81.81%        100          -                      
+        bin r_type                                          4          1          -    Covered              
+        bin i_type_a                                       97          1          -    Covered              
+        bin b_type                                         24          1          -    Covered              
+        bin u_lui                                           1          1          -    Covered              
+        bin u_auipc                                         8          1          -    Covered              
+        bin j_type                                         28          1          -    Covered              
+        bin fence                                           0          1          -    ZERO                 
+        bin load                                           50          1          -    Covered              
+        bin store                                          56          1          -    Covered              
+        bin jalr                                           14          1          -    Covered              
+        bin system                                          0          1          -    ZERO                 
+    Coverpoint cp_inst_typ                             77.77%        100          -    Uncovered            
+        covered/total bins:                                 7          9          -                      
+        missing/total bins:                                 2          9          -                      
+        % Hit:                                         77.77%        100          -                      
+        bin r_type                                          4          1          -    Covered              
+        bin i_type                                        161          1          -    Covered              
+        bin i_sys                                           0          1          -    ZERO                 
+        bin s_type                                         56          1          -    Covered              
+        bin b_type                                         24          1          -    Covered              
+        bin u_type                                          9          1          -    Covered              
+        bin j_type                                         28          1          -    Covered              
+        bin f_type                                          0          1          -    ZERO                 
+        bin unknown                                        33          1          -    Covered              
+    Coverpoint cp_branch_fun3                         100.00%        100          -    Covered              
+        covered/total bins:                                 6          6          -                      
+        missing/total bins:                                 0          6          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin beq                                            14          1          -    Covered              
+        bin bne                                             2          1          -    Covered              
+        bin blt                                             2          1          -    Covered              
+        bin bge                                             2          1          -    Covered              
+        bin bltu                                            2          1          -    Covered              
+        bin bgeu                                            2          1          -    Covered              
+    Cross x_opcode_insttyp                              9.09%        100          -    Uncovered            
+        covered/total bins:                                 9         99          -                      
+        missing/total bins:                                90         99          -                      
+        % Hit:                                          9.09%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <j_type,j_type>                            28          1          -    Covered              
+            bin <u_auipc,u_type>                            8          1          -    Covered              
+            bin <u_lui,u_type>                              1          1          -    Covered              
+            bin <b_type,b_type>                            24          1          -    Covered              
+            bin <store,s_type>                             56          1          -    Covered              
+            bin <jalr,i_type>                              14          1          -    Covered              
+            bin <load,i_type>                              50          1          -    Covered              
+            bin <i_type_a,i_type>                          97          1          -    Covered              
+            bin <r_type,r_type>                             4          1          -    Covered              
+            bin <system,*>                                  0          1          9    ZERO                 
+            bin <fence,*>                                   0          1          9    ZERO                 
+            bin <*,unknown>                                 0          1         11    ZERO                 
+            bin <*,f_type>                                  0          1         11    ZERO                 
+            bin <*,i_sys>                                   0          1         11    ZERO                 
+            bin <jalr,j_type>                               0          1          1    ZERO                 
+            bin <store,j_type>                              0          1          1    ZERO                 
+            bin <load,j_type>                               0          1          1    ZERO                 
+            bin <u_auipc,j_type>                            0          1          1    ZERO                 
+            bin <u_lui,j_type>                              0          1          1    ZERO                 
+            bin <b_type,j_type>                             0          1          1    ZERO                 
+            bin <i_type_a,j_type>                           0          1          1    ZERO                 
+            bin <r_type,j_type>                             0          1          1    ZERO                 
+            bin <jalr,u_type>                               0          1          1    ZERO                 
+            bin <store,u_type>                              0          1          1    ZERO                 
+            bin <load,u_type>                               0          1          1    ZERO                 
+            bin <j_type,u_type>                             0          1          1    ZERO                 
+            bin <b_type,u_type>                             0          1          1    ZERO                 
+            bin <i_type_a,u_type>                           0          1          1    ZERO                 
+            bin <r_type,u_type>                             0          1          1    ZERO                 
+            bin <jalr,b_type>                               0          1          1    ZERO                 
+            bin <store,b_type>                              0          1          1    ZERO                 
+            bin <load,b_type>                               0          1          1    ZERO                 
+            bin <j_type,b_type>                             0          1          1    ZERO                 
+            bin <u_auipc,b_type>                            0          1          1    ZERO                 
+            bin <u_lui,b_type>                              0          1          1    ZERO                 
+            bin <i_type_a,b_type>                           0          1          1    ZERO                 
+            bin <r_type,b_type>                             0          1          1    ZERO                 
+            bin <jalr,s_type>                               0          1          1    ZERO                 
+            bin <load,s_type>                               0          1          1    ZERO                 
+            bin <j_type,s_type>                             0          1          1    ZERO                 
+            bin <u_auipc,s_type>                            0          1          1    ZERO                 
+            bin <u_lui,s_type>                              0          1          1    ZERO                 
+            bin <b_type,s_type>                             0          1          1    ZERO                 
+            bin <i_type_a,s_type>                           0          1          1    ZERO                 
+            bin <r_type,s_type>                             0          1          1    ZERO                 
+            bin <store,i_type>                              0          1          1    ZERO                 
+            bin <j_type,i_type>                             0          1          1    ZERO                 
+            bin <u_auipc,i_type>                            0          1          1    ZERO                 
+            bin <u_lui,i_type>                              0          1          1    ZERO                 
+            bin <b_type,i_type>                             0          1          1    ZERO                 
+            bin <r_type,i_type>                             0          1          1    ZERO                 
+            bin <jalr,r_type>                               0          1          1    ZERO                 
+            bin <store,r_type>                              0          1          1    ZERO                 
+            bin <load,r_type>                               0          1          1    ZERO                 
+            bin <j_type,r_type>                             0          1          1    ZERO                 
+            bin <u_auipc,r_type>                            0          1          1    ZERO                 
+            bin <u_lui,r_type>                              0          1          1    ZERO                 
+            bin <b_type,r_type>                             0          1          1    ZERO                 
+            bin <i_type_a,r_type>                           0          1          1    ZERO                 
+ TYPE /tb_smoke_riscv32i/dut/u_riscv32i_main/u_core_coverage/alu_cg 
+                                                       62.21%        100          -    Uncovered            
+    covered/total bins:                                    77        346          -                      
+    missing/total bins:                                   269        346          -                      
+    % Hit:                                             22.25%        100          -                      
+    Coverpoint cp_alu_instruction                      37.83%        100          -    Uncovered            
+        covered/total bins:                                14         37          -                      
+        missing/total bins:                                23         37          -                      
+        % Hit:                                         37.83%        100          -                      
+    Coverpoint cp_alu_result_1                        100.00%        100          -    Covered              
+        covered/total bins:                                 4          4          -                      
+        missing/total bins:                                 0          4          -                      
+        % Hit:                                        100.00%        100          -                      
+    Coverpoint cp_alu_result_2                         66.66%        100          -    Uncovered            
+        covered/total bins:                                 2          3          -                      
+        missing/total bins:                                 1          3          -                      
+        % Hit:                                         66.66%        100          -                      
+    Coverpoint cp_branch_taken                        100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+    Coverpoint cp_jump_taken                          100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+    Coverpoint cp_reg_write                           100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+    Cross x_alu_instr_result                           13.51%        100          -    Uncovered            
+        covered/total bins:                                20        148          -                      
+        missing/total bins:                               128        148          -                      
+        % Hit:                                         13.51%        100          -                      
+    Cross x_branch_taken                               20.27%        100          -    Uncovered            
+        covered/total bins:                                15         74          -                      
+        missing/total bins:                                59         74          -                      
+        % Hit:                                         20.27%        100          -                      
+    Cross x_reg_write                                  21.62%        100          -    Uncovered            
+        covered/total bins:                                16         74          -                      
+        missing/total bins:                                58         74          -                      
+        % Hit:                                         21.62%        100          -                      
+ Covergroup instance \/tb_smoke_riscv32i/dut/u_riscv32i_main/u_core_coverage/alucg  
+                                                       62.21%        100          -    Uncovered            
+    covered/total bins:                                    77        346          -                      
+    missing/total bins:                                   269        346          -                      
+    % Hit:                                             22.25%        100          -                      
+    Coverpoint cp_alu_instruction                      37.83%        100          -    Uncovered            
+        covered/total bins:                                14         37          -                      
+        missing/total bins:                                23         37          -                      
+        % Hit:                                         37.83%        100          -                      
+        bin add_sub[1]                                      0          1          -    ZERO                 
+        bin add_sub[2]                                      4          1          -    Covered              
+        bin add_sub[1024]                                  93          1          -    Covered              
+        bin logic_ops[4]                                    0          1          -    ZERO                 
+        bin logic_ops[8]                                    0          1          -    ZERO                 
+        bin logic_ops[16]                                   0          1          -    ZERO                 
+        bin logic_ops[2048]                                 0          1          -    ZERO                 
+        bin logic_ops[4096]                                 0          1          -    ZERO                 
+        bin logic_ops[8192]                                 0          1          -    ZERO                 
+        bin shift_ops[32]                                   0          1          -    ZERO                 
+        bin shift_ops[64]                                   0          1          -    ZERO                 
+        bin shift_ops[128]                                  0          1          -    ZERO                 
+        bin shift_ops[16384]                                0          1          -    ZERO                 
+        bin shift_ops[32768]                                0          1          -    ZERO                 
+        bin shift_ops[65536]                                0          1          -    ZERO                 
+        bin compare_ops[256]                                0          1          -    ZERO                 
+        bin compare_ops[512]                                0          1          -    ZERO                 
+        bin compare_ops[131072]                             0          1          -    ZERO                 
+        bin compare_ops[262144]                             0          1          -    ZERO                 
+        bin mem_addr_ops[524288]                            0          1          -    ZERO                 
+        bin mem_addr_ops[1048576]                           0          1          -    ZERO                 
+        bin mem_addr_ops[2097152]                          53          1          -    Covered              
+        bin mem_addr_ops[4194304]                           0          1          -    ZERO                 
+        bin mem_addr_ops[8388608]                           0          1          -    ZERO                 
+        bin mem_addr_ops[16777216]                          0          1          -    ZERO                 
+        bin mem_addr_ops[33554432]                          0          1          -    ZERO                 
+        bin mem_addr_ops[67108864]                         50          1          -    Covered              
+        bin branch_ops[134217728]                           7          1          -    Covered              
+        bin branch_ops[268435456]                           1          1          -    Covered              
+        bin branch_ops[536870912]                           2          1          -    Covered              
+        bin branch_ops[1073741824]                          2          1          -    Covered              
+        bin branch_ops[2147483648]                          2          1          -    Covered              
+        bin branch_ops[4294967296]                          2          1          -    Covered              
+        bin jump_ops[8589934592]                           18          1          -    Covered              
+        bin jump_ops[17179869184]                           7          1          -    Covered              
+        bin upper_ops[34359738368]                          1          1          -    Covered              
+        bin upper_ops[68719476736]                          7          1          -    Covered              
+    Coverpoint cp_alu_result_1                        100.00%        100          -    Covered              
+        covered/total bins:                                 4          4          -                      
+        missing/total bins:                                 0          4          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin zero                                           83          1          -    Covered              
+        bin one                                            36          1          -    Covered              
+        bin positive                                      190          1          -    Covered              
+        bin negative                                        6          1          -    Covered              
+    Coverpoint cp_alu_result_2                         66.66%        100          -    Uncovered            
+        covered/total bins:                                 2          3          -                      
+        missing/total bins:                                 1          3          -                      
+        % Hit:                                         66.66%        100          -                      
+        bin zero                                          275          1          -    Covered              
+        bin positive                                       40          1          -    Covered              
+        bin negative                                        0          1          -    ZERO                 
+    Coverpoint cp_branch_taken                        100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin not_taken                                     304          1          -    Covered              
+        bin taken                                          11          1          -    Covered              
+    Coverpoint cp_jump_taken                          100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin no_jump                                       290          1          -    Covered              
+        bin jump                                           25          1          -    Covered              
+    Coverpoint cp_reg_write                           100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin no_write                                      150          1          -    Covered              
+        bin write                                         165          1          -    Covered              
+    Cross x_alu_instr_result                           13.51%        100          -    Uncovered            
+        covered/total bins:                                20        148          -                      
+        missing/total bins:                               128        148          -                      
+        % Hit:                                         13.51%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <upper_ops[34359738368],negative>           1          1          -    Covered              
+            bin <add_sub[1024],negative>                    4          1          -    Covered              
+            bin <add_sub[2],negative>                       1          1          -    Covered              
+            bin <upper_ops[68719476736],positive>           7          1          -    Covered              
+            bin <jump_ops[17179869184],positive>            7          1          -    Covered              
+            bin <jump_ops[8589934592],positive>            18          1          -    Covered              
+            bin <mem_addr_ops[67108864],positive>          50          1          -    Covered              
+            bin <mem_addr_ops[2097152],positive>           53          1          -    Covered              
+            bin <add_sub[1024],positive>                   53          1          -    Covered              
+            bin <add_sub[2],positive>                       2          1          -    Covered              
+            bin <branch_ops[4294967296],one>                2          1          -    Covered              
+            bin <branch_ops[2147483648],one>                1          1          -    Covered              
+            bin <branch_ops[268435456],one>                 1          1          -    Covered              
+            bin <branch_ops[134217728],one>                 7          1          -    Covered              
+            bin <add_sub[1024],one>                        25          1          -    Covered              
+            bin <branch_ops[2147483648],zero>               1          1          -    Covered              
+            bin <branch_ops[1073741824],zero>               2          1          -    Covered              
+            bin <branch_ops[536870912],zero>                2          1          -    Covered              
+            bin <add_sub[1024],zero>                       11          1          -    Covered              
+            bin <add_sub[2],zero>                           1          1          -    Covered              
+            bin <mem_addr_ops[33554432],*>                  0          1          4    ZERO                 
+            bin <mem_addr_ops[16777216],*>                  0          1          4    ZERO                 
+            bin <mem_addr_ops[8388608],*>                   0          1          4    ZERO                 
+            bin <mem_addr_ops[4194304],*>                   0          1          4    ZERO                 
+            bin <mem_addr_ops[1048576],*>                   0          1          4    ZERO                 
+            bin <mem_addr_ops[524288],*>                    0          1          4    ZERO                 
+            bin <compare_ops[262144],*>                     0          1          4    ZERO                 
+            bin <compare_ops[131072],*>                     0          1          4    ZERO                 
+            bin <compare_ops[512],*>                        0          1          4    ZERO                 
+            bin <compare_ops[256],*>                        0          1          4    ZERO                 
+            bin <shift_ops[65536],*>                        0          1          4    ZERO                 
+            bin <shift_ops[32768],*>                        0          1          4    ZERO                 
+            bin <shift_ops[16384],*>                        0          1          4    ZERO                 
+            bin <shift_ops[128],*>                          0          1          4    ZERO                 
+            bin <shift_ops[64],*>                           0          1          4    ZERO                 
+            bin <shift_ops[32],*>                           0          1          4    ZERO                 
+            bin <logic_ops[8192],*>                         0          1          4    ZERO                 
+            bin <logic_ops[4096],*>                         0          1          4    ZERO                 
+            bin <logic_ops[2048],*>                         0          1          4    ZERO                 
+            bin <logic_ops[16],*>                           0          1          4    ZERO                 
+            bin <logic_ops[8],*>                            0          1          4    ZERO                 
+            bin <logic_ops[4],*>                            0          1          4    ZERO                 
+            bin <add_sub[1],*>                              0          1          4    ZERO                 
+            bin <upper_ops[68719476736],negative>           0          1          1    ZERO                 
+            bin <jump_ops[17179869184],negative>            0          1          1    ZERO                 
+            bin <jump_ops[8589934592],negative>             0          1          1    ZERO                 
+            bin <branch_ops[4294967296],negative>           0          1          1    ZERO                 
+            bin <branch_ops[2147483648],negative>           0          1          1    ZERO                 
+            bin <branch_ops[1073741824],negative>           0          1          1    ZERO                 
+            bin <branch_ops[536870912],negative>            0          1          1    ZERO                 
+            bin <branch_ops[268435456],negative>            0          1          1    ZERO                 
+            bin <branch_ops[134217728],negative>            0          1          1    ZERO                 
+            bin <mem_addr_ops[67108864],negative>           0          1          1    ZERO                 
+            bin <mem_addr_ops[2097152],negative>            0          1          1    ZERO                 
+            bin <upper_ops[34359738368],positive>           0          1          1    ZERO                 
+            bin <branch_ops[4294967296],positive>           0          1          1    ZERO                 
+            bin <branch_ops[2147483648],positive>           0          1          1    ZERO                 
+            bin <branch_ops[1073741824],positive>           0          1          1    ZERO                 
+            bin <branch_ops[536870912],positive>            0          1          1    ZERO                 
+            bin <branch_ops[268435456],positive>            0          1          1    ZERO                 
+            bin <branch_ops[134217728],positive>            0          1          1    ZERO                 
+            bin <upper_ops[68719476736],one>                0          1          1    ZERO                 
+            bin <upper_ops[34359738368],one>                0          1          1    ZERO                 
+            bin <jump_ops[17179869184],one>                 0          1          1    ZERO                 
+            bin <jump_ops[8589934592],one>                  0          1          1    ZERO                 
+            bin <branch_ops[1073741824],one>                0          1          1    ZERO                 
+            bin <branch_ops[536870912],one>                 0          1          1    ZERO                 
+            bin <mem_addr_ops[67108864],one>                0          1          1    ZERO                 
+            bin <mem_addr_ops[2097152],one>                 0          1          1    ZERO                 
+            bin <add_sub[2],one>                            0          1          1    ZERO                 
+            bin <upper_ops[68719476736],zero>               0          1          1    ZERO                 
+            bin <upper_ops[34359738368],zero>               0          1          1    ZERO                 
+            bin <jump_ops[17179869184],zero>                0          1          1    ZERO                 
+            bin <jump_ops[8589934592],zero>                 0          1          1    ZERO                 
+            bin <branch_ops[4294967296],zero>               0          1          1    ZERO                 
+            bin <branch_ops[268435456],zero>                0          1          1    ZERO                 
+            bin <branch_ops[134217728],zero>                0          1          1    ZERO                 
+            bin <mem_addr_ops[67108864],zero>               0          1          1    ZERO                 
+            bin <mem_addr_ops[2097152],zero>                0          1          1    ZERO                 
+    Cross x_branch_taken                               20.27%        100          -    Uncovered            
+        covered/total bins:                                15         74          -                      
+        missing/total bins:                                59         74          -                      
+        % Hit:                                         20.27%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <branch_ops[4294967296],taken>              2          1          -    Covered              
+            bin <branch_ops[2147483648],taken>              1          1          -    Covered              
+            bin <branch_ops[268435456],taken>               1          1          -    Covered              
+            bin <branch_ops[134217728],taken>               7          1          -    Covered              
+            bin <upper_ops[68719476736],not_taken>          7          1          -    Covered              
+            bin <upper_ops[34359738368],not_taken>          1          1          -    Covered              
+            bin <jump_ops[17179869184],not_taken>           7          1          -    Covered              
+            bin <jump_ops[8589934592],not_taken>           18          1          -    Covered              
+            bin <branch_ops[2147483648],not_taken>          1          1          -    Covered              
+            bin <branch_ops[1073741824],not_taken>          2          1          -    Covered              
+            bin <branch_ops[536870912],not_taken>           2          1          -    Covered              
+            bin <mem_addr_ops[67108864],not_taken>         50          1          -    Covered              
+            bin <mem_addr_ops[2097152],not_taken>          53          1          -    Covered              
+            bin <add_sub[1024],not_taken>                  93          1          -    Covered              
+            bin <add_sub[2],not_taken>                      4          1          -    Covered              
+            bin <mem_addr_ops[33554432],*>                  0          1          2    ZERO                 
+            bin <mem_addr_ops[16777216],*>                  0          1          2    ZERO                 
+            bin <mem_addr_ops[8388608],*>                   0          1          2    ZERO                 
+            bin <mem_addr_ops[4194304],*>                   0          1          2    ZERO                 
+            bin <mem_addr_ops[1048576],*>                   0          1          2    ZERO                 
+            bin <mem_addr_ops[524288],*>                    0          1          2    ZERO                 
+            bin <compare_ops[262144],*>                     0          1          2    ZERO                 
+            bin <compare_ops[131072],*>                     0          1          2    ZERO                 
+            bin <compare_ops[512],*>                        0          1          2    ZERO                 
+            bin <compare_ops[256],*>                        0          1          2    ZERO                 
+            bin <shift_ops[65536],*>                        0          1          2    ZERO                 
+            bin <shift_ops[32768],*>                        0          1          2    ZERO                 
+            bin <shift_ops[16384],*>                        0          1          2    ZERO                 
+            bin <shift_ops[128],*>                          0          1          2    ZERO                 
+            bin <shift_ops[64],*>                           0          1          2    ZERO                 
+            bin <shift_ops[32],*>                           0          1          2    ZERO                 
+            bin <logic_ops[8192],*>                         0          1          2    ZERO                 
+            bin <logic_ops[4096],*>                         0          1          2    ZERO                 
+            bin <logic_ops[2048],*>                         0          1          2    ZERO                 
+            bin <logic_ops[16],*>                           0          1          2    ZERO                 
+            bin <logic_ops[8],*>                            0          1          2    ZERO                 
+            bin <logic_ops[4],*>                            0          1          2    ZERO                 
+            bin <add_sub[1],*>                              0          1          2    ZERO                 
+            bin <upper_ops[68719476736],taken>              0          1          1    ZERO                 
+            bin <upper_ops[34359738368],taken>              0          1          1    ZERO                 
+            bin <jump_ops[17179869184],taken>               0          1          1    ZERO                 
+            bin <jump_ops[8589934592],taken>                0          1          1    ZERO                 
+            bin <branch_ops[1073741824],taken>              0          1          1    ZERO                 
+            bin <branch_ops[536870912],taken>               0          1          1    ZERO                 
+            bin <mem_addr_ops[67108864],taken>              0          1          1    ZERO                 
+            bin <mem_addr_ops[2097152],taken>               0          1          1    ZERO                 
+            bin <add_sub[1024],taken>                       0          1          1    ZERO                 
+            bin <add_sub[2],taken>                          0          1          1    ZERO                 
+            bin <branch_ops[4294967296],not_taken>          0          1          1    ZERO                 
+            bin <branch_ops[268435456],not_taken>           0          1          1    ZERO                 
+            bin <branch_ops[134217728],not_taken>           0          1          1    ZERO                 
+    Cross x_reg_write                                  21.62%        100          -    Uncovered            
+        covered/total bins:                                16         74          -                      
+        missing/total bins:                                58         74          -                      
+        % Hit:                                         21.62%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <upper_ops[68719476736],write>              7          1          -    Covered              
+            bin <upper_ops[34359738368],write>              1          1          -    Covered              
+            bin <jump_ops[8589934592],write>                8          1          -    Covered              
+            bin <mem_addr_ops[2097152],write>              53          1          -    Covered              
+            bin <add_sub[1024],write>                      92          1          -    Covered              
+            bin <add_sub[2],write>                          4          1          -    Covered              
+            bin <jump_ops[17179869184],no_write>            7          1          -    Covered              
+            bin <jump_ops[8589934592],no_write>            10          1          -    Covered              
+            bin <branch_ops[4294967296],no_write>           2          1          -    Covered              
+            bin <branch_ops[2147483648],no_write>           2          1          -    Covered              
+            bin <branch_ops[1073741824],no_write>           2          1          -    Covered              
+            bin <branch_ops[536870912],no_write>            2          1          -    Covered              
+            bin <branch_ops[268435456],no_write>            1          1          -    Covered              
+            bin <branch_ops[134217728],no_write>            7          1          -    Covered              
+            bin <mem_addr_ops[67108864],no_write>          50          1          -    Covered              
+            bin <add_sub[1024],no_write>                    1          1          -    Covered              
+            bin <mem_addr_ops[33554432],*>                  0          1          2    ZERO                 
+            bin <mem_addr_ops[16777216],*>                  0          1          2    ZERO                 
+            bin <mem_addr_ops[8388608],*>                   0          1          2    ZERO                 
+            bin <mem_addr_ops[4194304],*>                   0          1          2    ZERO                 
+            bin <mem_addr_ops[1048576],*>                   0          1          2    ZERO                 
+            bin <mem_addr_ops[524288],*>                    0          1          2    ZERO                 
+            bin <compare_ops[262144],*>                     0          1          2    ZERO                 
+            bin <compare_ops[131072],*>                     0          1          2    ZERO                 
+            bin <compare_ops[512],*>                        0          1          2    ZERO                 
+            bin <compare_ops[256],*>                        0          1          2    ZERO                 
+            bin <shift_ops[65536],*>                        0          1          2    ZERO                 
+            bin <shift_ops[32768],*>                        0          1          2    ZERO                 
+            bin <shift_ops[16384],*>                        0          1          2    ZERO                 
+            bin <shift_ops[128],*>                          0          1          2    ZERO                 
+            bin <shift_ops[64],*>                           0          1          2    ZERO                 
+            bin <shift_ops[32],*>                           0          1          2    ZERO                 
+            bin <logic_ops[8192],*>                         0          1          2    ZERO                 
+            bin <logic_ops[4096],*>                         0          1          2    ZERO                 
+            bin <logic_ops[2048],*>                         0          1          2    ZERO                 
+            bin <logic_ops[16],*>                           0          1          2    ZERO                 
+            bin <logic_ops[8],*>                            0          1          2    ZERO                 
+            bin <logic_ops[4],*>                            0          1          2    ZERO                 
+            bin <add_sub[1],*>                              0          1          2    ZERO                 
+            bin <jump_ops[17179869184],write>               0          1          1    ZERO                 
+            bin <branch_ops[4294967296],write>              0          1          1    ZERO                 
+            bin <branch_ops[2147483648],write>              0          1          1    ZERO                 
+            bin <branch_ops[1073741824],write>              0          1          1    ZERO                 
+            bin <branch_ops[536870912],write>               0          1          1    ZERO                 
+            bin <branch_ops[268435456],write>               0          1          1    ZERO                 
+            bin <branch_ops[134217728],write>               0          1          1    ZERO                 
+            bin <mem_addr_ops[67108864],write>              0          1          1    ZERO                 
+            bin <upper_ops[68719476736],no_write>           0          1          1    ZERO                 
+            bin <upper_ops[34359738368],no_write>           0          1          1    ZERO                 
+            bin <mem_addr_ops[2097152],no_write>            0          1          1    ZERO                 
+            bin <add_sub[2],no_write>                       0          1          1    ZERO                 
+
+TOTAL COVERGROUP COVERAGE: 64.69%  COVERGROUP TYPES: 2
+
+Total Coverage By Instance (filtered view): 64.69%
+
+End time: 16:12:07 on Apr 27,2026, Elapsed time: 0:00:00
+Errors: 0, Warnings: 0

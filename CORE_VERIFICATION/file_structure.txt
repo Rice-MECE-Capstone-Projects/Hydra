@@ -1,0 +1,373 @@
+.
+├── CORE_FILES
+│   └── CORE
+│       ├── branch_prediction.v
+│       ├── dataMem.v
+│       ├── decode.v
+│       ├── excute.v
+│       ├── hazard.v
+│       ├── ins_mem.v
+│       ├── params.vh
+│       ├── pc.v
+│       ├── regfile.v
+│       ├── riscv32iTB.v
+│       └── riscv32i.v
+├── CORE_SMOKE
+│   └── CORE_TB
+│       ├── core_if.sv
+│       ├── core_smoke_test_pkg.sv
+│       ├── core_smoke_test.sv
+│       ├── golden_decocder.sv
+│       ├── params.sv
+│       ├── params.sv.bak
+│       ├── tb_decoder_scoreboard.sv
+│       ├── tb_top.sv
+│       ├── testbench_2.sv
+│       ├── testbench_2.sv.bak
+│       ├── testbench.sv
+│       ├── testbench.sv.bak
+│       ├── vsim.dbg
+│       ├── vsim_stacktrace.vstf
+│       └── vsim.wlf
+├── EXECUTE_MODULE
+│   ├── design.sv
+│   ├── design.sv.bak
+│   ├── env.sv
+│   ├── env.sv.bak
+│   ├── exec_driver.sv
+│   ├── exec_driver.sv.bak
+│   ├── exec_monitor.sv
+│   ├── exec_monitor.sv.bak
+│   ├── exec_scoreboard.sv
+│   ├── exec_scoreboard.sv.bak
+│   ├── execute_if.sv
+│   ├── EXECUTE.mpf
+│   ├── EXECUTEOUTPUT.txt
+│   ├── my_test.sv
+│   ├── my_test.sv.bak
+│   ├── pkg_tx.sv
+│   ├── pkg_tx.sv.bak
+│   ├── uvm_execute.cr.mti
+│   └── uvm_execute.mpf
+├── file_structure.txt
+├── README.md
+├── Test_case
+│   ├── ahb_apb_burst_test.sv
+│   ├── ahb_apb_single_test.sv
+│   ├── ahb_apb_test.sv
+│   └── README.md
+├── TOP_CORE
+│   ├── bram_ins.sv
+│   ├── bram_ins.sv.bak
+│   ├── bram_mem.sv
+│   ├── bram_mem.sv.bak
+│   ├── bram_mem.v
+│   ├── bram_mem.v.bak
+│   ├── certe_dump.xml
+│   ├── CORE
+│   │   ├── branch_prediction.v
+│   │   ├── branch_prediction.v.bak
+│   │   ├── dataMem.v
+│   │   ├── dataMem.v.bak
+│   │   ├── decode.v
+│   │   ├── decode.v.bak
+│   │   ├── excute.v
+│   │   ├── excute.v.bak
+│   │   ├── hazard.v
+│   │   ├── hazard.v.bak
+│   │   ├── ins_mem.v
+│   │   ├── ins_mem.v.bak
+│   │   ├── params.vh
+│   │   ├── pc.v
+│   │   ├── pc.v.bak
+│   │   ├── regfile.v
+│   │   ├── regfile.v.bak
+│   │   ├── riscv32iTB.v
+│   │   ├── riscv32iTB.v.bak
+│   │   ├── riscv32i.v
+│   │   └── riscv32i.v.bak
+│   ├── core.350431
+│   ├── CORE_TB
+│   │   ├── core_if.sv
+│   │   ├── core_smoke_test_pkg.sv
+│   │   ├── core_smoke_test.sv
+│   │   ├── core_smoke_test.sv.bak
+│   │   ├── tb_top.sv
+│   │   └── tb_top.sv.bak
+│   ├── decoder_scoreboard.sv
+│   ├── decoder_scoreboard.sv.bak
+│   ├── golden_decocder.sv
+│   ├── golden_decocder.sv.bak
+│   ├── ins_mem_model.sv
+│   ├── program.hex
+│   ├── program.hex.bak
+│   ├── riscv32i.v
+│   ├── riscv32i.v.bak
+│   ├── tb_decoder_scoreboard.sv
+│   ├── tb_decoder_scoreboard.sv.bak
+│   ├── tb_smoke_riscv32i.sv
+│   ├── tb_smoke_riscv32i.sv.bak
+│   ├── tb_smoke_riscv32i.v
+│   ├── TOP_CORE.cr.mti
+│   ├── TOP_CORE.mpf
+│   ├── transcript
+│   ├── vsim.dbg
+│   ├── vsim_stacktrace.vstf
+│   └── work
+│       ├── _dbcontainer
+│       │   ├── #64_opt1
+│       │   │   ├── __mti.dbg
+│       │   │   ├── work_bram_ins_fast_0.dbg
+│       │   │   ├── work_bram_mem_fast_0.dbg
+│       │   │   ├── work_dataMem_fast_0.dbg
+│       │   │   ├── work_decode_fast_0.dbg
+│       │   │   ├── work_decoder_scoreboard_fast_0.dbg
+│       │   │   ├── work_end_write_fast_0.dbg
+│       │   │   ├── work_execute_fast_0.dbg
+│       │   │   ├── work_hazard_fast_0.dbg
+│       │   │   ├── work_ins_mem_fast_0.dbg
+│       │   │   ├── work_pc_fast_0.dbg
+│       │   │   ├── work_pulse_generator_fast_0.dbg
+│       │   │   ├── work_reg_file_fast_0.dbg
+│       │   │   ├── work_riscv32i_fast_0.dbg
+│       │   │   ├── work_riscv32i_main_fast_0.dbg
+│       │   │   ├── work_tb_decoder_scoreboard_fast_0.dbg
+│       │   │   └── work_tb_smoke_riscv32i_fast_0.dbg
+│       │   └── #64_opt2
+│       │       ├── __mti.dbg
+│       │       ├── work_branch_prediction_fast_0.dbg
+│       │       ├── work_core_if_fast__2_0.dbg
+│       │       ├── work_dataMem_fast_0.dbg
+│       │       ├── work_decode_fast_0.dbg
+│       │       ├── work_end_write_fast_0.dbg
+│       │       ├── work_execute_fast_0.dbg
+│       │       ├── work_hazard_fast_0.dbg
+│       │       ├── work_ins_mem_fast_0.dbg
+│       │       ├── work_ins_mem_model_fast_0.dbg
+│       │       ├── work_inst_mem_bram_wrapper_fast_0.dbg
+│       │       ├── work_pc_fast_0.dbg
+│       │       ├── work_pulse_generator_fast_0.dbg
+│       │       ├── work_reg_file_fast_0.dbg
+│       │       ├── work_riscv32i_fast_0.dbg
+│       │       ├── work_riscv32i_main_fast_0.dbg
+│       │       └── work_tb_top_fast_0.dbg
+│       ├── _info
+│       ├── _lib1_17.qdb
+│       ├── _lib1_17.qpg
+│       ├── _lib1_17.qtl
+│       ├── _lib.qdb
+│       ├── @_opt
+│       │   ├── _data
+│       │   │   ├── exempt7wS7t5
+│       │   │   └── exemptYF1D1k
+│       │   ├── _lib1_0.qdb
+│       │   ├── _lib1_0.qpg
+│       │   ├── _lib1_0.qtl
+│       │   ├── _lib2_0.qdb
+│       │   ├── _lib2_0.qpg
+│       │   ├── _lib2_0.qtl
+│       │   ├── _lib3_0.qdb
+│       │   ├── _lib3_0.qpg
+│       │   ├── _lib3_0.qtl
+│       │   └── _lib.qdb
+│       ├── @_opt1
+│       │   ├── _data
+│       │   │   ├── exempta7TgMY
+│       │   │   ├── exemptj9h4W7
+│       │   │   └── exemptOOPxEl
+│       │   ├── _lib1_0.qdb
+│       │   ├── _lib1_0.qpg
+│       │   ├── _lib1_0.qtl
+│       │   ├── _lib2_0.qdb
+│       │   ├── _lib2_0.qpg
+│       │   ├── _lib2_0.qtl
+│       │   ├── _lib3_0.qdb
+│       │   ├── _lib3_0.qpg
+│       │   ├── _lib3_0.qtl
+│       │   ├── _lib4_0.qdb
+│       │   ├── _lib4_0.qpg
+│       │   ├── _lib4_0.qtl
+│       │   ├── _lib5_0.qdb
+│       │   ├── _lib5_0.qpg
+│       │   ├── _lib5_0.qtl
+│       │   └── _lib.qdb
+│       ├── @_opt2
+│       │   ├── _data
+│       │   │   ├── exemptHXwhmq
+│       │   │   ├── exemptq6qlho
+│       │   │   └── exemptUNqGKH
+│       │   ├── _lib1_0.qdb
+│       │   ├── _lib1_0.qpg
+│       │   ├── _lib1_0.qtl
+│       │   ├── _lib2_0.qdb
+│       │   ├── _lib2_0.qpg
+│       │   ├── _lib2_0.qtl
+│       │   ├── _lib3_0.qdb
+│       │   ├── _lib3_0.qpg
+│       │   ├── _lib3_0.qtl
+│       │   ├── _lib4_0.qdb
+│       │   ├── _lib4_0.qpg
+│       │   ├── _lib4_0.qtl
+│       │   └── _lib.qdb
+│       ├── _temp
+│       │   └── _typesEpBff3
+│       ├── _tempmsg
+│       └── _vmake
+├── uvm_pc_tb
+│   ├── pc_driver.sv
+│   ├── pc_driver.sv.bak
+│   ├── pc_env.sv
+│   ├── pc_env.sv.bak
+│   ├── pc_if.sv
+│   ├── pc_if.sv.bak
+│   ├── pc_pkg.sv
+│   ├── pc_pkg.sv.bak
+│   ├── pc_seq.sv
+│   ├── pc_seq.sv.bak
+│   ├── pc_test_2.sv
+│   ├── pc_test.sv
+│   ├── pc_test.sv.bak
+│   ├── pc_txn.sv
+│   ├── pc_txn.sv.bak
+│   ├── pc.v
+│   ├── pc.v.bak
+│   ├── QUESTA_prj.cr.mti
+│   ├── QUESTA_prj.mpf
+│   ├── tb_top.sv
+│   ├── tb_top.sv.bak
+│   ├── transcript
+│   ├── vsim.dbg
+│   ├── vsim.wlf
+│   └── work
+│       ├── _dbcontainer
+│       │   ├── #64_opt
+│       │   │   ├── __mti.dbg
+│       │   │   ├── work_pc_fast_0.dbg
+│       │   │   ├── work_pc_if_fast__1_0.dbg
+│       │   │   └── work_tb_top_fast_0.dbg
+│       │   └── #64_opt2
+│       │       ├── __mti.dbg
+│       │       ├── work_pc_fast_0.dbg
+│       │       ├── work_pc_if_fast__1_0.dbg
+│       │       └── work_tb_top_fast_0.dbg
+│       ├── _info
+│       ├── _lib1_1.qdb
+│       ├── _lib1_1.qpg
+│       ├── _lib1_1.qtl
+│       ├── _lib.qdb
+│       ├── @_opt
+│       │   ├── _data
+│       │   │   ├── exempt47EI0m
+│       │   │   ├── exemptlrzGZT
+│       │   │   └── exemptS37khL
+│       │   ├── _lib1_0.qdb
+│       │   ├── _lib1_0.qpg
+│       │   ├── _lib1_0.qtl
+│       │   ├── _lib2_0.qdb
+│       │   ├── _lib2_0.qpg
+│       │   ├── _lib2_0.qtl
+│       │   ├── _lib3_0.qdb
+│       │   ├── _lib3_0.qpg
+│       │   ├── _lib3_0.qtl
+│       │   ├── _lib4_0.qdb
+│       │   ├── _lib4_0.qpg
+│       │   ├── _lib4_0.qtl
+│       │   └── _lib.qdb
+│       ├── @_opt1
+│       │   ├── _data
+│       │   │   ├── exemptawTfOg
+│       │   │   ├── exemptGvETtP
+│       │   │   └── exemptKN84NB
+│       │   ├── _lib1_0.qdb
+│       │   ├── _lib1_0.qpg
+│       │   ├── _lib1_0.qtl
+│       │   ├── _lib2_0.qdb
+│       │   ├── _lib2_0.qpg
+│       │   ├── _lib2_0.qtl
+│       │   ├── _lib3_0.qdb
+│       │   ├── _lib3_0.qpg
+│       │   ├── _lib3_0.qtl
+│       │   ├── _lib4_0.qdb
+│       │   ├── _lib4_0.qpg
+│       │   ├── _lib4_0.qtl
+│       │   └── _lib.qdb
+│       ├── @_opt2
+│       │   ├── _data
+│       │   │   ├── exempt5kpN9u
+│       │   │   ├── exemptcx4dFX
+│       │   │   └── exemptewCnIs
+│       │   ├── _lib1_0.qdb
+│       │   ├── _lib1_0.qpg
+│       │   ├── _lib1_0.qtl
+│       │   ├── _lib2_0.qdb
+│       │   ├── _lib2_0.qpg
+│       │   ├── _lib2_0.qtl
+│       │   ├── _lib3_0.qdb
+│       │   ├── _lib3_0.qpg
+│       │   ├── _lib3_0.qtl
+│       │   ├── _lib4_0.qdb
+│       │   ├── _lib4_0.qpg
+│       │   ├── _lib4_0.qtl
+│       │   └── _lib.qdb
+│       ├── _temp
+│       ├── _tempmsg
+│       └── _vmake
+└── work
+    ├── _dbcontainer
+    │   └── #64_opt
+    │       ├── __mti.dbg
+    │       ├── work_execute_fast_0.dbg
+    │       ├── work_execute_if_fast__1_0.dbg
+    │       └── work_tb_top_fast_0.dbg
+    ├── _info
+    ├── _lib1_5.qdb
+    ├── _lib1_5.qpg
+    ├── _lib1_5.qtl
+    ├── _lib.qdb
+    ├── @_opt
+    │   ├── _data
+    │   │   ├── exempt4ajAwC
+    │   │   ├── exempttZxDpj
+    │   │   └── exemptZg89ve
+    │   ├── _lib1_0.qdb
+    │   ├── _lib1_0.qpg
+    │   ├── _lib1_0.qtl
+    │   ├── _lib2_0.qdb
+    │   ├── _lib2_0.qpg
+    │   ├── _lib2_0.qtl
+    │   ├── _lib3_0.qdb
+    │   ├── _lib3_0.qpg
+    │   ├── _lib3_0.qtl
+    │   ├── _lib4_0.qdb
+    │   ├── _lib4_0.qpg
+    │   ├── _lib4_0.qtl
+    │   ├── _lib5_0.qdb
+    │   ├── _lib5_0.qpg
+    │   ├── _lib5_0.qtl
+    │   └── _lib.qdb
+    ├── @_opt1
+    │   ├── _data
+    │   │   ├── exempt8Wf6kJ
+    │   │   ├── exemptE7htVp
+    │   │   └── exemptSLiRBW
+    │   ├── _lib1_0.qdb
+    │   ├── _lib1_0.qpg
+    │   ├── _lib1_0.qtl
+    │   ├── _lib2_0.qdb
+    │   ├── _lib2_0.qpg
+    │   ├── _lib2_0.qtl
+    │   ├── _lib3_0.qdb
+    │   ├── _lib3_0.qpg
+    │   ├── _lib3_0.qtl
+    │   ├── _lib4_0.qdb
+    │   ├── _lib4_0.qpg
+    │   ├── _lib4_0.qtl
+    │   ├── _lib5_0.qdb
+    │   ├── _lib5_0.qpg
+    │   ├── _lib5_0.qtl
+    │   └── _lib.qdb
+    ├── _temp
+    ├── _tempmsg
+    └── _vmake
+
+43 directories, 327 files
