@@ -1,0 +1,4 @@
+#!/bin/sh
+
+vlog hydra_pkg.sv hydra_scratchpad.sv hydra_transform.sv hydra_tb.sv 
+vsim -c hydra_tb -do "run -all; quit" > hydra_tb.log
