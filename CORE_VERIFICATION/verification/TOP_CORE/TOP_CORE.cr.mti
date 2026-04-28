@@ -57,6 +57,13 @@ QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
 Top level modules:
 	--none--
 
+} {} {}} /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/verification/TOP_CORE/golden_alu_pkg.sv {1 {vlog -work work -vopt -sv -stats=none /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/verification/TOP_CORE/golden_alu_pkg.sv
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+-- Compiling package golden_alu_pkg
+
+Top level modules:
+	--none--
+
 } {} {}} /storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/tb_decoder_scoreboard.sv {1 {vlog -work work -vopt -sv +incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE +incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE -stats=none /storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/tb_decoder_scoreboard.sv
 QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
 -- Compiling module tb_decoder_scoreboard
@@ -64,6 +71,24 @@ QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
 
 Top level modules:
 	tb_decoder_scoreboard
+
+} {} {}} /storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/tb_smoke_riscv32i.sv {1 {vlog -work work -vopt -sv -stats=none /storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/tb_smoke_riscv32i.sv
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+-- Compiling package tb_smoke_riscv32i_sv_unit
+-- Importing package golden_alu_pkg
+-- Compiling module tb_smoke_riscv32i
+-- Compiling module bram_mem
+-- Compiling module bram_ins
+
+Top level modules:
+	tb_smoke_riscv32i
+
+} {} {}} /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/verification/TOP_CORE/alu_scoreboard.sv {1 {vlog -work work -vopt -sv -stats=none /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/verification/TOP_CORE/alu_scoreboard.sv
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+-- Compiling module alu_scoreboard
+
+Top level modules:
+	alu_scoreboard
 
 } {} {}} /storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/bram_mem.sv {1 {vlog -work work -vopt -sv -stats=none /storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/bram_mem.sv
 QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
@@ -92,6 +117,13 @@ QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
 
 Top level modules:
 	--none--
+
+} {} {}} /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/verification/TOP_CORE/branch_scoreboard.sv {1 {vlog -work work -vopt -sv -stats=none /storage-home/i/ijt2/ELEC594_HYDRA/Hydra/CORE_VERIFICATION/verification/TOP_CORE/branch_scoreboard.sv
+QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
+-- Compiling module branch_scoreboard
+
+Top level modules:
+	branch_scoreboard
 
 } {} {}} /storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE_TB/core_smoke_test_pkg.sv {1 {vlog -work work -vopt -sv +incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE +incdir+/storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE_TB -stats=none /storage-home/i/ijt2/ELEC594/SwitchMCU/verification/UVM/TOP_CORE/CORE_TB/core_smoke_test_pkg.sv
 QuestaSim-64 vlog 2023.2 Compiler 2023.04 Apr 11 2023
