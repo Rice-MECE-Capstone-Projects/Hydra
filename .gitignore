@@ -2,10 +2,11 @@
 *.vcd
 *.vvp
 *.wlf
+wlf*
 *.wdb
 *.ucdb
-*.log
 *.vstf
+work/
 transcript
 vsim.wlf
 questa.ini
