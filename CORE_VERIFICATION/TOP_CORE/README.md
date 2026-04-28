@@ -451,7 +451,18 @@ Then rerun simulation.
 
 # Expanding the Environment
 
-The environment is intentionally modular and designed for extension.
+The verification framework is intentionally modular and designed to support incremental expansion as the processor RTL evolves.
+
+The current structure separates:
+- DUT integration
+- interfaces
+- scoreboards
+- golden behavioral models
+- coverage collection
+- memory infrastructure
+- program generation
+
+This allows new functionality to be added with minimal disruption to existing infrastructure.
 
 Possible expansions include:
 - additional scoreboards
@@ -466,15 +477,399 @@ Possible expansions include:
 - architectural reference models
 - cross-coverage refinement
 - constrained-random UVM sequences
+- multi-core support
+- out-of-order pipeline instrumentation
+- speculative execution tracking
 
-New modules can typically be integrated by:
-1. adding interfaces
-2. creating monitors
-3. implementing behavioral golden models
-4. attaching scoreboards
-5. extending coverage groups
+---
 
-The current structure provides a reusable foundation for progressively more advanced processor verification workflows.
+# Adding New Scoreboards Into TOP_CORE
+
+The existing framework already demonstrates the general structure required for integrating new scoreboard-driven verification components.
+
+Current examples include:
+- `decoder_scoreboard.sv`
+- `alu_scoreboard.sv`
+- `branch_scoreboard.sv`
+
+These can be used as templates for future module-level verification components.
+
+---
+
+## General Scoreboard Integration Flow
+
+A new scoreboard is typically integrated through the following steps:
+
+### 1. Expose DUT Signals Through Interfaces
+
+Relevant DUT signals should first be exposed through:
+- `core_if.sv`
+- dedicated module interfaces
+- pipeline-stage observation signals
+
+Examples:
+- pipeline valid bits
+- stall signals
+- forwarding selects
+- cache hit/miss indicators
+- branch prediction metadata
+- CSR writes
+- exception flags
+
+This ensures monitors and scoreboards remain decoupled from direct DUT hierarchy references.
+
+---
+
+### 2. Create a Behavioral Golden Model
+
+A behavioral reference model should be implemented to generate expected outputs.
+
+Examples:
+- forwarding decision logic
+- branch prediction logic
+- cache state tracking
+- CSR state updates
+- hazard detection behavior
+
+The golden model should:
+- avoid cycle-level RTL duplication
+- operate behaviorally
+- remain implementation-independent
+- focus on architectural correctness
+
+Examples already present:
+- `golden_alu_pkg.sv`
+- `golden_decocder.sv`
+
+---
+
+### 3. Create a Monitor or Observation Layer
+
+The monitor collects:
+- DUT outputs
+- internal control signals
+- pipeline metadata
+- transaction state
+
+For pipeline-aware modules, this often includes:
+- instruction opcode
+- source/destination registers
+- valid bits
+- PC values
+- branch targets
+- memory addresses
+
+The monitor should package this information into transaction-like structures before forwarding to the scoreboard.
+
+---
+
+### 4. Implement the Scoreboard
+
+The scoreboard compares:
+- DUT behavior
+- expected behavior from the golden model
+
+The scoreboard may:
+- immediately compare results
+- maintain state history
+- track outstanding transactions
+- model pipeline timing
+
+Typical scoreboard responsibilities:
+- mismatch reporting
+- assertion triggering
+- debug logging
+- scoreboard statistics
+- pass/fail tracking
+
+---
+
+### 5. Integrate Functional Coverage
+
+Coverage should be integrated alongside scoreboard development.
+
+Typical additions include:
+- new covergroups
+- cross coverage
+- state transition coverage
+- control-flow coverage
+- pipeline interaction coverage
+
+Examples:
+- forwarding source combinations
+- stall cause combinations
+- branch prediction accuracy
+- exception type coverage
+- cache eviction patterns
+
+Coverage is currently centralized in:
+
+```text
+project_files/core_coverage.sv
+```
+
+though future expansion may separate coverage into module-specific files.
+
+---
+
+# Example Expansion Targets
+
+## Hazard Verification
+
+Potential additions:
+- RAW hazard detection coverage
+- stall insertion checking
+- forwarding-vs-stall correctness
+- pipeline bubble tracking
+
+Possible signals:
+- `stall`
+- `flush`
+- source/destination register dependencies
+- valid bits
+
+---
+
+## Cache Verification
+
+Potential additions:
+- cache hit/miss scoreboards
+- memory consistency checking
+- refill verification
+- eviction tracking
+- writeback verification
+
+Would likely require:
+- transaction-level memory monitors
+- cache state models
+- memory latency modeling
+
+---
+
+## CSR Verification
+
+Potential additions:
+- CSR access legality
+- privilege checks
+- exception generation
+- CSR state tracking
+
+Would require:
+- CSR behavioral model
+- CSR access monitor
+- architectural state comparison
+
+---
+
+## Exception / Flush Verification
+
+Potential additions:
+- illegal instruction handling
+- pipeline flush correctness
+- redirect timing validation
+- interrupt entry/return verification
+
+Would require:
+- precise PC tracking
+- pipeline-valid tracking
+- exception-state monitoring
+
+---
+
+# Adapting the Framework to Wally
+
+The framework was intentionally developed in a sufficiently modular way that it can serve as a foundation for integration with more advanced open-source RISC-V cores such as Wally.
+
+Wally introduces substantially more architectural complexity than the current RV32I implementation, including:
+- deeper pipelines
+- more advanced hazard handling
+- branch prediction infrastructure
+- caches
+- privilege support
+- CSR infrastructure
+- MMU/TLB behavior
+- potentially multiple issue/control paths depending on configuration
+
+The existing framework would not need to be discarded; instead, the methodology can be incrementally extended.
+
+---
+
+# Expected Architectural Changes Required for Wally
+
+## 1. Expanded Interface Instrumentation
+
+The current framework primarily monitors:
+- decode outputs
+- ALU behavior
+- branch decisions
+- basic pipeline state
+
+Wally integration would require exposing significantly more metadata through interfaces.
+
+Examples include:
+- pipeline stage valid bits
+- stall/flush controls
+- forwarding selects
+- branch prediction metadata
+- CSR accesses
+- exception state
+- privilege mode
+- cache transactions
+- MMU translations
+- TLB misses
+- commit-stage architectural state
+
+The preferred approach would be:
+- one interface per major subsystem
+- shared transaction structures
+- centralized monitor aggregation
+
+rather than directly probing deep DUT hierarchy paths.
+
+---
+
+## 2. Pipeline-Aware Scoreboarding
+
+The current scoreboards are primarily localized and stage-focused.
+
+Wally would require:
+- multi-stage transaction tracking
+- in-flight instruction bookkeeping
+- pipeline flush awareness
+- speculative execution handling
+- commit-stage validation
+
+This would likely require transitioning toward:
+- transaction-based pipeline scoreboards
+- reorder-aware instruction tracking
+- instruction tags or sequence IDs
+- architectural state synchronization
+
+---
+
+## 3. Architectural State Scoreboarding
+
+The current framework validates:
+- localized module behavior
+- decoder correctness
+- ALU correctness
+- branch correctness
+
+Wally adaptation would benefit from adding:
+- architectural register-state scoreboarding
+- memory-state checking
+- commit-stage validation
+
+A future extension could compare:
+- DUT architectural state
+- reference model architectural state
+
+after each retired instruction.
+
+This would significantly improve:
+- end-to-end validation
+- exception correctness
+- pipeline recovery validation
+
+---
+
+## 4. Coverage Expansion for Deep Pipelines
+
+Current coverage is instruction-centric and module-centric.
+
+Wally would require significantly richer coverage models.
+
+Examples:
+- hazard resolution combinations
+- branch predictor states
+- cache coherence behavior
+- exception-entry paths
+- TLB refill scenarios
+- privilege transitions
+- pipeline flush causes
+- speculation recovery paths
+
+Cross coverage would become substantially more important.
+
+Examples:
+- branch mispredict × flush type
+- cache miss × stall source
+- exception × privilege mode
+- forwarding path × instruction class
+
+---
+
+## 5. RISC-V-DV Scaling
+
+The current framework already supports RISC-V-DV integration, which provides a strong foundation for Wally adaptation.
+
+However, Wally would require:
+- broader ISA support
+- CSR instruction generation
+- privileged instruction testing
+- memory-intensive workloads
+- branch-heavy workloads
+- exception-heavy workloads
+
+Likely changes:
+- enabling full RV32IM or RV64 support
+- adding constrained-random stress programs
+- integrating directed corner-case sequences
+- generating privilege-mode transitions
+- randomized interrupt injection
+
+---
+
+## 6. Memory-System Verification
+
+The current framework uses relatively simple BRAM-backed memories.
+
+Wally adaptation would likely require:
+- cache-aware memory models
+- latency injection
+- memory response randomization
+- AXI/AHB/APB monitoring
+- transaction-level memory scoreboards
+
+The verification environment would move closer to:
+- full SoC-style verification
+- transaction-level monitoring
+- protocol-aware scoreboards
+
+---
+
+## 7. UVM Migration Strategy
+
+The safest migration path would likely be incremental.
+
+Recommended progression:
+1. Integrate Wally RTL into existing TOP_CORE flow
+2. Re-establish smoke-test functionality
+3. Reconnect decoder/ALU scoreboards
+4. Add pipeline-state interfaces
+5. Add commit-stage monitoring
+6. Expand coverage infrastructure
+7. Introduce architectural-state scoreboarding
+8. Introduce cache/MMU verification
+9. Add constrained-random stress testing
+
+This avoids attempting a complete verification rewrite immediately.
+
+---
+
+# Long-Term Verification Direction
+
+The current framework is intentionally structured as a reusable verification foundation rather than a fixed one-off testbench.
+
+The design philosophy emphasizes:
+- modular scoreboards
+- reusable interfaces
+- scalable coverage collection
+- incremental subsystem validation
+- realistic instruction execution
+- compatibility with randomized program generation
+
+This allows the framework to evolve alongside increasingly sophisticated processor implementations while preserving existing infrastructure and methodology.
 
 ---
 
@@ -486,3 +881,4 @@ The current structure provides a reusable foundation for progressively more adva
 - Scoreboards compare DUT behavior against behavioral golden models.
 - RISC-V-DV integration enables scalable randomized instruction testing.
 - The environment is structured to support future RTL evolution and verification expansion.
+- The modular methodology is intended to support migration toward more advanced processor architectures such as Wally with incremental infrastructure growth rather than complete redesign.
