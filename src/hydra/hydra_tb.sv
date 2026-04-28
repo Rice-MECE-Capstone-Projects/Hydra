@@ -1,0 +1,352 @@
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+// hydra_tb.sv
+// Rice University - Project HYDRA
+// Author: Giovanni <gs86@rice.edu>
+// Description: Unit testbench for hydra_transform + hydra_scratchpad.
+//
+// DUT scope: hydra_transform and hydra_scratchpad in isolation.
+// AHB slave is a simple synchronous RAM model. Bus grant is a 1-cycle
+// delayed copy of HBUSREQ. CPU AHB reads to scratchpad are not exercised
+// here - output verification reads u_scratchpad.mem[] directly.
+//
+// Test list:
+    // IMPLEMENTED
+//   T1  Mode B, length=NUM_ELEMS,                no wait states
+
+    // YET TO BE IMPLEMENTED
+//   T2  Mode B, length=2*NUM_ELEMS (two blocks), no wait states
+//   T3  Mode B, length=NUM_ELEMS,                wait state injected
+//   T4  Mode B, length=NUM_ELEMS,                wait state injected mid-burst
+//   T5  Mode B, length=64 (invalid length)       => ERROR_HALT
+//   T6  Mode B, length=0 (zero length)           => ERROR_HALT
+//   T7  Mode B, length=NUM_ELEMS (wrong HRESP)   => ERROR_HALT
+
+//   T8  Mode C, length=NUM_ELEMS,  signed,    scale_shift=8,   round_en=1
+//   T9  Mode C, length=NUM_ELEMS,  unsigned,  scale_shift=16,  round_en=0
+//   T10 Mode C, length=NUM_ELEMS,  signed,    scale_shift=0,   saturation corners
+//
+// Usage:
+//   `run`      executable for log printing only
+//   `runwave`  executable for waveform viewing in Questa
+
+import hydra_pkg::*;
+module hydra_tb;
+  localparam int unsigned NUM_ELEMS    = BLOCK_ROWS * BLOCK_COLS;   // 128
+  localparam int unsigned QUANT_DEPTH  = DATA_WIDTH / QUANT_DIM;    // 4 words => 1 packed
+  localparam int unsigned RAM_WORDS    = 16384;                     // 64 KB AHB slave RAM
+  localparam int unsigned TIMEOUT      = 2000;                      // max clock cycles per test
+
+  // -------------------------SIGNALS-------------------------
+  // Clock and Reset
+  logic clk = 0;
+  logic rst_n;
+  always #5 clk = ~clk;   // 100 MHz
+
+  // MMR
+  logic                   start;
+  hydra_mode              mode;
+  logic [ADDR_WIDTH-1:0]  src_addr, dst_addr;
+  logic [LEN_WIDTH-1:0]   length;
+  logic [4:0]             scale_shift;
+  logic                   signed_out, round_en;
+
+  // Arbiter
+  logic                   HBUSREQ, bus_grant;
+
+  // RAM
+  logic [ADDR_WIDTH-1:0]  HADDR_m;
+  logic [2:0]             HBURST_m;
+  logic [2:0]             HSIZE_m;
+  logic [1:0]             HTRANS_m;
+  logic [ADDR_WIDTH-1:0]  HWDATA_m;
+  logic                   HWRITE_m;
+  logic [ADDR_WIDTH-1:0]  HRDATA_m;
+  logic                   HREADY_m;
+  logic                   HRESP_m;
+
+  // Scratchpad
+  logic                   SCRATCH_WE;
+  logic [ADDR_WIDTH-1:0]  SCRATCH_WADDR;
+  logic [DATA_WIDTH-1:0]  SCRATCH_WDATA;
+
+  // Status
+  logic         done, error;
+
+  // -------------------------RAM MODEL-------------------------
+  logic [DATA_WIDTH-1:0]  ahb_ram [0:RAM_WORDS-1];
+  logic [ADDR_WIDTH-1:0]  haddr_lat;
+  logic                   HREADY_ctrl = 1;    // default: always ready
+  logic                   HRESP_ctrl  = 0;    // default: no error
+
+  // Simulate address and data phases with one cycle latency
+  always_ff @(posedge clk) begin
+    if (HTRANS_m[1] && HREADY_m)
+      haddr_lat <= HADDR_m;
+  end
+
+  assign HRDATA_m = ahb_ram[haddr_lat[$clog2(RAM_WORDS)+1:2]];    // word-aligned
+  assign HREADY_m = HREADY_ctrl;
+  assign HRESP_m  = HRESP_ctrl;
+
+  // -------------------------Arbiter MODEL-------------------------
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n) bus_grant <= 0;
+    else        bus_grant <= HBUSREQ;
+  end
+
+  // -------------------------DUTs-------------------------
+  hydra_transform u_transform (
+    .clk           (clk),
+    .rst_n         (rst_n),
+    .start         (start),
+    .mode          (mode),
+    .src_addr      (src_addr),
+    .dst_addr      (dst_addr),
+    .length        (length),
+    .scale_shift   (scale_shift),
+    .signed_out    (signed_out),
+    .round_en      (round_en),
+    .bus_grant     (bus_grant),
+    .HBUSREQ       (HBUSREQ),
+    .HADDR         (HADDR_m),
+    .HBURST        (HBURST_m),
+    .HSIZE         (HSIZE_m),
+    .HTRANS        (HTRANS_m),
+    .HWDATA        (HWDATA_m),
+    .HWRITE        (HWRITE_m),
+    .HRDATA        (HRDATA_m),
+    .HREADY        (HREADY_m),
+    .HRESP         (HRESP_m),
+    .SCRATCH_WE    (SCRATCH_WE),
+    .SCRATCH_WADDR (SCRATCH_WADDR),
+    .SCRATCH_WDATA (SCRATCH_WDATA),
+    .done          (done),
+    .error         (error)
+  );
+  hydra_scratchpad u_scratchpad (
+    .clk           (clk),
+    .rst_n         (rst_n),
+    .HSELScratch   ('0),
+    .HADDR         ('0),
+    .HBURST        ('0),
+    .HSIZE         ('0),
+    .HTRANS        ('0),    // AHB_IDLE
+    .HWRITE        ('0),
+    .HREADY        ('1),
+    .HRDATA        (),
+    .HRESP         (),
+    .HREADYOUT     (),
+    .SCRATCH_WE    (SCRATCH_WE),
+    .SCRATCH_WADDR (SCRATCH_WADDR),
+    .SCRATCH_WDATA (SCRATCH_WDATA)
+  );
+
+  // -------------------------GOLDEN MODELS-------------------------
+  int  errors  = 0;
+  int  test_id = 0;
+
+  // Mode B
+  function automatic logic [DATA_WIDTH-1:0] golden_b (
+    input int out_idx,    // absolute scratchpad word index
+    input int src_base    // src_addr >> 2
+  );
+    int blk, local_i, r, c;
+    blk     = out_idx / NUM_ELEMS;
+    local_i = out_idx % NUM_ELEMS;
+    r       = local_i % BLOCK_ROWS;
+    c       = local_i / BLOCK_ROWS;
+    return ahb_ram[src_base + blk * NUM_ELEMS + r * BLOCK_COLS + c];
+  endfunction
+
+  // Mode C
+  function automatic logic [DATA_WIDTH-1:0] golden_c (
+    input int         out_idx,
+    input int         src_base,
+    input logic [4:0] sc,
+    input logic       s_out,
+    input logic       r_en
+  );
+    golden_c = '0;
+    for (int k = 0; k < QUANT_DEPTH; k++)
+      golden_c[k*QUANT_DIM +: QUANT_DIM] = 
+        quant_fn(ahb_ram[src_base + out_idx*QUANT_DEPTH + k], sc, s_out, r_en);
+    return golden_c;
+  endfunction
+
+  // -------------------------TASKS-------------------------
+  task automatic do_reset ();
+    rst_n       = 0;
+    start       = 0;
+    mode        = MODE_B;
+    src_addr    = 0;
+    dst_addr    = 0;
+    length      = 0;
+    scale_shift = 0;
+    signed_out  = 0;
+    round_en    = 0;
+    HREADY_ctrl = 1;
+    HRESP_ctrl  = 0;
+    repeat (4) @(posedge clk);
+    @(negedge clk); rst_n = 1;
+    @(posedge clk);
+  endtask
+
+  task automatic launch (
+    input hydra_mode              m,
+    input logic [ADDR_WIDTH-1:0]  src, dst, len,
+    input logic [4:0]             sc,
+    input logic                   s_out, r_en
+  );
+    @(negedge clk);
+    mode        = m;
+    src_addr    = src;
+    dst_addr    = dst;
+    length      = len;
+    scale_shift = sc;
+    signed_out  = s_out;
+    round_en    = r_en;
+    start       = 1;
+    @(posedge clk);
+    @(negedge clk);
+    start = 0;
+  endtask
+
+  task automatic wait_done ();
+    for (int i = 0; i < TIMEOUT; i++) begin
+      @(posedge clk); #1;
+      if (done || error) return;
+    end
+    $display("\t[TIMEOUT] T%0d: done never asserted after %0d cycles", test_id, TIMEOUT);
+    errors++;
+  endtask
+
+  // Inject one-cycle HREADY=0 at a specific cycle offset from now
+  task automatic inject_wait (input int cycle_offset);
+    repeat (cycle_offset) @(posedge clk);
+    @(negedge clk); HREADY_ctrl = 0;
+    @(posedge clk);
+    @(negedge clk); HREADY_ctrl = 1;
+  endtask
+
+  // Inject one-cycle HRESP=1 at a specific cycle offset from now
+  task automatic inject_error (input int cycle_offset);
+    repeat (cycle_offset) @(posedge clk);
+    @(negedge clk); HRESP_ctrl = 1;
+    @(posedge clk);
+    @(negedge clk); HRESP_ctrl = 0;
+  endtask
+
+  // Fill RAM incrementally 
+  task automatic fill_ram_incr (
+    input int base, n,
+    input logic [DATA_WIDTH-1:0] base_val
+  );
+    for (int i = 0; i < n; i++)
+      ahb_ram[base + i] = base_val + i;
+  endtask
+
+// Fill RAM with saturation corner cases
+  task automatic fill_ram_corners (input int base, input int n);
+    logic signed [DATA_WIDTH-1:0] corner_vals[];
+
+    corner_vals = '{
+      {{(DATA_WIDTH-1){1'b0}}, 1'b1},   // +1 (no clip)
+      {1'b0, {(DATA_WIDTH-1){1'b1}}},   // maximum positive
+      {DATA_WIDTH{1'b1}},               // -1 (clips or rounds)
+      {1'b1, {(DATA_WIDTH-1){1'b0}}}    // minimum negative
+    };
+
+    for (int i = 0; i < n; i++) begin
+      ahb_ram[base + i] = corner_vals[i % corner_vals.size()];
+    end
+  endtask
+
+  task automatic clear_scratch (input int base, input int n);
+    for (int i = 0; i < n; i++)
+      u_scratchpad.mem[base + i] = '0;
+  endtask
+
+  task automatic check_mode_b (
+    input int src_base,   // src_addr >> 2
+    input int dst_base,   // dst_addr >> 2
+    input int len_words
+  );
+    logic [DATA_WIDTH-1:0] exp, got;
+    for (int i = 0; i < len_words; i++) begin
+      exp = golden_b(i, src_base);
+      got = u_scratchpad.mem[dst_base + i];
+      if (got !== exp) begin
+        $display("\t[FAIL] T%0d Mode B: scratch[%03d] = %h, expected %h",
+                 test_id, dst_base + i, got, exp);
+        errors++;
+      end else
+        $display("\t[PASS] T%0d Mode B: scratch[%03d] = %h, expected %h",
+                 test_id, dst_base + i, got, exp);
+    end
+  endtask
+
+  task automatic check_mode_c (
+    input int          src_base,
+    input int          dst_base,
+    input int          len_words,
+    input logic [4:0]  sc,
+    input logic        s_out,
+    input logic        r_en
+  );
+    logic [DATA_WIDTH-1:0] exp, got;
+    int out_words;
+    out_words = len_words / QUANT_DEPTH;
+    for (int i = 0; i < out_words; i++) begin
+      exp = golden_c(i, src_base, sc, s_out, r_en);
+      got = u_scratchpad.mem[dst_base + i];
+      if (got !== exp) begin
+        $display("\t[FAIL] T%0d Mode C: scratch[%03d] = %h, expected %h",
+                 test_id, dst_base + i, got, exp);
+        errors++;
+      end else
+        $display("\t[PASS] T%0d Mode C: scratch[%03d] = %h, expected %h",
+                 test_id, dst_base + i, got, exp);     
+    end
+  endtask
+
+  int prev_errors;
+  task automatic report ();
+    if (errors == prev_errors)
+      $display("T%0d PASSED SUCCESSFULLY!", test_id);
+    else
+      $display("T%0d FAILED! Encountered %0d new error(s)", test_id, errors - prev_errors);
+    prev_errors = errors;
+  endtask
+
+
+  // -------------------------MAIN-------------------------
+  initial begin
+    $display("-----------------------------------------------------------------");
+    $display("HYDRA TESTBENCH (hydra_transform + hydra_scratchpad)");
+    $display();   // \n
+    prev_errors = 0;
+
+    // T1: Mode B, length=NUM_ELEMS, no wait states
+    test_id = 1;
+    $display("[T1] Mode B, length=%0d, no wait states", NUM_ELEMS);
+    do_reset();
+    fill_ram_incr(0, NUM_ELEMS, 'd1);   // [1, 2, ..., NUM_ELEMS]
+    clear_scratch(0, NUM_ELEMS);
+    launch(MODE_B, '0, '0, NUM_ELEMS, '0, '0, '0);
+    wait_done();
+    if (!error) check_mode_b(0, 0, NUM_ELEMS);
+    else begin $display("[FAIL] unexpected error!"); errors++; end
+    report();
+
+    // SUMMARY
+    $display();   // \n
+    $display("Results: %0d error(s) across %0d test(s).", errors, test_id);
+    if (!errors)
+      $display("ALL TESTS PASSED!");
+    else
+      $display("SOME TESTS FAILED!");
+    $display("-----------------------------------------------------------------");
+    $stop;
+  end
+
+endmodule
