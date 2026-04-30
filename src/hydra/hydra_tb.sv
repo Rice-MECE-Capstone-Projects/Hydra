@@ -10,20 +10,17 @@
 // here - output verification reads u_scratchpad.mem[] directly.
 //
 // Test list:
-    // IMPLEMENTED
 //   T1  Mode B, length=NUM_ELEMS,                no wait states
-
-    // YET TO BE IMPLEMENTED
 //   T2  Mode B, length=2*NUM_ELEMS (two blocks), no wait states
-//   T3  Mode B, length=NUM_ELEMS,                wait state injected
+//   T3  Mode B, length=NUM_ELEMS,                wait state injected early
 //   T4  Mode B, length=NUM_ELEMS,                wait state injected mid-burst
 //   T5  Mode B, length=64 (invalid length)       => ERROR_HALT
 //   T6  Mode B, length=0 (zero length)           => ERROR_HALT
 //   T7  Mode B, length=NUM_ELEMS (wrong HRESP)   => ERROR_HALT
 
-//   T8  Mode C, length=NUM_ELEMS,  signed,    scale_shift=8,   round_en=1
-//   T9  Mode C, length=NUM_ELEMS,  unsigned,  scale_shift=16,  round_en=0
-//   T10 Mode C, length=NUM_ELEMS,  signed,    scale_shift=0,   saturation corners
+//   T8  Mode C, length=NUM_ELEMS,    signed,   scale_shift=NUM_ELEMS/16, round_en=1
+//   T9  Mode C, length=NUM_ELEMS,    unsigned, scale_shift=NUM_ELEMS/8,  round_en=0
+//   T10 Mode C, saturation corners,  signed,   scale_shift=0,            round_en=0
 //
 // Usage:
 //   `run`      executable for log printing only
@@ -42,12 +39,18 @@ module hydra_tb;
   logic rst_n;
   always #5 clk = ~clk;   // 100 MHz
 
+  // Helpers
+  int length_x    = 0;
+  int scale_x     = 0;
+  int signed_x    = 0;
+  int round_en_x  = 0;
+
   // MMR
   logic                   start;
   hydra_mode              mode;
   logic [ADDR_WIDTH-1:0]  src_addr, dst_addr;
   logic [LEN_WIDTH-1:0]   length;
-  logic [4:0]             scale_shift;
+  logic [DATA_BITS-1:0]   scale_shift;
   logic                   signed_out, round_en;
 
   // Arbiter
@@ -160,11 +163,11 @@ module hydra_tb;
 
   // Mode C
   function automatic logic [DATA_WIDTH-1:0] golden_c (
-    input int         out_idx,
-    input int         src_base,
-    input logic [4:0] sc,
-    input logic       s_out,
-    input logic       r_en
+    input int                   out_idx,
+    input int                   src_base,
+    input logic [DATA_BITS-1:0] sc,
+    input logic                 s_out,
+    input logic                 r_en
   );
     golden_c = '0;
     for (int k = 0; k < QUANT_DEPTH; k++)
@@ -194,7 +197,7 @@ module hydra_tb;
   task automatic launch (
     input hydra_mode              m,
     input logic [ADDR_WIDTH-1:0]  src, dst, len,
-    input logic [4:0]             sc,
+    input logic [DATA_BITS-1:0]   sc,
     input logic                   s_out, r_en
   );
     @(negedge clk);
@@ -245,19 +248,10 @@ module hydra_tb;
       ahb_ram[base + i] = base_val + i;
   endtask
 
-// Fill RAM with saturation corner cases
+// Fill RAM with saturation corner cases for MODE C
   task automatic fill_ram_corners (input int base, input int n);
-    logic signed [DATA_WIDTH-1:0] corner_vals[];
-
-    corner_vals = '{
-      {{(DATA_WIDTH-1){1'b0}}, 1'b1},   // +1 (no clip)
-      {1'b0, {(DATA_WIDTH-1){1'b1}}},   // maximum positive
-      {DATA_WIDTH{1'b1}},               // -1 (clips or rounds)
-      {1'b1, {(DATA_WIDTH-1){1'b0}}}    // minimum negative
-    };
-
     for (int i = 0; i < n; i++) begin
-      ahb_ram[base + i] = corner_vals[i % corner_vals.size()];
+      ahb_ram[base + i] = corner_vals[i % corner_vals.size()];    // corner_vals[] in hydra_pkg.sv
     end
   endtask
 
@@ -280,18 +274,18 @@ module hydra_tb;
                  test_id, dst_base + i, got, exp);
         errors++;
       end else
-        $display("\t[PASS] T%0d Mode B: scratch[%03d] = %h, expected %h",
-                 test_id, dst_base + i, got, exp);
+        $display("\t[PASS] T%0d Mode B: scratch[%03d] = %h",
+                 test_id, dst_base + i, got);
     end
   endtask
 
   task automatic check_mode_c (
-    input int          src_base,
-    input int          dst_base,
-    input int          len_words,
-    input logic [4:0]  sc,
-    input logic        s_out,
-    input logic        r_en
+    input int                   src_base,
+    input int                   dst_base,
+    input int                   len_words,
+    input logic [DATA_BITS-1:0] sc,
+    input logic                 s_out,
+    input logic                 r_en
   );
     logic [DATA_WIDTH-1:0] exp, got;
     int out_words;
@@ -304,8 +298,8 @@ module hydra_tb;
                  test_id, dst_base + i, got, exp);
         errors++;
       end else
-        $display("\t[PASS] T%0d Mode C: scratch[%03d] = %h, expected %h",
-                 test_id, dst_base + i, got, exp);     
+        $display("\t[PASS] T%0d Mode C: scratch[%03d] = %h",
+                 test_id, dst_base + i, got);     
     end
   endtask
 
@@ -314,29 +308,134 @@ module hydra_tb;
     if (errors == prev_errors)
       $display("T%0d PASSED SUCCESSFULLY!", test_id);
     else
-      $display("T%0d FAILED! Encountered %0d new error(s)", test_id, errors - prev_errors);
+      $display("T%0d FAILED! Encountered %0d new error(s).", test_id, errors - prev_errors);
     prev_errors = errors;
   endtask
 
 
   // -------------------------MAIN-------------------------
   initial begin
+    $dumpfile("hydra_tb.vcd");
+    $dumpvars(0, hydra_tb);
+
     $display("-----------------------------------------------------------------");
     $display("HYDRA TESTBENCH (hydra_transform + hydra_scratchpad)");
     $display();   // \n
     prev_errors = 0;
 
     // T1: Mode B, length=NUM_ELEMS, no wait states
-    test_id = 1;
-    $display("[T1] Mode B, length=%0d, no wait states", NUM_ELEMS);
+    test_id   = 1;
+    length_x  = NUM_ELEMS;
+    $display("[T1] Mode B, length=%0d, no wait states", length_x);
     do_reset();
-    fill_ram_incr(0, NUM_ELEMS, 'd1);   // [1, 2, ..., NUM_ELEMS]
-    clear_scratch(0, NUM_ELEMS);
-    launch(MODE_B, '0, '0, NUM_ELEMS, '0, '0, '0);
+    fill_ram_incr(0, length_x, 'h0000_0001);   // [1, 2, ..., length_x]
+    clear_scratch(0, length_x);
+    launch(MODE_B, '0, '0, length_x, '0, '0, '0);
     wait_done();
-    if (!error) check_mode_b(0, 0, NUM_ELEMS);
+    if (!error) check_mode_b(0, 0, length_x);
     else begin $display("[FAIL] unexpected error!"); errors++; end
     report();
+
+    // T2: Mode B, length=2*NUM_ELEMS (two contiguous blocks), no wait states
+      // drain_sel flip is the critical boundary.
+    test_id   = 2;
+    length_x  = 2 * NUM_ELEMS;
+    $display("[T2] Mode B, length=%0d, %0d blocks", length_x, length_x/NUM_ELEMS);
+    do_reset();
+    fill_ram_incr(0, length_x, 'h0001_0000);   // [65536, 65537, ..., 65536+length_x-1]
+    clear_scratch(0, length_x);
+    launch(MODE_B, '0, '0, length_x, '0, '0, '0);
+    wait_done();
+    if (!error) check_mode_b(0, 0, length_x);
+    else begin $display("\t[FAIL] unexpected error"); errors++; end
+    report();
+
+    // T3: Mode B, length=NUM_ELEMS, wait state injected early (during burst 1, ~cycle 20)
+    test_id   = 3;
+    length_x  = NUM_ELEMS;
+    $display("[T3] Mode B, length=%0d, wait state at cycle 20", length_x);
+    do_reset();
+    fill_ram_incr(0, length_x, 'h1);
+    clear_scratch(0, length_x);
+    fork
+      inject_wait(20);
+      begin
+        launch(MODE_B, '0, '0, length_x, '0, '0, '0);
+        wait_done();
+      end
+    join
+    if (!error) check_mode_b(0, 0, length_x);
+    else begin $display("\t[FAIL] unexpected error"); errors++; end
+    report();
+
+    // T4: Mode B, length=NUM_ELEMS, wait state injected mid-burst (during burst 6, ~cycle 100)
+      // wait state happens late in transfer, near drain start.
+    test_id   = 4;
+    length_x  = NUM_ELEMS;
+    $display("[T4] Mode B, length=%0d, wait state at cycle 100", length_x);
+    do_reset();
+    fill_ram_incr(0, length_x, 'hDEAD_0000);
+    clear_scratch(0, length_x);
+    fork
+      inject_wait(100);
+      begin
+        launch(MODE_B, '0, '0, length_x, '0, '0, '0);
+        wait_done();
+      end
+    join
+    if (!error) check_mode_b(0, 0, length_x);
+    else begin $display("\t[FAIL] unexpected error"); errors++; end
+    report();
+
+    // T5: Mode B, length=NUM_ELEMS/2 (invalid: not a multiple of NUM_ELEMS) => ERROR_HALT
+    test_id   = 5;
+    length_x  = NUM_ELEMS / 2;
+    $display("[T5] Mode B, length=%0d (invalid) => expect ERROR_HALT", length_x);
+    do_reset();
+    launch(MODE_B, '0, '0, length_x, '0, '0, '0);
+    repeat (10) @(posedge clk); #1;
+    if (!error) begin
+      $display("\t[FAIL] T%0d: ERROR_HALT not asserted", test_id); errors++;
+    end
+    report();
+
+    // T6: Mode B, length=0 (invalid: not >0) => ERROR_HALT
+    test_id   = 6;
+    length_x  = 0;
+    $display("[T6] Mode B, length=%0d => expect ERROR_HALT", length_x);
+    do_reset();
+    launch(MODE_B, '0, '0, length_x, '0, '0, '0);
+    repeat (10) @(posedge clk); #1;
+    if (!error) begin
+      $display("\t[FAIL] T%0d: ERROR_HALT not asserted", test_id); errors++;
+    end
+    report();
+
+    // T7: Mode B, length=NUM_ELEMS, HRESP=1 injected early (during burst 1, ~cycle 25)
+      // Expected ERROR_HALT + HBUSREQ deasserted.
+    test_id   = 7;
+    length_x  = NUM_ELEMS;
+    $display("[T7] Mode B, length=%0d, HRESP error at cycle 25 => expect ERROR_HALT", length_x);
+    do_reset();
+    fill_ram_incr(0, length_x, 'h0000_0001);
+    fork
+      inject_error(25);
+      begin
+        launch(MODE_B, '0, '0, length_x, '0, '0, '0);
+        repeat (60) @(posedge clk);
+      end
+    join
+    #1;
+    if (!error) begin
+      $display("\t[FAIL] T%0d: ERROR_HALT not asserted after HRESP", test_id); errors++;
+    end
+    // HBUSREQ must have been deasserted (done_B or error path clears it)
+    @(posedge clk); #1;
+    if (HBUSREQ) begin
+      $display("\t[FAIL] T%0d: HBUSREQ still high after ERROR_HALT", test_id); errors++;
+    end
+    report();
+    
 
     // SUMMARY
     $display();   // \n
