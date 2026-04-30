@@ -38,7 +38,8 @@ package hydra_pkg;
     typedef enum logic [1:0] {
         MODE_A = 2'b00,     // scatter-gather
         MODE_B = 2'b01,     // matrix transposition
-        MODE_C = 2'b10      // quantization
+        MODE_C = 2'b10,     // quantization
+        IDLE   = 2'b11
     } hydra_mode;
 
     parameter int unsigned      ADDR_WIDTH      = 32;
