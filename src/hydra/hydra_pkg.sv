@@ -54,10 +54,11 @@ package hydra_pkg;
     // Scratchpad has 4 MB at 32-bit words
     parameter int unsigned      MEM_SIZE        = 1048576;
 
+    localparam int unsigned     DATA_BITS       = $clog2(DATA_WIDTH);
     localparam int unsigned     LEN_WIDTH       = $clog2(MEM_SIZE);
     localparam int unsigned     S_QUANT_BOUND   = 1 << (QUANT_DIM-1);
     localparam int unsigned     U_QUANT_BOUND   = 1 << (QUANT_DIM);
-
+    
     function automatic int getLen_fn(ahb_burst_type b);
         case (b)
             SINGLE  :   return 1;
@@ -75,27 +76,36 @@ package hydra_pkg;
     //      round_en    : 1 = add rounding correction before shift
     function automatic logic [QUANT_DIM-1:0] quant_fn (
         logic [DATA_WIDTH-1:0]  src, 
-        logic [4:0]             scale_shift, 
+        logic [DATA_BITS-1:0]   scale_shift, 
         logic                   signed_out, 
         logic                   round_en
     );
         logic signed [DATA_WIDTH:0] val;        // one extra bit to absorb rounding carry safely
         logic signed [DATA_WIDTH:0] rounded;
-        logic signed [DATA_WIDTH:0] shifted;
+        logic signed [DATA_WIDTH:0] scaled;
         logic signed [DATA_WIDTH:0] lo, hi;
 
         val     = {src[DATA_WIDTH-1], src};     // sign-extend
+        // if rounded is enabled, add half of target scale to improve accuracy
         rounded = round_en && (scale_shift > 0)
                     ? val + ({{DATA_WIDTH{1'b0}}, 1'b1} << (scale_shift - 1))
                     : val;
-        shifted = $signed(rounded) >>> scale_shift;
+        scaled = $signed(rounded) >>> scale_shift;
 
         lo      = signed_out ? -S_QUANT_BOUND : 0;
         hi      = signed_out ?  S_QUANT_BOUND-1 : U_QUANT_BOUND-1;
 
-        if      ($signed(shifted) < $signed(lo)) return lo[QUANT_DIM-1:0];
-        else if ($signed(shifted) > $signed(hi)) return hi[QUANT_DIM-1:0];
-        else                                     return shifted[QUANT_DIM-1:0];
+        if      ($signed(scaled) < $signed(lo)) return lo[QUANT_DIM-1:0];
+        else if ($signed(scaled) > $signed(hi)) return hi[QUANT_DIM-1:0];
+        else                                    return scaled[QUANT_DIM-1:0];
     endfunction
+    
+    // Corner cases for MODE C
+    const logic signed [DATA_WIDTH-1:0] corner_vals[] = '{
+      {{(DATA_WIDTH-1){1'b0}}, 1'b1},       // +1 (no clip)
+      {1'b0, {(DATA_WIDTH-1){1'b1}}},       // maximum positive (clip)
+      {DATA_WIDTH{1'b1}},                   // -1 (no clip)
+      {1'b1, {(DATA_WIDTH-1){1'b0}}}        // minimum negative (clip)
+    };
 
 endpackage
