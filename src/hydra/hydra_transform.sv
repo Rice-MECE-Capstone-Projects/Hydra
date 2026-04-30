@@ -162,7 +162,7 @@ module hydra_transform (
                 next_done       = (SCRATCH_count == length-1) && SCRATCH_WE;
             end
             MODE_C: begin
-                SCRATCH_WADDR   = dst_addr + (quant_curr << 2);
+                SCRATCH_WADDR   = dst_addr + (quant_curr << 2) + offset;
                 SCRATCH_WE      = (state == BUSY) && HREADY && (count_bytes == QUANT_DEPTH-1);
                 SCRATCH_WDATA   = {quant_fn(HRDATA, scale_shift, signed_out, round_en), quant[DATA_WIDTH-QUANT_DIM-1:0]}; 
                 next_done       = next_done_read;
@@ -254,7 +254,8 @@ module hydra_transform (
                             SCRATCH_count   <= (SCRATCH_count == length-1)      ? '0 : SCRATCH_count + 1;
                             SCRATCH_col     <= (SCRATCH_col == BLOCK_COLS-1)    ? '0 : SCRATCH_col + 1;
                             SCRATCH_row     <= (SCRATCH_col == BLOCK_COLS-1)    ? ((SCRATCH_row == BLOCK_ROWS-1) ? '0 : SCRATCH_row + 1) : SCRATCH_row;
-                        end
+                        end else if (mode == MODE_C)
+                            offset <= (quant_curr == QUANT_WIDTH-1) ? offset + QUANT_WIDTH*QUANT_DEPTH : offset;
                     end                    
                 end
             end
