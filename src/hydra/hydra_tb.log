@@ -3,10 +3,12 @@ Reading pref.tcl
 # 2023.2
 
 # vsim -debugDB -voptargs=""+acc"" -c hydra_tb -do "run -all; quit" 
-# Start time: 23:05:00 on Apr 29,2026
+# Start time: 00:21:24 on Apr 30,2026
 # ** Note: (vsim-3813) Design is being optimized due to module recompilation...
 # ** Note: (vsim-8611) Generating debug db.
 # ** Warning: (vopt-10587) Some optimizations are turned off because the +acc switch is in effect. This will cause your simulation to run slowly. Please use -access/-debug to maintain needed visibility.
+# ** Note: (vopt-143) Recognized 1 FSM in module "hydra_transform(fast)".
+# ** Note: (vopt-4301) Memory core inferred for signal 'mem' width=32, depth=1048576, type=RAM at location hydra_scratchpad.sv:48
 # ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=1.
 # //  Questa Sim-64
 # //  Version 2023.2 linux_x86_64 Apr 11 2023
@@ -695,14 +697,119 @@ Reading pref.tcl
 # T6 PASSED SUCCESSFULLY!
 # [T7] Mode B, length=128, HRESP error at cycle 25 => expect ERROR_HALT
 # T7 PASSED SUCCESSFULLY!
+# [T8] Mode C, length=256, signed=1, scale_shift=8
+# round_en=0
+# 	[PASS] T8 Mode C: scratch[  0] = 00000000
+# 	[PASS] T8 Mode C: scratch[  1] = 00000000
+# 	[PASS] T8 Mode C: scratch[  2] = 00000000
+# 	[PASS] T8 Mode C: scratch[  3] = 00000000
+# 	[PASS] T8 Mode C: scratch[  4] = 00000000
+# 	[PASS] T8 Mode C: scratch[  5] = 00000000
+# 	[PASS] T8 Mode C: scratch[  6] = 00000000
+# 	[PASS] T8 Mode C: scratch[  7] = 00000000
+# 	[PASS] T8 Mode C: scratch[  8] = 00000000
+# 	[PASS] T8 Mode C: scratch[  9] = 00000000
+# 	[PASS] T8 Mode C: scratch[ 10] = 00000000
+# 	[PASS] T8 Mode C: scratch[ 11] = 00000000
+# 	[PASS] T8 Mode C: scratch[ 12] = 00000000
+# 	[PASS] T8 Mode C: scratch[ 13] = 00000000
+# 	[PASS] T8 Mode C: scratch[ 14] = 00000000
+# 	[PASS] T8 Mode C: scratch[ 15] = 00000000
+# round_en=1
+# 	[PASS] T8 Mode C: scratch[ 16] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 17] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 18] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 19] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 20] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 21] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 22] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 23] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 24] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 25] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 26] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 27] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 28] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 29] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 30] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 31] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 32] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 33] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 34] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 35] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 36] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 37] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 38] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 39] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 40] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 41] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 42] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 43] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 44] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 45] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 46] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 47] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 48] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 49] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 50] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 51] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 52] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 53] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 54] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 55] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 56] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 57] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 58] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 59] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 60] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 61] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 62] = 01010101
+# 	[PASS] T8 Mode C: scratch[ 63] = 01010101
+# T8 PASSED SUCCESSFULLY!
+# [T9] Mode C, length=128, signed=0, scale_shift=16, round_en=0
+# 	[PASS] T9 Mode C: scratch[  0] = 03020100
+# 	[PASS] T9 Mode C: scratch[  1] = 07060504
+# 	[PASS] T9 Mode C: scratch[  2] = 0b0a0908
+# 	[PASS] T9 Mode C: scratch[  3] = 0f0e0d0c
+# 	[PASS] T9 Mode C: scratch[  4] = 13121110
+# 	[PASS] T9 Mode C: scratch[  5] = 17161514
+# 	[PASS] T9 Mode C: scratch[  6] = 1b1a1918
+# 	[PASS] T9 Mode C: scratch[  7] = 1f1e1d1c
+# 	[PASS] T9 Mode C: scratch[  8] = 23222120
+# 	[PASS] T9 Mode C: scratch[  9] = 27262524
+# 	[PASS] T9 Mode C: scratch[ 10] = 2b2a2928
+# 	[PASS] T9 Mode C: scratch[ 11] = 2f2e2d2c
+# 	[PASS] T9 Mode C: scratch[ 12] = 33323130
+# 	[PASS] T9 Mode C: scratch[ 13] = 37363534
+# 	[PASS] T9 Mode C: scratch[ 14] = 3b3a3938
+# 	[PASS] T9 Mode C: scratch[ 15] = 3f3e3d3c
+# 	[PASS] T9 Mode C: scratch[ 16] = 43424140
+# 	[PASS] T9 Mode C: scratch[ 17] = 47464544
+# 	[PASS] T9 Mode C: scratch[ 18] = 4b4a4948
+# 	[PASS] T9 Mode C: scratch[ 19] = 4f4e4d4c
+# 	[PASS] T9 Mode C: scratch[ 20] = 53525150
+# 	[PASS] T9 Mode C: scratch[ 21] = 57565554
+# 	[PASS] T9 Mode C: scratch[ 22] = 5b5a5958
+# 	[PASS] T9 Mode C: scratch[ 23] = 5f5e5d5c
+# 	[PASS] T9 Mode C: scratch[ 24] = 63626160
+# 	[PASS] T9 Mode C: scratch[ 25] = 67666564
+# 	[PASS] T9 Mode C: scratch[ 26] = 6b6a6968
+# 	[PASS] T9 Mode C: scratch[ 27] = 6f6e6d6c
+# 	[PASS] T9 Mode C: scratch[ 28] = 73727170
+# 	[PASS] T9 Mode C: scratch[ 29] = 77767574
+# 	[PASS] T9 Mode C: scratch[ 30] = 7b7a7978
+# 	[PASS] T9 Mode C: scratch[ 31] = 7f7e7d7c
+# T9 PASSED SUCCESSFULLY!
+# [T10] Mode C, saturation corners=4, signed=1, scale_shift=0, round_en=0
+# 	[PASS] T10 Mode C: scratch[  0] = 80ff7f01
+# T10 PASSED SUCCESSFULLY!
 #  
-# Results: 0 error(s) across 7 test(s).
+# Results: 0 error(s) across 10 test(s).
 # ALL TESTS PASSED!
 # -----------------------------------------------------------------
-# ** Note: $stop    : hydra_tb.sv(448)
-#    Time: 12046 ps  Iteration: 0  Instance: /hydra_tb
-# Break in Module hydra_tb at hydra_tb.sv line 448
-# Stopped at hydra_tb.sv line 448
+# ** Note: $stop    : hydra_tb.sv(509)
+#    Time: 16326 ps  Iteration: 0  Instance: /hydra_tb
+# Break in Module hydra_tb at hydra_tb.sv line 509
+# Stopped at hydra_tb.sv line 509
 #  quit
-# End time: 23:05:02 on Apr 29,2026, Elapsed time: 0:00:02
+# End time: 00:21:26 on Apr 30,2026, Elapsed time: 0:00:02
 # Errors: 0, Warnings: 1
