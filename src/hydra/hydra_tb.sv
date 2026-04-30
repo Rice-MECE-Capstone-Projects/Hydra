@@ -18,7 +18,7 @@
 //   T6  Mode B, length=0 (zero length)           => ERROR_HALT
 //   T7  Mode B, length=NUM_ELEMS (wrong HRESP)   => ERROR_HALT
 
-//   T8  Mode C, length=NUM_ELEMS,    signed,   scale_shift=NUM_ELEMS/16, round_en=1
+//   T8  Mode C, length=2*NUM_ELEMS,  signed,   scale_shift=NUM_ELEMS/16, round_en=0->1
 //   T9  Mode C, length=NUM_ELEMS,    unsigned, scale_shift=NUM_ELEMS/8,  round_en=0
 //   T10 Mode C, saturation corners,  signed,   scale_shift=0,            round_en=0
 //
@@ -180,7 +180,7 @@ module hydra_tb;
   task automatic do_reset ();
     rst_n       = 0;
     start       = 0;
-    mode        = MODE_B;
+    mode        = IDLE;
     src_addr    = 0;
     dst_addr    = 0;
     length      = 0;
@@ -435,7 +435,68 @@ module hydra_tb;
       $display("\t[FAIL] T%0d: HBUSREQ still high after ERROR_HALT", test_id); errors++;
     end
     report();
-    
+
+
+    // T8: Mode C, length=2*NUM_ELEMS, signed, scale_shift=NUM_ELEMS/16, round_en=0->1
+      // Values around shift boundary => should be '1' with round_en=1 or index>32, '0' otherwise
+    test_id     = 8;
+    length_x    = 2 * NUM_ELEMS;
+    scale_x     = NUM_ELEMS / 16;
+    signed_x    = 1;
+    round_en_x  = 0;
+    $display("[T8] Mode C, length=%0d, signed=%0d, scale_shift=%0d", length_x, signed_x, scale_x);
+    do_reset();
+    fill_ram_incr(0, length_x, 'h0000_0080);   // [128, 129, ..., 128+length_x-1]
+    clear_scratch(0, length_x/QUANT_DEPTH);
+    $display("round_en=%0d", round_en_x);
+    launch(MODE_C, '0, '0, length_x/4, scale_x, signed_x, round_en_x);
+    wait_done();
+    if (!error) check_mode_c(0, 0, length_x/4, scale_x, signed_x, round_en_x);
+    else begin $display("\t[FAIL] unexpected error"); errors++; end
+    do_reset();
+    $display("round_en=%0d", !round_en_x);
+    launch(MODE_C, ((length_x/4)<<2), ((length_x/4)<<2)/QUANT_DEPTH, 3*length_x/4, scale_x, signed_x, !round_en_x);   // scratchpad is byte-addressed
+    wait_done();
+    if (!error)
+      check_mode_c(((length_x/4)<<2)/QUANT_DEPTH, (length_x/4)/4, 3*length_x/4, scale_x, signed_x, !round_en_x);    // RAM model is word-addressed
+    else begin $display("\t[FAIL] unexpected error"); errors++; end
+    report();
+
+    // T9: Mode C, length=NUM_ELEMS, unsigned, scale_shift=NUM_ELEMS/8, round_en=0
+    test_id     = 9;
+    length_x    = NUM_ELEMS;
+    scale_x     = NUM_ELEMS / 8;
+    signed_x    = 0;
+    round_en_x  = 0;
+    $display("[T9] Mode C, length=%0d, signed=%0d, scale_shift=%0d, round_en=%0d", length_x, signed_x, scale_x, round_en_x);
+    do_reset();
+    fill_ram_incr(0, length_x, 'h0000_0000);
+    for (int i = 0; i < length_x; i++)
+      ahb_ram[i] = i << scale_x;
+    clear_scratch(0, length_x/QUANT_DEPTH);
+    launch(MODE_C, '0, '0, length_x, scale_x, signed_x, round_en_x);
+    wait_done();
+    if (!error) check_mode_c(0, 0, length_x, scale_x, signed_x, round_en_x);
+    else begin $display("\t[FAIL] unexpected error"); errors++; end
+    report();
+
+    // T10: Mode C, saturation corners, signed, scale_shift=0, round_en=0
+      // All four clip cases.
+    test_id     = 10;
+    length_x    = corner_vals.size();
+    scale_x     = 0;
+    signed_x    = 1;
+    round_en_x  = 0;
+    $display("[T10] Mode C, saturation corners=%0d, signed=%0d, scale_shift=%0d, round_en=%0d", length_x, signed_x, scale_x, round_en_x);
+    do_reset();
+    fill_ram_corners(0, length_x);
+    clear_scratch(0, length_x/QUANT_DEPTH);
+    launch(MODE_C, '0, '0, length_x, scale_x, signed_x, round_en_x);
+    wait_done();
+    if (!error) check_mode_c(0, 0, length_x, scale_x, signed_x, round_en_x);
+    else begin $display("\t[FAIL] unexpected error"); errors++; end
+    report();
+
 
     // SUMMARY
     $display();   // \n
