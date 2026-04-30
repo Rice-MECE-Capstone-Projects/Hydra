@@ -45,13 +45,10 @@ module hydra_scratchpad (
     localparam int unsigned ADDR_BITS  = $clog2(MEM_DEPTH);
     localparam int unsigned BYTE_SHIFT = $clog2(DATA_WIDTH/8);
 
-    logic [DATA_WIDTH-1:0] mem [0:MEM_DEPTH-1];
+    logic [DATA_WIDTH-1:0]  mem [0:MEM_DEPTH-1];
+    logic                   read_access;
 
-    logic transfer_start;
-    logic read_access;
-
-    assign transfer_start   = HSELScratch && HREADY && HTRANS[1];
-    assign read_access      = transfer_start && !HWRITE;
+    assign read_access      = HTRANS[1] && HSELScratch && !HWRITE && HREADY;
 
     // Scratchpad has no wait states and never signals errors
     // (matches cvw/src/uncore/ram_ahb.sv convention)
