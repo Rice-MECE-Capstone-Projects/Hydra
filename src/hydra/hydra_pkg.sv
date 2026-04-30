@@ -6,6 +6,7 @@
 
 `timescale 1ns/1ps
 package hydra_pkg;
+// -------------------------AHB Typedefs-------------------------
     typedef enum logic [2:0] {
         SINGLE = 3'b000, 
         INCR   = 3'b001, 
@@ -35,13 +36,7 @@ package hydra_pkg;
         KILO    = 3'b111
     } ahb_size_type;
 
-    typedef enum logic [1:0] {
-        MODE_A = 2'b00,     // scatter-gather
-        MODE_B = 2'b01,     // matrix transposition
-        MODE_C = 2'b10,     // quantization
-        IDLE   = 2'b11
-    } hydra_mode;
-
+  // -------------------------Parameters-------------------------
     parameter int unsigned      ADDR_WIDTH      = 32;
     parameter int unsigned      DATA_WIDTH      = 32;
 
@@ -55,11 +50,38 @@ package hydra_pkg;
     // Scratchpad has 4 MB at 32-bit words
     parameter int unsigned      MEM_SIZE        = 1048576;
 
+    localparam int unsigned     REG_STRIDE      = DATA_WIDTH / 8;
     localparam int unsigned     DATA_BITS       = $clog2(DATA_WIDTH);
     localparam int unsigned     LEN_WIDTH       = $clog2(MEM_SIZE);
     localparam int unsigned     S_QUANT_BOUND   = 1 << (QUANT_DIM-1);
     localparam int unsigned     U_QUANT_BOUND   = 1 << (QUANT_DIM);
-    
+
+  // -------------------------HYDRA Typedefs-------------------------
+    typedef enum logic [1:0] {
+        IDLE   = 2'b00,
+        MODE_A = 2'b01,     // scatter-gather
+        MODE_B = 2'b10,     // matrix transposition
+        MODE_C = 2'b11      // quantization
+    } hydra_mode;
+
+    typedef enum logic [7:0] { 
+        CTRL    = 8'(0 * REG_STRIDE),
+        SRC     = 8'(1 * REG_STRIDE),
+        DST     = 8'(2 * REG_STRIDE),
+        LEN     = 8'(3 * REG_STRIDE),
+        STATUS  = 8'(4 * REG_STRIDE)
+    } hydra_mmr_map;
+
+  // -------------------------Constants Declarations-------------------------
+    // Corner cases for MODE C
+    const logic signed [DATA_WIDTH-1:0] corner_vals[] = '{
+      {{(DATA_WIDTH-1){1'b0}}, 1'b1},       // +1 (no clip)
+      {1'b0, {(DATA_WIDTH-1){1'b1}}},       // maximum positive (clip)
+      {DATA_WIDTH{1'b1}},                   // -1 (no clip)
+      {1'b1, {(DATA_WIDTH-1){1'b0}}}        // minimum negative (clip)
+    };
+
+  // -------------------------Functions Declarations-------------------------
     function automatic int getLen_fn(ahb_burst_type b);
         case (b)
             SINGLE  :   return 1;
@@ -100,13 +122,5 @@ package hydra_pkg;
         else if ($signed(scaled) > $signed(hi)) return hi[QUANT_DIM-1:0];
         else                                    return scaled[QUANT_DIM-1:0];
     endfunction
-    
-    // Corner cases for MODE C
-    const logic signed [DATA_WIDTH-1:0] corner_vals[] = '{
-      {{(DATA_WIDTH-1){1'b0}}, 1'b1},       // +1 (no clip)
-      {1'b0, {(DATA_WIDTH-1){1'b1}}},       // maximum positive (clip)
-      {DATA_WIDTH{1'b1}},                   // -1 (no clip)
-      {1'b1, {(DATA_WIDTH-1){1'b0}}}        // minimum negative (clip)
-    };
 
 endpackage
