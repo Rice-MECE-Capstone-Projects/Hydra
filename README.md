@@ -87,7 +87,7 @@ Wally to a specific commit, and patches are generated against that exact base.
 
 ### Adding or updating a patch
 
-1. Edit the target file inside `wally/`:
+1. Edit the target file inside `wally/`. For example:
 ```bash
 nano wally/config/rv32gc/config.vh
 ```
@@ -113,14 +113,16 @@ pinned commit pointer, not the working tree contents.
 
 ---
 
-## HYDRA RTL modules
+## HYDRA RTL files
 
-| Module | File | Description |
+| Instance | File | Description |
 |---|---|---|
 | `hydra_top` | `src/hydra/hydra_top.sv` | Top-level wrapper. AHB master + slave ports, scratchpad sideband |
 | `hydra_mmr` | `src/hydra/hydra_mmr.sv` | AHB-Lite slave MMR. Holds CTRL, SRC, DST, LEN, STATUS. Zero wait-state |
 | `hydra_transform` | `src/hydra/hydra_transform.sv` | AHB master FSM, AGU, ping-pong buffers (Mode B), quant pipeline (Mode C) |
+| `hydra_scratchpad` | `src/hydra/hydra_scratchpad.sv` | 4 MB non-cacheable scratchpad SRAM |
 | `hydra_arbiter` | `src/hydra/hydra_arbiter.sv` | Static-priority Moore FSM. CPU priority, burst-boundary preemption |
+| `hydra_pkg` | `src/hydra/hydra_pkg.sv` | Project's package with parameter definitions, function declarations, and corner cases |
 
 ---
 
