@@ -25,7 +25,7 @@ module hydra_transform (
     input  logic [LEN_WIDTH-1:0]    length,     // number of 32-bit words
 
     // Arbiter
-    input  logic                    bus_grant,
+    input  logic                    HREADY,
     output logic                    HBUSREQ,
 
     // AHB-Lite master port
@@ -36,7 +36,6 @@ module hydra_transform (
     output logic [DATA_WIDTH-1:0]   HWDATA,
     output logic                    HWRITE,
     input  logic [DATA_WIDTH-1:0]   HRDATA,
-    input  logic                    HREADY,
     input  logic                    HRESP,
 
     // Scratchpad sideband write port
@@ -45,6 +44,7 @@ module hydra_transform (
     output logic [DATA_WIDTH-1:0]   SCRATCH_WDATA,
 
     // Status
+    output logic [BEATS_WIDTH-1:0]  currBeat,
     output logic                    done,
     output logic                    error
 );
@@ -59,8 +59,6 @@ module hydra_transform (
     localparam TRANSP_START = (BLOCK_ROWS - 1) * (BLOCK_COLS - 1);      // we can start writing scratchpad before first buffer is full
     localparam ROWS_WIDTH   = $clog2(BLOCK_ROWS);
     localparam COLS_WIDTH   = $clog2(BLOCK_COLS);
-    localparam NUM_BEATS    = getLen_fn(BURST_TYPE);
-    localparam BEATS_WIDTH  = $clog2(NUM_BEATS);
     localparam BURST_WIDTH  = LEN_WIDTH - BEATS_WIDTH;
 
     logic [DATA_WIDTH-1:0]  mbtb_buffer_a [0:BLOCK_ROWS-1][0:BLOCK_COLS-1];     // Buffer A for Mode B
@@ -78,19 +76,20 @@ module hydra_transform (
     logic [DATA_WIDTH-1:0]  quant;
     logic [2:0]             next_HBURST, next_HSIZE;
     logic [1:0]             next_HTRANS;
-    logic                   next_HWRITE, next_HBUSREQ;
+    logic                   next_HBUSREQ;
     logic                   invalid_length;
     logic                   first_trans, start_fill;
     logic                   fill_sel, drain_sel;
     logic                   next_done_read, done_read, next_done;
 
-    typedef enum logic [1:0] {IDLE, BUSY, FLUSH, ERROR_HALT} bus_state_type;
+    typedef enum logic [1:0] {IDLE, BUSY, FLUSH, ERROR} bus_state_type;
     bus_state_type state, next_state;
 
+    assign currBeat         = beat;
     assign next_done_read   = (count == length-1) && HREADY && (state == BUSY); // done reading when last word of last column is read from AHB
     assign invalid_length   = (length == '0) || ((mode == MODE_B) && (length[ELEM_WIDTH-1:0] != '0)) ||
                               ((mode == MODE_C) && (length[QUANT_BITS-1:0] != '0));
-    assign error            = (state == ERROR_HALT);
+    assign error            = (state == ERROR);
     always_ff @(posedge clk) begin
         if (rst_n && start) begin
             if (invalid_length) begin
@@ -105,28 +104,26 @@ module hydra_transform (
     begin : NEXT_STATE_SIGNALS
         next_state = state;
 
-        if (HRESP) next_state = ERROR_HALT;     // if any AHB error response is received, go to error halt
+        if (HRESP || invalid_length) next_state = ERROR;     // if any AHB error response is received, go to error halt
         else begin
             case (state)
-                IDLE        : next_state = start            ? (invalid_length ? ERROR_HALT : BUSY) : IDLE;
+                IDLE        : next_state = HREADY           ? (invalid_length ? ERROR : BUSY) : IDLE;
                 BUSY        : next_state = (mode == MODE_B) ? (done_read ? FLUSH : BUSY) : ((mode == MODE_C) ? (done_read ? IDLE : BUSY) : IDLE);
-                FLUSH       : next_state = done             ? IDLE  : FLUSH;
-                ERROR_HALT  : next_state = ERROR_HALT;
+                FLUSH       : next_state = done             ? IDLE          : FLUSH;
+                ERROR       : next_state = IDLE;
             endcase
         end
     end
 
     always_comb
     begin : AHB_SIGNALS
-        next_HBUSREQ    = start ? 1 : ((done_read || next_state == ERROR_HALT) ? 0 : HBUSREQ);
+        next_HBUSREQ    = (!invalid_length && start) ? 1 : ((done_read || next_state == ERROR) ? 0 : HBUSREQ);
         next_HADDR      = HADDR;
         next_HBURST     = BURST_TYPE;
         next_HSIZE      = AHB_SIZE;
         next_HTRANS     = HTRANS;
-        next_HWRITE     = 0;
 
         if (state == BUSY) begin
-            if (bus_grant) begin
                 if (HREADY) begin
                     if (first_trans) begin
                         next_HADDR  = src_addr;
@@ -136,10 +133,9 @@ module hydra_transform (
                         next_HTRANS = (beat == NUM_BEATS-1) ? ((count == length-1) ? AHB_IDLE : AHB_NONSEQ) : AHB_SEQ;
                     end
                 end
-            end else begin
-                next_HADDR  = '0;
-                next_HTRANS = AHB_IDLE;
-            end
+        end else begin
+            next_HADDR  = '0;
+            next_HTRANS = AHB_IDLE;
         end
     end
 
@@ -153,7 +149,7 @@ module hydra_transform (
         case (mode)
             MODE_B  : begin
                 SCRATCH_WADDR   = dst_addr + (SCRATCH_col << (ROWS_WIDTH + 2)) + (SCRATCH_row << 2) + offset;
-                SCRATCH_WE      = ((state == BUSY) && HREADY && (count > TRANSP_START)) || (state == FLUSH);
+                SCRATCH_WE      = ((state == BUSY) && HREADY && (count > TRANSP_START)) || (next_state == FLUSH);
                 SCRATCH_WDATA   = drain_sel ? mbtb_buffer_a[SCRATCH_row][SCRATCH_col] : mbtb_buffer_b[SCRATCH_row][SCRATCH_col];
                 // if (drain_sel)
                 //     $display("scratch[%0d, %0d] <= mbtb_buffer_a[%0d][%0d] = %0h", SCRATCH_WADDR/32, (SCRATCH_WADDR/4)%8, SCRATCH_row, SCRATCH_col, mbtb_buffer_a[SCRATCH_row][SCRATCH_col]);
@@ -207,24 +203,34 @@ module hydra_transform (
             HBURST      <= next_HBURST;
             HSIZE       <= next_HSIZE;
             HTRANS      <= next_HTRANS;
-            HWRITE      <= next_HWRITE;
             done_read   <= next_done_read;
             done        <= next_done;
 
             if (state == IDLE) begin
-                first_trans <= 1;
-                start_fill  <= 0;
-                offset      <= '0;
-                quant_curr  <= '0;
-                count_bytes <= '0;
-                quant       <= '0;
-                count       <= '0;
-                pos_mat     <= '0;
+                done_read       <= 0;
+                done            <= 0;
+                first_trans     <= 1;
+                start_fill      <= 0;
+                fill_sel        <= 0;
+                drain_sel       <= 0;
+                count           <= '0;
+                count_bytes     <= '0;
+                quant_curr      <= '0;
+                quant           <= '0;
+                pos_mat         <= '0;
+                beat            <= '0;
+                burst           <= '0;
+                col             <= '0;
+                row             <= '0;
+                offset          <= '0;
+                SCRATCH_count   <= '0;
+                SCRATCH_row     <= '0;
+                SCRATCH_col     <= '0;
             end else begin
                 first_trans <= (HTRANS == AHB_NONSEQ)       ? 0 : first_trans;
                 start_fill  <= (HTRANS == AHB_SEQ)          ? 1 : start_fill;
 
-                if ((((mode == MODE_B) || (mode == MODE_C)) && HREADY) || (state == FLUSH)) begin
+                if ((((mode == MODE_B) || (mode == MODE_C)) && HREADY) || (next_state == FLUSH)) begin
                     if (state == BUSY) begin
                         beat <= (beat == NUM_BEATS-1) ? '0 : (!first_trans ? beat + 1 : beat);
                         if (start_fill || (HTRANS == AHB_SEQ)) begin
