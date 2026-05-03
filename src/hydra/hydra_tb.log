@@ -3,12 +3,11 @@ Reading pref.tcl
 # 2023.2
 
 # vsim -debugDB -voptargs=""+acc"" -c hydra_tb -do "run -all; quit" 
-# Start time: 10:07:53 on Apr 30,2026
+# Start time: 22:49:56 on May 02,2026
 # ** Note: (vsim-3813) Design is being optimized due to module recompilation...
 # ** Note: (vsim-8611) Generating debug db.
 # ** Warning: (vopt-10587) Some optimizations are turned off because the +acc switch is in effect. This will cause your simulation to run slowly. Please use -access/-debug to maintain needed visibility.
 # ** Note: (vopt-143) Recognized 1 FSM in module "hydra_transform(fast)".
-# ** Note: (vopt-4301) Memory core inferred for signal 'mem' width=32, depth=1048576, type=RAM at location hydra_scratchpad.sv:48
 # ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=1.
 # //  Questa Sim-64
 # //  Version 2023.2 linux_x86_64 Apr 11 2023
@@ -32,6 +31,8 @@ Reading pref.tcl
 # Loading work.hydra_transform(fast)
 # Loading work.hydra_scratchpad_sv_unit(fast)
 # Loading work.hydra_scratchpad(fast)
+# Loading work.hydra_arbiter_sv_unit(fast)
+# Loading work.hydra_arbiter(fast)
 # ** Note: (vsim-8900) Creating design debug database vsim.dbg.
 # run -all
 # -----------------------------------------------------------------
@@ -425,7 +426,7 @@ Reading pref.tcl
 # 	[PASS] T2 Mode B: scratch[254] = 000100ef
 # 	[PASS] T2 Mode B: scratch[255] = 000100ff
 # T2 PASSED SUCCESSFULLY!
-# [T3] Mode B, length=128, wait state at cycle 20
+# [T3] Mode B, length=128, wait state at cycle 15
 # 	[PASS] T3 Mode B: scratch[  0] = 00000001
 # 	[PASS] T3 Mode B: scratch[  1] = 00000011
 # 	[PASS] T3 Mode B: scratch[  2] = 00000021
@@ -555,7 +556,7 @@ Reading pref.tcl
 # 	[PASS] T3 Mode B: scratch[126] = 00000070
 # 	[PASS] T3 Mode B: scratch[127] = 00000080
 # T3 PASSED SUCCESSFULLY!
-# [T4] Mode B, length=128, wait state at cycle 100
+# [T4] Mode B, length=256, wait state at cycle 250
 # 	[PASS] T4 Mode B: scratch[  0] = dead0000
 # 	[PASS] T4 Mode B: scratch[  1] = dead0010
 # 	[PASS] T4 Mode B: scratch[  2] = dead0020
@@ -684,6 +685,134 @@ Reading pref.tcl
 # 	[PASS] T4 Mode B: scratch[125] = dead005f
 # 	[PASS] T4 Mode B: scratch[126] = dead006f
 # 	[PASS] T4 Mode B: scratch[127] = dead007f
+# 	[PASS] T4 Mode B: scratch[128] = dead0080
+# 	[PASS] T4 Mode B: scratch[129] = dead0090
+# 	[PASS] T4 Mode B: scratch[130] = dead00a0
+# 	[PASS] T4 Mode B: scratch[131] = dead00b0
+# 	[PASS] T4 Mode B: scratch[132] = dead00c0
+# 	[PASS] T4 Mode B: scratch[133] = dead00d0
+# 	[PASS] T4 Mode B: scratch[134] = dead00e0
+# 	[PASS] T4 Mode B: scratch[135] = dead00f0
+# 	[PASS] T4 Mode B: scratch[136] = dead0081
+# 	[PASS] T4 Mode B: scratch[137] = dead0091
+# 	[PASS] T4 Mode B: scratch[138] = dead00a1
+# 	[PASS] T4 Mode B: scratch[139] = dead00b1
+# 	[PASS] T4 Mode B: scratch[140] = dead00c1
+# 	[PASS] T4 Mode B: scratch[141] = dead00d1
+# 	[PASS] T4 Mode B: scratch[142] = dead00e1
+# 	[PASS] T4 Mode B: scratch[143] = dead00f1
+# 	[PASS] T4 Mode B: scratch[144] = dead0082
+# 	[PASS] T4 Mode B: scratch[145] = dead0092
+# 	[PASS] T4 Mode B: scratch[146] = dead00a2
+# 	[PASS] T4 Mode B: scratch[147] = dead00b2
+# 	[PASS] T4 Mode B: scratch[148] = dead00c2
+# 	[PASS] T4 Mode B: scratch[149] = dead00d2
+# 	[PASS] T4 Mode B: scratch[150] = dead00e2
+# 	[PASS] T4 Mode B: scratch[151] = dead00f2
+# 	[PASS] T4 Mode B: scratch[152] = dead0083
+# 	[PASS] T4 Mode B: scratch[153] = dead0093
+# 	[PASS] T4 Mode B: scratch[154] = dead00a3
+# 	[PASS] T4 Mode B: scratch[155] = dead00b3
+# 	[PASS] T4 Mode B: scratch[156] = dead00c3
+# 	[PASS] T4 Mode B: scratch[157] = dead00d3
+# 	[PASS] T4 Mode B: scratch[158] = dead00e3
+# 	[PASS] T4 Mode B: scratch[159] = dead00f3
+# 	[PASS] T4 Mode B: scratch[160] = dead0084
+# 	[PASS] T4 Mode B: scratch[161] = dead0094
+# 	[PASS] T4 Mode B: scratch[162] = dead00a4
+# 	[PASS] T4 Mode B: scratch[163] = dead00b4
+# 	[PASS] T4 Mode B: scratch[164] = dead00c4
+# 	[PASS] T4 Mode B: scratch[165] = dead00d4
+# 	[PASS] T4 Mode B: scratch[166] = dead00e4
+# 	[PASS] T4 Mode B: scratch[167] = dead00f4
+# 	[PASS] T4 Mode B: scratch[168] = dead0085
+# 	[PASS] T4 Mode B: scratch[169] = dead0095
+# 	[PASS] T4 Mode B: scratch[170] = dead00a5
+# 	[PASS] T4 Mode B: scratch[171] = dead00b5
+# 	[PASS] T4 Mode B: scratch[172] = dead00c5
+# 	[PASS] T4 Mode B: scratch[173] = dead00d5
+# 	[PASS] T4 Mode B: scratch[174] = dead00e5
+# 	[PASS] T4 Mode B: scratch[175] = dead00f5
+# 	[PASS] T4 Mode B: scratch[176] = dead0086
+# 	[PASS] T4 Mode B: scratch[177] = dead0096
+# 	[PASS] T4 Mode B: scratch[178] = dead00a6
+# 	[PASS] T4 Mode B: scratch[179] = dead00b6
+# 	[PASS] T4 Mode B: scratch[180] = dead00c6
+# 	[PASS] T4 Mode B: scratch[181] = dead00d6
+# 	[PASS] T4 Mode B: scratch[182] = dead00e6
+# 	[PASS] T4 Mode B: scratch[183] = dead00f6
+# 	[PASS] T4 Mode B: scratch[184] = dead0087
+# 	[PASS] T4 Mode B: scratch[185] = dead0097
+# 	[PASS] T4 Mode B: scratch[186] = dead00a7
+# 	[PASS] T4 Mode B: scratch[187] = dead00b7
+# 	[PASS] T4 Mode B: scratch[188] = dead00c7
+# 	[PASS] T4 Mode B: scratch[189] = dead00d7
+# 	[PASS] T4 Mode B: scratch[190] = dead00e7
+# 	[PASS] T4 Mode B: scratch[191] = dead00f7
+# 	[PASS] T4 Mode B: scratch[192] = dead0088
+# 	[PASS] T4 Mode B: scratch[193] = dead0098
+# 	[PASS] T4 Mode B: scratch[194] = dead00a8
+# 	[PASS] T4 Mode B: scratch[195] = dead00b8
+# 	[PASS] T4 Mode B: scratch[196] = dead00c8
+# 	[PASS] T4 Mode B: scratch[197] = dead00d8
+# 	[PASS] T4 Mode B: scratch[198] = dead00e8
+# 	[PASS] T4 Mode B: scratch[199] = dead00f8
+# 	[PASS] T4 Mode B: scratch[200] = dead0089
+# 	[PASS] T4 Mode B: scratch[201] = dead0099
+# 	[PASS] T4 Mode B: scratch[202] = dead00a9
+# 	[PASS] T4 Mode B: scratch[203] = dead00b9
+# 	[PASS] T4 Mode B: scratch[204] = dead00c9
+# 	[PASS] T4 Mode B: scratch[205] = dead00d9
+# 	[PASS] T4 Mode B: scratch[206] = dead00e9
+# 	[PASS] T4 Mode B: scratch[207] = dead00f9
+# 	[PASS] T4 Mode B: scratch[208] = dead008a
+# 	[PASS] T4 Mode B: scratch[209] = dead009a
+# 	[PASS] T4 Mode B: scratch[210] = dead00aa
+# 	[PASS] T4 Mode B: scratch[211] = dead00ba
+# 	[PASS] T4 Mode B: scratch[212] = dead00ca
+# 	[PASS] T4 Mode B: scratch[213] = dead00da
+# 	[PASS] T4 Mode B: scratch[214] = dead00ea
+# 	[PASS] T4 Mode B: scratch[215] = dead00fa
+# 	[PASS] T4 Mode B: scratch[216] = dead008b
+# 	[PASS] T4 Mode B: scratch[217] = dead009b
+# 	[PASS] T4 Mode B: scratch[218] = dead00ab
+# 	[PASS] T4 Mode B: scratch[219] = dead00bb
+# 	[PASS] T4 Mode B: scratch[220] = dead00cb
+# 	[PASS] T4 Mode B: scratch[221] = dead00db
+# 	[PASS] T4 Mode B: scratch[222] = dead00eb
+# 	[PASS] T4 Mode B: scratch[223] = dead00fb
+# 	[PASS] T4 Mode B: scratch[224] = dead008c
+# 	[PASS] T4 Mode B: scratch[225] = dead009c
+# 	[PASS] T4 Mode B: scratch[226] = dead00ac
+# 	[PASS] T4 Mode B: scratch[227] = dead00bc
+# 	[PASS] T4 Mode B: scratch[228] = dead00cc
+# 	[PASS] T4 Mode B: scratch[229] = dead00dc
+# 	[PASS] T4 Mode B: scratch[230] = dead00ec
+# 	[PASS] T4 Mode B: scratch[231] = dead00fc
+# 	[PASS] T4 Mode B: scratch[232] = dead008d
+# 	[PASS] T4 Mode B: scratch[233] = dead009d
+# 	[PASS] T4 Mode B: scratch[234] = dead00ad
+# 	[PASS] T4 Mode B: scratch[235] = dead00bd
+# 	[PASS] T4 Mode B: scratch[236] = dead00cd
+# 	[PASS] T4 Mode B: scratch[237] = dead00dd
+# 	[PASS] T4 Mode B: scratch[238] = dead00ed
+# 	[PASS] T4 Mode B: scratch[239] = dead00fd
+# 	[PASS] T4 Mode B: scratch[240] = dead008e
+# 	[PASS] T4 Mode B: scratch[241] = dead009e
+# 	[PASS] T4 Mode B: scratch[242] = dead00ae
+# 	[PASS] T4 Mode B: scratch[243] = dead00be
+# 	[PASS] T4 Mode B: scratch[244] = dead00ce
+# 	[PASS] T4 Mode B: scratch[245] = dead00de
+# 	[PASS] T4 Mode B: scratch[246] = dead00ee
+# 	[PASS] T4 Mode B: scratch[247] = dead00fe
+# 	[PASS] T4 Mode B: scratch[248] = dead008f
+# 	[PASS] T4 Mode B: scratch[249] = dead009f
+# 	[PASS] T4 Mode B: scratch[250] = dead00af
+# 	[PASS] T4 Mode B: scratch[251] = dead00bf
+# 	[PASS] T4 Mode B: scratch[252] = dead00cf
+# 	[PASS] T4 Mode B: scratch[253] = dead00df
+# 	[PASS] T4 Mode B: scratch[254] = dead00ef
+# 	[PASS] T4 Mode B: scratch[255] = dead00ff
 # T4 PASSED SUCCESSFULLY!
 # [T5] Mode B, length=64 (invalid) => expect ERROR_HALT
 # 	[ERROR] Fatal error occurred in hydra_transform:
@@ -806,10 +935,10 @@ Reading pref.tcl
 # Results: 0 error(s) across 10 test(s).
 # ALL TESTS PASSED!
 # -----------------------------------------------------------------
-# ** Note: $stop    : hydra_tb.sv(509)
-#    Time: 16326 ps  Iteration: 0  Instance: /hydra_tb
-# Break in Module hydra_tb at hydra_tb.sv line 509
-# Stopped at hydra_tb.sv line 509
+# ** Note: $stop    : hydra_tb.sv(516)
+#    Time: 17396 ps  Iteration: 0  Instance: /hydra_tb
+# Break in Module hydra_tb at hydra_tb.sv line 516
+# Stopped at hydra_tb.sv line 516
 #  quit
-# End time: 10:07:55 on Apr 30,2026, Elapsed time: 0:00:02
+# End time: 22:49:58 on May 02,2026, Elapsed time: 0:00:02
 # Errors: 0, Warnings: 1
