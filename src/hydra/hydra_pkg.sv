@@ -55,6 +55,8 @@ package hydra_pkg;
     localparam int unsigned     LEN_WIDTH       = $clog2(MEM_SIZE);
     localparam int unsigned     S_QUANT_BOUND   = 1 << (QUANT_DIM-1);
     localparam int unsigned     U_QUANT_BOUND   = 1 << (QUANT_DIM);
+    localparam int unsigned     NUM_BEATS       = getLen_fn(BURST_TYPE);
+    localparam int unsigned     BEATS_WIDTH     = $clog2(NUM_BEATS);
 
   // -------------------------HYDRA Typedefs-------------------------
     typedef enum logic [1:0] {
