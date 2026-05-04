@@ -1,0 +1,21 @@
+diff --git a/src/uncore/plic_apb.sv b/src/uncore/plic_apb.sv
+index bf95dd51f..2044f1c56 100644
+--- a/src/uncore/plic_apb.sv
++++ b/src/uncore/plic_apb.sv
+@@ -50,7 +50,7 @@ module plic_apb import cvw::*;  #(parameter cvw_t P) (
+   input  logic                PENABLE,
+   output logic [P.XLEN-1:0]   PRDATA,
+   output logic                PREADY,
+-  input  logic                UARTIntr,GPIOIntr, SPIIntr, SDCIntr,
++  input  logic                UARTIntr,GPIOIntr, SPIIntr, SDCIntr, HYDRAIntr,
+   output logic                MExtInt, SExtInt
+ );
+ 
+@@ -173,6 +173,7 @@ module plic_apb import cvw::*;  #(parameter cvw_t P) (
+     if(P.PLIC_UART_ID != 0) requests[P.PLIC_UART_ID] = UARTIntr;
+     if(P.PLIC_SPI_ID != 0) requests[P.PLIC_SPI_ID] = SPIIntr;
+     if(P.PLIC_SDC_ID !=0)   requests[P.PLIC_SDC_ID]  = SDCIntr;
++    if(P.PLIC_HYDRA_ID != 0) requests[P.PLIC_HYDRA_ID] = HYDRAIntr;
+   end
+ 
+   // pending interrupt request
