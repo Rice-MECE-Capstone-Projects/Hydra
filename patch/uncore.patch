@@ -1,0 +1,104 @@
+diff --git a/src/uncore/uncore.sv b/src/uncore/uncore.sv
+index 96f40cd30..a1d6767a4 100644
+--- a/src/uncore/uncore.sv
++++ b/src/uncore/uncore.sv
+@@ -3,6 +3,7 @@
+ //
+ // Written: David_Harris@hmc.edu 9 January 2021
+ // Modified: Ben Bracker 6 Mar 2021 to better fit AMBA 3 AHB-Lite spec
++//           Giovanni Sirtori <gs86@rice.edu> (HYDRA integration), 3 May 2026 
+ //
+ // Purpose: System-on-Chip components outside the core
+ //          Memories, peripherals, external bus control
+@@ -46,6 +47,10 @@ module uncore import cvw::*;  #(parameter cvw_t P)(
+   output logic [P.AHBW-1:0]    HRDATA,
+   output logic                 HREADY, HRESP,
+   output logic                 HSELEXT,
++  input  logic [P.AHBW-1:0]    HRDATAHYDRA,
++  input  logic                 HREADYHYDRA, HRESPHYDRA,
++  input  logic                 HYDRAIntr,
++  output logic                 HSELHYDRA,
+   // peripheral pins
+   output logic                 MTimerInt, MSwInt,         // Timer and software interrupts from CLINT
+   output logic                 MExtInt, SExtInt,          // External interrupts from PLIC
+@@ -66,9 +71,9 @@ module uncore import cvw::*;  #(parameter cvw_t P)(
+ 
+   logic [P.XLEN-1:0]           HREADRam, HREADSDC;
+ 
+-  logic [11:0]                 HSELRegions;
++  logic [12:0]                 HSELRegions;
+   logic                        HSELDTIM, HSELIROM, HSELRam, HSELCLINT, HSELPLIC, HSELGPIO, HSELUART,HSELSDC, HSELSPI;
+-  logic                        HSELDTIMD, HSELIROMD, HSELEXTD, HSELRamD, HSELCLINTD, HSELPLICD, HSELGPIOD, HSELUARTD, HSELSDCD, HSELSPID;
++  logic                        HSELDTIMD, HSELIROMD, HSELEXTD, HSELRamD, HSELCLINTD, HSELPLICD, HSELGPIOD, HSELUARTD, HSELSDCD, HSELSPID, HSELHYDRAD;
+   logic                        HRESPRam,  HRESPSDC;
+   logic                        HREADYRam, HRESPSDCD;
+   logic [P.XLEN-1:0]           HREADBootRom;
+@@ -98,7 +103,7 @@ module uncore import cvw::*;  #(parameter cvw_t P)(
+   adrdecs #(P) adrdecs(HADDR, 1'b1, 1'b1, 1'b1, HSIZE[1:0], HSELRegions);
+ 
+   // unswizzle HSEL signals
+-  assign {HSELSPI, HSELSDC, HSELPLIC, HSELUART, HSELGPIO, HSELCLINT, HSELRam, HSELBootRom, HSELEXT, HSELIROM, HSELDTIM} = HSELRegions[11:1];
++  assign {HSELHYDRA, HSELSPI, HSELSDC, HSELPLIC, HSELUART, HSELGPIO, HSELCLINT, HSELRam, HSELBootRom, HSELEXT, HSELIROM, HSELDTIM} = HSELRegions[12:1];
+ 
+   // AHB -> APB bridge
+   ahbapbbridge #(P, 6) ahbapbbridge (
+@@ -131,7 +136,7 @@ module uncore import cvw::*;  #(parameter cvw_t P)(
+ 
+   if (P.PLIC_SUPPORTED == 1) begin : plic
+     plic_apb #(P) plic(.PCLK, .PRESETn, .PSEL(PSEL[2]), .PADDR(PADDR[27:0]), .PWDATA, .PSTRB, .PWRITE, .PENABLE,
+-      .PRDATA(PRDATA[2]), .PREADY(PREADY[2]), .UARTIntr, .GPIOIntr, .SDCIntr, .SPIIntr, .MExtInt, .SExtInt);
++      .PRDATA(PRDATA[2]), .PREADY(PREADY[2]), .UARTIntr, .GPIOIntr, .SDCIntr, .SPIIntr, .HYDRAIntr, .MExtInt, .SExtInt);
+   end else begin : plic
+     assign MExtInt = 1'b0;
+     assign SExtInt = 1'b0;
+@@ -175,22 +180,37 @@ module uncore import cvw::*;  #(parameter cvw_t P)(
+     assign SDCCmd = '0; assign SDCCS = 4'b0; assign SDCIntr = 1'b0; assign SDCCLK = 1'b0;
+   end
+ 
++  // if (P.HYDRA_SUPPORTED) begin : hydra_mmr
++  //   hydra_mmr hydra_mmr (
++  //     .HCLK, .HRESETn, .HSELRam, .HADDR, .HWRITE, .HREADY,
++  //     .HTRANS, .HWDATA, .HWSTRB, .HREADRam, .HRESPRam, .HREADYRam);
++  // end else assign {HREADRam, HRESPRam, HREADYRam} = '0;
++
++  //   if (P.HYDRA_SUPPORTED) begin : hydra_scratchpad
++  //   hydra_scratchpad hydra_scratch (
++  //     .HCLK, .HRESETn, .HSELRam, .HADDR, .HWRITE, .HREADY,
++  //     .HTRANS, .HWDATA, .HWSTRB, .HREADRam, .HRESPRam, .HREADYRam);
++  // end else assign {HREADRam, HRESPRam, HREADYRam} = '0;
++
+ 
+   // AHB Read Multiplexer
+   assign HRDATA = ({P.XLEN{HSELRamD}} & HREADRam) |
+                   ({P.XLEN{HSELEXTD}} & HRDATAEXT) |
+                   ({P.XLEN{HSELBRIDGED}} & HREADBRIDGE) |
+-                  ({P.XLEN{HSELBootRomD}} & HREADBootRom);
++                  ({P.XLEN{HSELBootRomD}} & HREADBootRom) |
++                  ({P.XLEN{HSELHYDRAD}} & HRDATAHYDRA);
+ 
+   assign HRESP = HSELRamD & HRESPRam |
+                  HSELEXTD & HRESPEXT |
+                  HSELBRIDGE & HRESPBRIDGE |
+-                 HSELBootRomD & HRESPBootRom;
++                 HSELBootRomD & HRESPBootRom |
++                 HSELHYDRAD & HRESPHYDRA;
+ 
+   assign HREADY = HSELRamD & HREADYRam |
+                   HSELEXTD & HREADYEXT |
+                   HSELBRIDGED & HREADYBRIDGE |
+                   HSELBootRomD & HREADYBootRom |
++                  HSELHYDRAD & HREADYHYDRA |
+                   HSELNoneD; // don't lock up the bus if no region is being accessed
+ 
+   // Address Decoder Delay (figure 4-2 in spec)
+@@ -198,8 +218,8 @@ module uncore import cvw::*;  #(parameter cvw_t P)(
+   // takes more than 1 cycle to respond it needs to hold on to the old select until the
+   // device is ready.  Hence this register must be selectively enabled by HREADY.
+   // However on reset None must be selected.
+-  flopenl #(12) hseldelayreg(HCLK, ~HRESETn, HREADY, HSELRegions, 12'b1,
+-    {HSELSPID, HSELSDCD, HSELPLICD, HSELUARTD, HSELGPIOD, HSELCLINTD,
++  flopenl #(13) hseldelayreg(HCLK, ~HRESETn, HREADY, HSELRegions, 13'b1,
++    {HSELHYDRAD, HSELSPID, HSELSDCD, HSELPLICD, HSELUARTD, HSELGPIOD, HSELCLINTD,
+       HSELRamD, HSELBootRomD, HSELEXTD, HSELIROMD, HSELDTIMD, HSELNoneD});
+   flopenr #(1) hselbridgedelayreg(HCLK, ~HRESETn, HREADY, HSELBRIDGE, HSELBRIDGED);
+ endmodule
