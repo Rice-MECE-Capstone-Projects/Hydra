@@ -127,10 +127,8 @@ module hydra_tb;
   hydra_scratchpad u_scratchpad (
     .clk           (clk),
     .rst_n         (rst_n),
-    .HSELScratch   ('0),
+    .HSEL   ('0),
     .HADDR         ('0),
-    .HBURST        ('0),
-    .HSIZE         ('0),
     .HTRANS        ('0),    // AHB_IDLE
     .HWRITE        ('0),
     .HREADY        ('1),
