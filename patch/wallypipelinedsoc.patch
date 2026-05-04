@@ -1,0 +1,126 @@
+diff --git a/src/wally/wallypipelinedsoc.sv b/src/wally/wallypipelinedsoc.sv
+index 51d2f6124..f813ed629 100644
+--- a/src/wally/wallypipelinedsoc.sv
++++ b/src/wally/wallypipelinedsoc.sv
+@@ -2,7 +2,7 @@
+ // wally-pipelinedsoc.sv
+ //
+ // Written: David_Harris@hmc.edu 6 November 2020
+-// Modified:
++// Modified: Giovanni Sirtori <gs86@rice.edu> (HYDRA integration), 3 May 2026
+ //
+ // Purpose: System on chip including pipelined processor and uncore memories/peripherals
+ //
+@@ -72,6 +72,48 @@ module wallypipelinedsoc import cvw::*; #(parameter cvw_t P)  (
+   logic                       MTimerInt, MSwInt;// timer and software interrupts from CLINT
+   logic [63:0]                MTIME_CLINT;      // from CLINT to CSRs
+   logic                       MExtInt,SExtInt;  // from PLIC
++  logic                       HSELHYDRA;
++  logic [P.AHBW-1:0]          HRDATAHYDRA;
++  logic                       HREADYHYDRA;
++  logic                       HRESPHYDRA;
++  logic [P.PA_BITS-1:0]       HADDR_bus, HADDR_hydra;
++  logic [2:0]                 HBURST_bus, HBURST_hydra;
++  logic [1:0]                 HTRANS_bus, HTRANS_hydra;
++  logic [2:0]                 HSIZE_bus, HSIZE_hydra;
++  logic [P.AHBW-1:0]          HWDATA_bus, HWDATA_hydra;
++  logic [P.XLEN/8-1:0]        HWSTRB_bus, HWSTRB_hydra; 
++  logic                       HWRITE_bus, HWRITE_hydra;
++  logic [3:0]                 HPROT_bus, HPROT_hydra;
++  logic                       HMASTLOCK_bus, HMASTLOCK_hydra;
++  logic                       hydra_grant, hydra_HSEL;
++  logic                       HYDRAIntr;
++
++  always_comb
++  begin : AHB_ARBITER
++      if (hydra_grant) begin
++          HADDR_bus       = HADDR_hydra;
++          HBURST_bus      = HBURST_hydra;
++          HSIZE_bus       = HSIZE_hydra;
++          HTRANS_bus      = HTRANS_hydra;
++          HWDATA_bus      = HWDATA_hydra;
++          HWSTRB_bus      = HWSTRB_hydra;
++          HWRITE_bus      = HWRITE_hydra;
++          HMASTLOCK_bus   = HMASTLOCK_hydra;
++          HPROT_bus       = HPROT_hydra;
++          hydra_HSEL      = 0;
++      end else begin
++          HADDR_bus       = HADDR;
++          HBURST_bus      = HBURST;
++          HSIZE_bus       = HSIZE;
++          HTRANS_bus      = HTRANS;
++          HWDATA_bus      = HWDATA;
++          HWSTRB_bus      = HWSTRB;
++          HWRITE_bus      = HWRITE;
++          HMASTLOCK_bus   = HMASTLOCK;
++          HPROT_bus       = HPROT;
++          hydra_HSEL      = HSELHYDRA;
++      end
++  end
+ 
+   // synchronize reset to SOC clock domain
+   synchronizer resetsync(.clk, .d(reset_ext), .q(reset));
+@@ -79,19 +121,59 @@ module wallypipelinedsoc import cvw::*; #(parameter cvw_t P)  (
+   // instantiate processor and internal memories
+   wallypipelinedcore #(P) core(.clk, .reset,
+     .MTimerInt, .MExtInt, .SExtInt, .MSwInt, .MTIME_CLINT,
+-    .HRDATA, .HREADY, .HRESP, .HCLK, .HRESETn, .HADDR, .HWDATA, .HWSTRB,
++    .HRDATA, .HREADY(HREADY & !hydra_grant), .HRESP, .HCLK, .HRESETn, .HADDR, .HWDATA, .HWSTRB,
+     .HWRITE, .HSIZE, .HBURST, .HPROT, .HTRANS, .HMASTLOCK, .ExternalStall
+    );
+ 
++  // instantiate HYDRA accelerator
++  hydra_top #(
++    .MMR_BASE      (P.HYDRA_MMR_BASE),
++    .MMR_RANGE     (P.HYDRA_MMR_RANGE),
++    .SCRATCH_BASE  (P.HYDRA_SCRATCH_BASE),
++    .SCRATCH_RANGE (P.HYDRA_SCRATCH_RANGE)
++  ) hydra (
++    .clk,
++    .rst_n        (!reset),
++    
++    .hydra_HSEL,                      // from cpu to hydra (scratchpad / mmr)
++    .HADDR_s      (HADDR_bus),        // from cpu to hydra (scratchpad / mmr)
++    .HWDATA_s     (HWDATA_bus),       // from cpu to hydra (scratchpad / mmr)
++    .HWRITE_s     (HWRITE_bus),       // from cpu to hydra (scratchpad / mmr)
++    .HTRANS_s     (HTRANS_bus),       // from cpu to hydra (scratchpad / mmr)
++    .HREADY_s     (HREADY),           // from cpu to hydra (scratchpad / mmr)
++    .HTRANS1_cpu  (HTRANS[1]),        // from cpu to hydra (arbiter)
++
++    .HRDATA_m     (HRDATA),           // from ram to hydra
++    .HREADY_m     (HREADY),           // from ram to hydra
++    .HRESP_m      (HRESP),            // from ram to hydra
++
++    .HRDATA_s     (HRDATAHYDRA),      // from hydra (scratchpad / mmr) to bus
++    .HREADYOUT_s  (HREADYHYDRA),      // from hydra (scratchpad / mmr) to bus
++    .HRESP_s      (HRESPHYDRA),       // from hydra (scratchpad / mmr) to bus
++    .hydra_grant,                     // from hydra (arbiter) to cpu
++    .irq_hydra    (HYDRAIntr),        // from hydra to cpu
++
++    .HADDR_m      (HADDR_hydra),      // from hydra to ram
++    .HBURST_m     (HBURST_hydra),     // from hydra to ram
++    .HSIZE_m      (HSIZE_hydra),      // from hydra to ram
++    .HTRANS_m     (HTRANS_hydra),     // from hydra to ram
++    .HWDATA_m     (HWDATA_hydra),     // from hydra to ram
++    .HWSTRB_m     (HWSTRB_hydra),     // from hydra to ram
++    .HWRITE_m     (HWRITE_hydra),     // from hydra to ram
++    .HPROT_m      (HPROT_hydra),      // from hydra to ram
++    .HMASTLOCK_m  (HMASTLOCK_hydra)   // from hydra to ram
++  );
++
+   // instantiate uncore if a bus interface exists
+   if (P.BUS_SUPPORTED) begin : uncoregen // Hack to work around Verilator bug https://github.com/verilator/verilator/issues/4769
+     uncore #(P) uncore(.HCLK, .HRESETn, .TIMECLK,
+-      .HADDR, .HWDATA, .HWSTRB, .HWRITE, .HSIZE, .HBURST, .HPROT, .HTRANS, .HMASTLOCK, .HRDATAEXT,
+-      .HREADYEXT, .HRESPEXT, .HRDATA, .HREADY, .HRESP, .HSELEXT,
++      .HADDR(HADDR_bus), .HWDATA(HWDATA_bus), .HWSTRB(HWSTRB_bus), .HWRITE(HWRITE_bus), .HSIZE(HSIZE_bus), 
++      .HBURST(HBURST_bus), .HPROT(HPROT_bus), .HTRANS(HTRANS_bus), .HMASTLOCK(HMASTLOCK_bus), .HRDATAEXT, .HREADYEXT, 
++      .HRESPEXT, .HRDATA, .HREADY, .HRESP, .HSELEXT, .HRDATAHYDRA, .HREADYHYDRA, .HRESPHYDRA, .HYDRAIntr, .HSELHYDRA,
+       .MTimerInt, .MSwInt, .MExtInt, .SExtInt, .GPIOIN, .GPIOOUT, .GPIOEN, .UARTSin,
+       .UARTSout, .MTIME_CLINT, .SPIIn, .SPIOut, .SPICS, .SPICLK, .SDCIn, .SDCCmd, .SDCCS, .SDCCLK);
+   end else begin
+-    assign {HRDATA, HREADY, HRESP, HSELEXT, MTimerInt, MSwInt, MExtInt, SExtInt,
++    assign {HRDATA, HREADY, HRESP, HSELEXT, HSELHYDRA, MTimerInt, MSwInt, MExtInt, SExtInt,
+             MTIME_CLINT, GPIOOUT, GPIOEN, UARTSout, SPIOut, SPICS, SPICLK, SDCCmd, SDCCS, SDCCLK} = '0;
+   end
+ 
