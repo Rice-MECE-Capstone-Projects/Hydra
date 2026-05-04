@@ -53,8 +53,6 @@ package hydra_pkg;
     localparam int unsigned     REG_STRIDE      = DATA_WIDTH / 8;
     localparam int unsigned     DATA_BITS       = $clog2(DATA_WIDTH);
     localparam int unsigned     LEN_WIDTH       = $clog2(MEM_SIZE);
-    localparam int unsigned     S_QUANT_BOUND   = 1 << (QUANT_DIM-1);
-    localparam int unsigned     U_QUANT_BOUND   = 1 << (QUANT_DIM);
     localparam int unsigned     NUM_BEATS       = getLen_fn(BURST_TYPE);
     localparam int unsigned     BEATS_WIDTH     = $clog2(NUM_BEATS);
 
@@ -97,7 +95,8 @@ package hydra_pkg;
     // Quantize a [DATA_WIDTH-1:0] signal to QUANT_DIM bits using 
     // power-of-two shift.
     //      scale_shift : arithmetic right-shift amount [0:DATA_WIDTH-1]
-    //      signed_out  : 1 = INT_QUANT_DIM [-S_QUANT_BOUND,S_QUANT_BOUND-1], 0 = UINT_QUANT_DIM [0,U_QUANT_BOUND-1]
+    //      signed_out  : 1 = INT_QUANT_DIM [-2^(QUANT_DIM-1),2^(QUANT_DIM-1)-1], 
+    //                    0 = UINT_QUANT_DIM [0,2^(QUANT_DIM)-1]
     //      round_en    : 1 = add rounding correction before shift
     function automatic logic [QUANT_DIM-1:0] quant_fn (
         logic [DATA_WIDTH-1:0]  src, 
@@ -105,24 +104,24 @@ package hydra_pkg;
         logic                   signed_out, 
         logic                   round_en
     );
-        logic signed [DATA_WIDTH:0] val;        // one extra bit to absorb rounding carry safely
-        logic signed [DATA_WIDTH:0] rounded;
-        logic signed [DATA_WIDTH:0] scaled;
-        logic signed [DATA_WIDTH:0] lo, hi;
+        // one extra bit to absorb rounding carry safely
+        logic signed [DATA_WIDTH:0] val, rounded, scaled;
+        logic                       neg, ovf_signed, ovf_unsigned;
 
         val     = {src[DATA_WIDTH-1], src};     // sign-extend
         // if rounded is enabled, add half of target scale to improve accuracy
-        rounded = round_en && (scale_shift > 0)
+        rounded = (round_en && |scale_shift)
                     ? val + ({{DATA_WIDTH{1'b0}}, 1'b1} << (scale_shift - 1))
                     : val;
-        scaled = $signed(rounded) >>> scale_shift;
+        scaled = rounded >>> scale_shift;
 
-        lo      = signed_out ? -S_QUANT_BOUND : 0;
-        hi      = signed_out ?  S_QUANT_BOUND-1 : U_QUANT_BOUND-1;
+        neg          = scaled[DATA_WIDTH];
+        ovf_signed   = |scaled[DATA_WIDTH:QUANT_DIM-1] && ~&scaled[DATA_WIDTH:QUANT_DIM-1];
+        ovf_unsigned = |scaled[DATA_WIDTH:QUANT_DIM];
 
-        if      ($signed(scaled) < $signed(lo)) return lo[QUANT_DIM-1:0];
-        else if ($signed(scaled) > $signed(hi)) return hi[QUANT_DIM-1:0];
-        else                                    return scaled[QUANT_DIM-1:0];
+        if      (signed_out  && ovf_signed)   return {neg, {(QUANT_DIM-1){~neg}}};
+        else if (!signed_out && ovf_unsigned) return {QUANT_DIM{~neg}};
+        else                                  return scaled[QUANT_DIM-1:0];
     endfunction
 
 endpackage
