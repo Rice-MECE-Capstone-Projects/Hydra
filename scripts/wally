@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-# wally — manage the Wally submodule and HYDRA patches.
-#
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+# wally
+# Rice University — Project HYDRA
+# Author: Giovanni Sirtori <gs86@rice.edu>
+# Description: Manage the Wally submodule and HYDRA patches.
 # Usage:
 #   ./scripts/wally update      sync submodule and apply all patches
 #   ./scripts/wally save        regenerate patch files from current wally/ edits
@@ -15,9 +18,11 @@ PATCH_DIR="$REPO_ROOT/patch"
 # NOTE: add a line here when you start modifying a new Wally file.
 declare -A FILES=(
   ["config_rv32gc.patch"]="config/rv32gc/config.vh"
+  ["cvw.patch"]="src/cvw.sv"
   ["wallypipelinedsoc.patch"]="src/wally/wallypipelinedsoc.sv"
   ["uncore.patch"]="src/uncore/uncore.sv"
   ["adrdecs.patch"]="src/mmu/adrdecs.sv"
+  ["plic_apb.patch"]="src/uncore/plic_apb.sv"
 )
 
 cmd_update() {
