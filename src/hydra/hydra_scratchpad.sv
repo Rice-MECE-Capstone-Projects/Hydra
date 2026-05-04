@@ -19,18 +19,18 @@ import hydra_pkg::*;
 module hydra_scratchpad (
     input  logic                   clk,
     input  logic                   rst_n,
-    input  logic                   HSELScratch,
 
     // AHB-Lite slave port — CPU read
     input  logic [ADDR_WIDTH-1:0]  HADDR,
-    input  logic [2:0]             HBURST,   // accepted, but unused (non-cacheable region)
-    input  logic [2:0]             HSIZE,    // accepted, but unused (LSU handles sub-word)
-    input  logic [1:0]             HTRANS,
+    // input  logic [2:0]             HBURST,   // unused (non-cacheable region)
+    // input  logic [2:0]             HSIZE,    // unused (LSU handles sub-word)
     input  logic                   HWRITE,
+    input  logic [1:0]             HTRANS,
+    input  logic                   HSEL,
     input  logic                   HREADY,
     output logic [DATA_WIDTH-1:0]  HRDATA,
-    output logic                   HRESP,
     output logic                   HREADYOUT,
+    output logic                   HRESP,
 
     // Sideband write port — HYDRA private write
     input  logic                   SCRATCH_WE,
@@ -48,7 +48,7 @@ module hydra_scratchpad (
     logic [DATA_WIDTH-1:0]  mem [0:MEM_DEPTH-1];
     logic                   read_access;
 
-    assign read_access      = HTRANS[1] && HSELScratch && !HWRITE && HREADY;
+    assign read_access      = HTRANS[1] && HSEL && !HWRITE && HREADY;
 
     // Scratchpad has no wait states and never signals errors
     // (matches cvw/src/uncore/ram_ahb.sv convention)
