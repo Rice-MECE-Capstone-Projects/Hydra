@@ -1,0 +1,33 @@
+diff --git a/src/mmu/adrdecs.sv b/src/mmu/adrdecs.sv
+index 0a906b9d7..3038e4bce 100644
+--- a/src/mmu/adrdecs.sv
++++ b/src/mmu/adrdecs.sv
+@@ -2,7 +2,7 @@
+ // adrdecs.sv
+ //
+ // Written: David_Harris@hmc.edu 22 June 2021
+-// Modified:
++// Modified: Giovanni Sirtori <gs86@rice.edu> (HYDRA integration), 3 May 2026
+ //
+ // Purpose: All the address decoders for peripherals
+ //
+@@ -33,7 +33,7 @@ module adrdecs import cvw::*;  #(parameter cvw_t P) (
+   input  logic [P.PA_BITS-1:0] PhysicalAddress,
+   input  logic                 AccessRW, AccessRX, AccessRWXC,
+   input  logic [1:0]           Size,
+-  output logic [11:0]          SelRegions
++  output logic [12:0]          SelRegions
+ );
+ 
+   localparam logic [3:0]       SUPPORTED_SIZE = (P.LLEN == 32 ? 4'b0111 : 4'b1111);
+@@ -49,8 +49,9 @@ module adrdecs import cvw::*;  #(parameter cvw_t P) (
+   adrdec #(P.PA_BITS) plicdec(PhysicalAddress, P.PLIC_BASE[P.PA_BITS-1:0], P.PLIC_RANGE[P.PA_BITS-1:0], P.PLIC_SUPPORTED, AccessRW, Size, 4'b0100, SelRegions[9]);
+   adrdec #(P.PA_BITS) sdcdec(PhysicalAddress, P.SDC_BASE[P.PA_BITS-1:0], P.SDC_RANGE[P.PA_BITS-1:0], P.SDC_SUPPORTED, AccessRW, Size, SUPPORTED_SIZE & 4'b1100, SelRegions[10]);
+   adrdec #(P.PA_BITS) spidec(PhysicalAddress, P.SPI_BASE[P.PA_BITS-1:0], P.SPI_RANGE[P.PA_BITS-1:0], P.SPI_SUPPORTED, AccessRW, Size, 4'b0100, SelRegions[11]);
++  adrdec #(P.PA_BITS) hydradec(PhysicalAddress, P.HYDRA_BASE[P.PA_BITS-1:0], P.HYDRA_RANGE[P.PA_BITS-1:0], P.HYDRA_SUPPORTED, AccessRW, Size, SUPPORTED_SIZE, SelRegions[12]);
+ 
+-  assign SelRegions[0] = ~|(SelRegions[11:1]); // none of the regions are selected
++  assign SelRegions[0] = ~|(SelRegions[12:1]); // none of the regions are selected
+ endmodule
+ 
+   // verilator lint_on UNOPTFLAT
