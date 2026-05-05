@@ -1,5 +1,5 @@
 diff --git a/src/uncore/uncore.sv b/src/uncore/uncore.sv
-index 96f40cd30..a1d6767a4 100644
+index 96f40cd30..82a07ad32 100644
 --- a/src/uncore/uncore.sv
 +++ b/src/uncore/uncore.sv
 @@ -3,6 +3,7 @@
@@ -51,23 +51,11 @@ index 96f40cd30..a1d6767a4 100644
    end else begin : plic
      assign MExtInt = 1'b0;
      assign SExtInt = 1'b0;
-@@ -175,22 +180,37 @@ module uncore import cvw::*;  #(parameter cvw_t P)(
+@@ -175,22 +180,24 @@ module uncore import cvw::*;  #(parameter cvw_t P)(
      assign SDCCmd = '0; assign SDCCS = 4'b0; assign SDCIntr = 1'b0; assign SDCCLK = 1'b0;
    end
  
-+  // if (P.HYDRA_SUPPORTED) begin : hydra_mmr
-+  //   hydra_mmr hydra_mmr (
-+  //     .HCLK, .HRESETn, .HSELRam, .HADDR, .HWRITE, .HREADY,
-+  //     .HTRANS, .HWDATA, .HWSTRB, .HREADRam, .HRESPRam, .HREADYRam);
-+  // end else assign {HREADRam, HRESPRam, HREADYRam} = '0;
-+
-+  //   if (P.HYDRA_SUPPORTED) begin : hydra_scratchpad
-+  //   hydra_scratchpad hydra_scratch (
-+  //     .HCLK, .HRESETn, .HSELRam, .HADDR, .HWRITE, .HREADY,
-+  //     .HTRANS, .HWDATA, .HWSTRB, .HREADRam, .HRESPRam, .HREADYRam);
-+  // end else assign {HREADRam, HRESPRam, HREADYRam} = '0;
-+
- 
+-
    // AHB Read Multiplexer
    assign HRDATA = ({P.XLEN{HSELRamD}} & HREADRam) |
                    ({P.XLEN{HSELEXTD}} & HRDATAEXT) |
@@ -91,7 +79,7 @@ index 96f40cd30..a1d6767a4 100644
                    HSELNoneD; // don't lock up the bus if no region is being accessed
  
    // Address Decoder Delay (figure 4-2 in spec)
-@@ -198,8 +218,8 @@ module uncore import cvw::*;  #(parameter cvw_t P)(
+@@ -198,8 +205,8 @@ module uncore import cvw::*;  #(parameter cvw_t P)(
    // takes more than 1 cycle to respond it needs to hold on to the old select until the
    // device is ready.  Hence this register must be selectively enabled by HREADY.
    // However on reset None must be selected.
