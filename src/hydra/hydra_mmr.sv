@@ -1,9 +1,29 @@
-// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+//////////////////////////////////////////////////////////////////////////////////////////////////
 // hydra_mmr.sv
-// Rice University — Project HYDRA
+//
 // Author: Giovanni Sirtori <gs86@rice.edu>
+//
 // Description: Implements an AHB-Lite slave interface through 
 // which the host CPU programs transfer descriptors and reads status.
+//
+// A component of the HYDRA project.
+// https://github.com/Rice-MECE-Capstone-Projects/Hydra
+//
+// Copyright (C) 2025-26 Rice University
+//
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+//
+// Licensed under the Solderpad Hardware License v 2.1 (the “License”); you may not use this file
+// except in compliance with the License, or, at your option, the Apache License version 2.0. You
+// may obtain a copy of the License at
+//
+// https://solderpad.org/licenses/SHL-2.1/
+//
+// Unless required by applicable law or agreed to in writing, any work distributed under the
+// License is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+// either express or implied. See the License for the specific language governing permissions
+// and limitations under the License.
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Register map:
     // Offset CTRL      : [0]=START, [2:1]=MODE[1:0], [7:3]=SCALE_SHIFT[4:0], [8]=SIGNED_OUT, [9]=ROUND_EN

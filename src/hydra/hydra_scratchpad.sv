@@ -1,19 +1,36 @@
-// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+//////////////////////////////////////////////////////////////////////////////////////////////////
 // hydra_scratchpad.sv
-// Rice University — Project HYDRA
+//
 // Author: Giovanni Sirtori <gs86@rice.edu>
+//
 // Description: Dual-port scratchpad for HYDRA outputs across all modes.
 //   Port A: AHB-Lite slave — CPU read-only access.
 //   Port B: HYDRA private sideband write port.
 //
-// Ordering contract (enforced by software, not hardware):
-//   CPU must only read scratchpad after HYDRA asserts STATUS.DONE.
-//   Concurrent read/write collisions are not guarded in hardware — if
-//   software violates the contract, the read returns pre-write data
-//   (standard flop read-before-write semantics) but no corruption occurs.
+// A component of the HYDRA project.
+// https://github.com/Rice-MECE-Capstone-Projects/Hydra
 //
-// CPU writes to this region are silently ignored. Scratchpad is strictly
-// read-only from the AHB side.
+// Copyright (C) 2025-26 Rice University
+//
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+//
+// Licensed under the Solderpad Hardware License v 2.1 (the “License”); you may not use this file
+// except in compliance with the License, or, at your option, the Apache License version 2.0. You
+// may obtain a copy of the License at
+//
+// https://solderpad.org/licenses/SHL-2.1/
+//
+// Unless required by applicable law or agreed to in writing, any work distributed under the
+// License is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+// either express or implied. See the License for the specific language governing permissions
+// and limitations under the License.
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Ordering contract (enforced by software, not hardware):
+    //   1. CPU must only read scratchpad after HYDRA asserts STATUS.DONE.
+    //   2. Concurrent read/write collisions are not guarded in hardware — if
+    //      software violates the contract, the read returns pre-write data
+    //      (standard flop read-before-write semantics) but no corruption occurs.
 
 import hydra_pkg::*;
 module hydra_scratchpad (
