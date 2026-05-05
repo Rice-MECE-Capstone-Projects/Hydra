@@ -4,9 +4,9 @@
 // Author: Giovanni Sirtori <gs86@rice.edu>
 //
 // Description: Top-level integration module. Instantiates the 
-// arbiter, transform datapath, and MMR register file. Connects
-// to the Wally AHB-Lite bus fabric as a second master alongside 
-// the CPU.
+// arbiter, MMR register file, scratchpad memory, and transform 
+// datapath. Connects to the Wally AHB-Lite bus fabric as a second 
+// master alongside the CPU.
 //
 // A component of the HYDRA project.
 // https://github.com/Rice-MECE-Capstone-Projects/Hydra
