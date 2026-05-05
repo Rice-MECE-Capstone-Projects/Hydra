@@ -1,5 +1,5 @@
 $date
-	Mon May  4 17:00:33 2026
+	Tue May  5 01:24:57 2026
 $end
 $version
 	QuestaSim Version 2023.2
@@ -286,7 +286,7 @@ $scope begin SCRATCHPAD_SIGNALS $end
 $upscope $end
 $upscope $end
 
-$scope module u_scratchpad $end
+$scope module scratchpad $end
 $var parameter 32 F" MEM_DEPTH $end
 $var parameter 32 G" ADDR_BITS $end
 $var parameter 32 H" BYTE_SHIFT $end
@@ -400,7 +400,7 @@ $var wire 1 U# SCRATCH_WDATA [0] $end
 $var reg 1 V# read_access $end
 $upscope $end
 
-$scope module u_arbiter $end
+$scope module arbiter $end
 $var wire 1 W# clk $end
 $var wire 1 X# rst_n $end
 $var wire 1 Y# hydra_HBUSREQ $end

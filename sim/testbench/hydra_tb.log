@@ -3,12 +3,12 @@ Reading pref.tcl
 # 2023.2
 
 # vsim -debugDB -voptargs=""+acc"" -c hydra_tb -do "run -all; quit" 
-# Start time: 17:00:31 on May 04,2026
+# Start time: 01:24:55 on May 05,2026
 # ** Note: (vsim-3813) Design is being optimized due to module recompilation...
 # ** Note: (vsim-8611) Generating debug db.
 # ** Warning: (vopt-10587) Some optimizations are turned off because the +acc switch is in effect. This will cause your simulation to run slowly. Please use -access/-debug to maintain needed visibility.
 # ** Note: (vopt-143) Recognized 1 FSM in module "hydra_transform(fast)".
-# ** Note: (vopt-4301) Memory core inferred for signal 'mem' width=32, depth=1048576, type=RAM at location hydra_scratchpad.sv:48
+# ** Note: (vopt-4301) Memory core inferred for signal 'mem' width=32, depth=1048576, type=RAM at location ../../src/hydra/hydra_scratchpad.sv:65
 # ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=1.
 # //  Questa Sim-64
 # //  Version 2023.2 linux_x86_64 Apr 11 2023
@@ -936,10 +936,10 @@ Reading pref.tcl
 # Results: 0 error(s) across 10 test(s).
 # ALL TESTS PASSED!
 # -----------------------------------------------------------------
-# ** Note: $stop    : hydra_tb.sv(508)
+# ** Note: $stop    : hydra_tb.sv(526)
 #    Time: 17396 ps  Iteration: 0  Instance: /hydra_tb
-# Break in Module hydra_tb at hydra_tb.sv line 508
-# Stopped at hydra_tb.sv line 508
+# Break in Module hydra_tb at hydra_tb.sv line 526
+# Stopped at hydra_tb.sv line 526
 #  quit
-# End time: 17:00:33 on May 04,2026, Elapsed time: 0:00:02
+# End time: 01:24:57 on May 05,2026, Elapsed time: 0:00:02
 # Errors: 0, Warnings: 1

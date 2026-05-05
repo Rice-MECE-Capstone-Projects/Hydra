@@ -1,14 +1,32 @@
-// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+//////////////////////////////////////////////////////////////////////////////////////////////////
 // hydra_tb.sv
-// Rice University - Project HYDRA
-// Author: Giovanni <gs86@rice.edu>
-// Description: Unit testbench for hydra_transform + hydra_scratchpad.
 //
-// DUT scope: hydra_transform and hydra_scratchpad in isolation.
-// AHB slave is a simple synchronous RAM model. Bus grant is a 1-cycle
-// delayed copy of HBUSREQ. CPU AHB reads to scratchpad are not exercised
-// here - output verification reads u_scratchpad.mem[] directly.
+// Author: Giovanni Sirtori <gs86@rice.edu>
 //
+// Description: Unit testbench for hydra_transform, hydra_scratchpad, and 
+// hydra_arbiter. AHB slave is a simple synchronous RAM model. CPU AHB 
+// reads to scratchpad are not exercised here - output verification reads 
+// scratchpad.mem[] directly.
+//
+// A component of the HYDRA project.
+// https://github.com/Rice-MECE-Capstone-Projects/Hydra
+//
+// Copyright (C) 2025-26 Rice University
+//
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+//
+// Licensed under the Solderpad Hardware License v 2.1 (the “License”); you may not use this file
+// except in compliance with the License, or, at your option, the Apache License version 2.0. You
+// may obtain a copy of the License at
+//
+// https://solderpad.org/licenses/SHL-2.1/
+//
+// Unless required by applicable law or agreed to in writing, any work distributed under the
+// License is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+// either express or implied. See the License for the specific language governing permissions
+// and limitations under the License.
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
 // Test list:
 //   T1  Mode B, length=NUM_ELEMS,                no wait states
 //   T2  Mode B, length=2*NUM_ELEMS (two blocks), no wait states
@@ -17,7 +35,7 @@
 //   T5  Mode B, length=64 (invalid length)       => ERROR_HALT
 //   T6  Mode B, length=0 (zero length)           => ERROR_HALT
 //   T7  Mode B, length=NUM_ELEMS (wrong HRESP)   => ERROR_HALT
-
+//
 //   T8  Mode C, length=2*NUM_ELEMS,  signed,   scale_shift=NUM_ELEMS/16, round_en=0->1
 //   T9  Mode C, length=NUM_ELEMS,    unsigned, scale_shift=NUM_ELEMS/8,  round_en=0
 //   T10 Mode C, saturation corners,  signed,   scale_shift=0,            round_en=0
@@ -124,7 +142,7 @@ module hydra_tb;
     .done          (done),
     .error         (error)
   );
-  hydra_scratchpad u_scratchpad (
+  hydra_scratchpad scratchpad (
     .clk           (clk),
     .rst_n         (rst_n),
     .HSEL   ('0),
@@ -139,7 +157,7 @@ module hydra_tb;
     .SCRATCH_WADDR (SCRATCH_WADDR),
     .SCRATCH_WDATA (SCRATCH_WDATA)
   );
-  hydra_arbiter u_arbiter (
+  hydra_arbiter arbiter (
     .clk            (clk),
     .rst_n          (rst_n),
     .hydra_HBUSREQ  (HBUSREQ),
@@ -261,7 +279,7 @@ module hydra_tb;
 
   task automatic clear_scratch (input int base, input int n);
     for (int i = 0; i < n; i++)
-      u_scratchpad.mem[base + i] = '0;
+      scratchpad.mem[base + i] = '0;
   endtask
 
   task automatic check_mode_b (
@@ -272,7 +290,7 @@ module hydra_tb;
     logic [DATA_WIDTH-1:0] exp, got;
     for (int i = 0; i < len_words; i++) begin
       exp = golden_b(i, src_base);
-      got = u_scratchpad.mem[dst_base + i];
+      got = scratchpad.mem[dst_base + i];
       if (got !== exp) begin
         $display("\t[FAIL] T%0d Mode B: scratch[%03d] = %h, expected %h",
                  test_id, dst_base + i, got, exp);
@@ -296,7 +314,7 @@ module hydra_tb;
     out_words = len_words / QUANT_DEPTH;
     for (int i = 0; i < out_words; i++) begin
       exp = golden_c(i, src_base, sc, s_out, r_en);
-      got = u_scratchpad.mem[dst_base + i];
+      got = scratchpad.mem[dst_base + i];
       if (got !== exp) begin
         $display("\t[FAIL] T%0d Mode C: scratch[%03d] = %h, expected %h",
                  test_id, dst_base + i, got, exp);

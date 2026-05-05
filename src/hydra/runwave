@@ -1,4 +1,0 @@
-#!/bin/sh
-
-vlog hydra_pkg.sv hydra_scratchpad.sv hydra_transform.sv hydra_tb.sv 
-vsim hydra_tb -do "log -r /*; add wave -r /*; run -all"
