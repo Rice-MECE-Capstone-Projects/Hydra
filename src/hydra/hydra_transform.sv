@@ -35,6 +35,7 @@ module hydra_transform (
     input logic [DATA_BITS-1:0]     scale_shift,
     input logic                     signed_out,
     input logic                     round_en,
+    input hydra_reduce_op           reduce_op,
 
 
     // Control from MMR
@@ -94,6 +95,10 @@ module hydra_transform (
     logic [QUANT_BITS-1:0]  count_bytes;
     logic [QUANT_SIZE-1:0]  quant_curr;
     logic [DATA_WIDTH-1:0]  quant;
+    logic [POOL_BITS-1:0]   pool_count;
+    logic [LEN_WIDTH-1:0]   pool_idx;
+    logic [DATA_WIDTH-1:0]  accum;
+    logic [DATA_WIDTH-1:0]  next_accum;
     logic [2:0]             next_HBURST, next_HSIZE;
     logic [1:0]             next_HTRANS;
     logic                   next_HBUSREQ;
@@ -108,6 +113,7 @@ module hydra_transform (
     assign currBeat         = beat;
     assign next_done_read   = (count == length-1) && HREADY && (state == BUSY); // done reading when last word of last column is read from AHB
     assign invalid_length   = (length == '0) || ((mode == MODE_B) && (length[ELEM_WIDTH-1:0] != '0)) ||
+                  ((mode == MODE_E) && (length[POOL_BITS-1:0] != '0)) ||
                               ((mode == MODE_C) && (length[QUANT_BITS-1:0] != '0));
     assign error            = (state == ERROR);
     always_ff @(posedge clk) begin
@@ -128,7 +134,15 @@ module hydra_transform (
         else begin
             case (state)
                 IDLE        : next_state = HREADY           ? (invalid_length ? ERROR : BUSY) : IDLE;
-                BUSY        : next_state = (mode == MODE_B) ? (done_read ? FLUSH : BUSY) : ((mode == MODE_C) ? (done_read ? IDLE : BUSY) : IDLE);
+                BUSY        : begin
+                    case (mode)
+                        MODE_A: next_state = IDLE;
+                        MODE_B: next_state = done_read ? FLUSH : BUSY;
+                        MODE_C: next_state = done_read ? IDLE : BUSY;
+                        MODE_E: next_state = done_read ? IDLE : BUSY;
+                        default: next_state = IDLE;
+                    endcase
+                end
                 FLUSH       : next_state = done             ? IDLE          : FLUSH;
                 ERROR       : next_state = IDLE;
             endcase
@@ -165,6 +179,7 @@ module hydra_transform (
     SCRATCH_WE    = 0;
     SCRATCH_WDATA = '0;
     next_done     = 0;
+    next_accum    = accum;
 
         case (mode)
             MODE_B  : begin
@@ -181,6 +196,13 @@ module hydra_transform (
                 SCRATCH_WADDR   = dst_addr + (quant_curr << 2) + offset;
                 SCRATCH_WE      = (state == BUSY) && HREADY && (count_bytes == QUANT_DEPTH-1);
                 SCRATCH_WDATA   = {quant_fn(HRDATA, scale_shift, signed_out, round_en), quant[DATA_WIDTH-QUANT_DIM-1:0]}; 
+                next_done       = next_done_read;
+            end
+            MODE_E  : begin
+                next_accum      = reduce_fn(accum, HRDATA, reduce_op, pool_count == 0);
+                SCRATCH_WADDR   = dst_addr + (pool_idx << 2);
+                SCRATCH_WE      = (state == BUSY) && HREADY && (pool_count == POOL_SIZE-1);
+                SCRATCH_WDATA   = (reduce_op == POOL_AVG) ? (next_accum >>> POOL_BITS) : next_accum;
                 next_done       = next_done_read;
             end
         endcase
@@ -204,6 +226,9 @@ module hydra_transform (
             count           <= '0;
             count_bytes     <= '0;
             quant_curr      <= '0;
+            pool_count      <= '0;
+            pool_idx        <= '0;
+            accum           <= '0;
             quant           <= '0;
             pos_mat         <= '0;
             beat            <= '0;
@@ -236,6 +261,9 @@ module hydra_transform (
                 count           <= '0;
                 count_bytes     <= '0;
                 quant_curr      <= '0;
+                pool_count      <= '0;
+                pool_idx        <= '0;
+                accum           <= '0;
                 quant           <= '0;
                 pos_mat         <= '0;
                 beat            <= '0;
@@ -250,15 +278,15 @@ module hydra_transform (
                 first_trans <= (HTRANS == AHB_NONSEQ)       ? 0 : first_trans;
                 start_fill  <= (HTRANS == AHB_SEQ)          ? 1 : start_fill;
 
-                if ((((mode == MODE_B) || (mode == MODE_C)) && HREADY) || (next_state == FLUSH)) begin
+                if ((((mode == MODE_B) || (mode == MODE_C) || (mode == MODE_E)) && HREADY) || (next_state == FLUSH)) begin
                     if (state == BUSY) begin
                         beat <= (beat == NUM_BEATS-1) ? '0 : (!first_trans ? beat + 1 : beat);
                         if (start_fill || (HTRANS == AHB_SEQ)) begin
-                            if (start_fill || (HTRANS == AHB_SEQ)) begin
-                                count   <= (count == length-1)      ? count : count + 1;
-                                pos_mat <= (pos_mat == NUM_ELEMS-1) ? '0 : pos_mat + 1;
-                                burst   <= (count == length-1)      ? '0 : ((beat == NUM_BEATS-1)   ? burst + 1 : burst);
-                            end
+                            // if (start_fill || (HTRANS == AHB_SEQ)) begin
+                            count   <= (count == length-1)      ? count : count + 1;
+                            pos_mat <= (pos_mat == NUM_ELEMS-1) ? '0 : pos_mat + 1;
+                            burst   <= (count == length-1)      ? '0 : ((beat == NUM_BEATS-1)   ? burst + 1 : burst);
+                            // end
 
                             if (mode == MODE_B) begin
                                 col                     <= (col == BLOCK_COLS-1)    ? '0 : col + 1;
@@ -270,6 +298,10 @@ module hydra_transform (
                                 count_bytes                                 <= (count_bytes == QUANT_DEPTH-1) ? '0 : count_bytes + 1;
                                 quant_curr                                  <= (count_bytes == QUANT_DEPTH-1) ? ((quant_curr == QUANT_WIDTH-1) ? '0 : quant_curr + 1) : quant_curr;
                                 quant[count_bytes*QUANT_DIM +: QUANT_DIM]   <= quant_fn(HRDATA, scale_shift, signed_out, round_en);     // function quant_fn() defined in hydra_pkg.sv
+                            end else if (mode == MODE_E) begin
+                                pool_count <= (pool_count == POOL_SIZE-1) ? '0 : pool_count + 1'b1;
+                                pool_idx   <= (pool_count == POOL_SIZE-1) ? pool_idx + 1'b1 : pool_idx;
+                                accum      <= next_accum;
                             end
                         end
                     end if (SCRATCH_WE) begin

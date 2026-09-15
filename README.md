@@ -18,6 +18,9 @@ HYDRA implements three operation modes:
   reduction with 4:1 word packing, delivering 4× effective bandwidth on the
   write side.
 
+- **Mode E — Reduction/pooling:** streaming signed sum, max, min, or average
+  over configurable-size windows for CNN pooling and related DSP workloads.
+
 HYDRA is integrated into Wally's uncore as an AHB slave (MMR at
 `0x2000_0000`) and AHB master (data-plane transfers from main RAM at
 `0x8000_0000` to scratchpad at `0x2001_0000`). Completion is signaled via
@@ -119,7 +122,7 @@ pinned commit pointer, not the working tree contents.
 |---|---|---|
 | `hydra_top` | `src/hydra/hydra_top.sv` | Top-level wrapper. AHB master + slave ports, scratchpad sideband |
 | `hydra_mmr` | `src/hydra/hydra_mmr.sv` | AHB-Lite slave MMR. Holds CTRL, SRC, DST, LEN, STATUS. Zero wait-state |
-| `hydra_transform` | `src/hydra/hydra_transform.sv` | AHB master FSM, AGU, ping-pong buffers (Mode B), quant pipeline (Mode C) |
+| `hydra_transform` | `src/hydra/hydra_transform.sv` | AHB master FSM, AGU, ping-pong buffers (Mode B), quant pipeline (Mode C), reduction datapath (Mode E) |
 | `hydra_scratchpad` | `src/hydra/hydra_scratchpad.sv` | 4 MB non-cacheable scratchpad SRAM |
 | `hydra_arbiter` | `src/hydra/hydra_arbiter.sv` | Static-priority Moore FSM. CPU priority, burst-boundary preemption |
 | `hydra_pkg` | `src/hydra/hydra_pkg.sv` | Project's package with parameter definitions, function declarations, and corner cases |

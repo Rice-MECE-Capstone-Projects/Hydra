@@ -72,6 +72,7 @@ module hydra_tb;
   logic [LEN_WIDTH-1:0]   length;
   logic [DATA_BITS-1:0]   scale_shift;
   logic                   signed_out, round_en;
+  hydra_reduce_op         reduce_op;
 
   // Arbiter
   logic                   HBUSREQ;
@@ -125,6 +126,7 @@ module hydra_tb;
     .scale_shift   (scale_shift),
     .signed_out    (signed_out),
     .round_en      (round_en),
+    .reduce_op     (reduce_op),
     .HBUSREQ       (HBUSREQ),
     .HADDR         (HADDR_m),
     .HBURST        (HBURST_m),
@@ -198,6 +200,27 @@ module hydra_tb;
     return golden_c;
   endfunction
 
+  function automatic logic [DATA_WIDTH-1:0] golden_pool (
+    input int out_idx,
+    input int src_base,
+    input hydra_reduce_op op
+  );
+    logic signed [DATA_WIDTH-1:0] value;
+    value = $signed(ahb_ram[src_base + out_idx*POOL_SIZE]);
+    for (int k = 1; k < POOL_SIZE; k++) begin
+      case (op)
+        POOL_MAX: if ($signed(ahb_ram[src_base + out_idx*POOL_SIZE + k]) > value)
+                    value = $signed(ahb_ram[src_base + out_idx*POOL_SIZE + k]);
+        POOL_MIN: if ($signed(ahb_ram[src_base + out_idx*POOL_SIZE + k]) < value)
+                    value = $signed(ahb_ram[src_base + out_idx*POOL_SIZE + k]);
+        default: value = value + $signed(ahb_ram[src_base + out_idx*POOL_SIZE + k]);
+      endcase
+    end
+    if (op == POOL_AVG)
+      value = value >>> POOL_BITS;
+    return value;
+  endfunction
+
   // -------------------------TASKS-------------------------
   task automatic do_reset ();
     rst_n       = 0;
@@ -209,6 +232,7 @@ module hydra_tb;
     scale_shift = 0;
     signed_out  = 0;
     round_en    = 0;
+    reduce_op   = POOL_SUM;
     cpu_HBUSREQ = 0;
     HRESP_ctrl  = 0;
     repeat (4) @(posedge clk);
@@ -220,7 +244,8 @@ module hydra_tb;
     input hydra_mode              m,
     input logic [ADDR_WIDTH-1:0]  src, dst, len,
     input logic [DATA_BITS-1:0]   sc,
-    input logic                   s_out, r_en
+    input logic                   s_out, r_en,
+    input hydra_reduce_op         r_op = POOL_SUM
   );
     @(negedge clk);
     mode        = m;
@@ -230,6 +255,7 @@ module hydra_tb;
     scale_shift = sc;
     signed_out  = s_out;
     round_en    = r_en;
+    reduce_op   = r_op;
     start       = 1;
     @(posedge clk);
     @(negedge clk);
@@ -322,6 +348,23 @@ module hydra_tb;
       end else
         $display("\t[PASS] T%0d Mode C: scratch[%03d] = %h",
                  test_id, dst_base + i, got);     
+    end
+  endtask
+
+  task automatic check_mode_e (
+    input int src_base,
+    input int dst_base,
+    input int len_words,
+    input hydra_reduce_op op
+  );
+    logic [DATA_WIDTH-1:0] exp, got;
+    for (int i = 0; i < len_words / POOL_SIZE; i++) begin
+      exp = golden_pool(i, src_base, op);
+      got = scratchpad.mem[dst_base + i];
+      if (got !== exp) begin
+        $display("\t[FAIL] T%0d Mode E: scratch[%03d] = %h, expected %h", test_id, dst_base + i, got, exp);
+        errors++;
+      end
     end
   endtask
 
@@ -512,6 +555,61 @@ module hydra_tb;
     wait_done();
     if (!error) check_mode_c(0, 0, length_x, scale_x, signed_x, round_en_x);
     else begin $display("\t[FAIL] unexpected error"); errors++; end
+    report();
+
+
+    // T11: Mode E, sum reduction over four-word windows
+    test_id = test_id + 1;
+    length_x = 4 * POOL_SIZE;
+    fill_ram_incr(0, length_x, 'h10);
+    clear_scratch(0, length_x / POOL_SIZE);
+    do_reset();
+    launch(MODE_E, '0, '0, length_x, '0, '0, '0, POOL_SUM);
+    wait_done();
+    if (!error) check_mode_e(0, 0, length_x, POOL_SUM);
+    else begin $display("\t[FAIL] unexpected error"); errors++; end
+    report();
+
+    // T12: Mode E, signed maximum and minimum
+    test_id = test_id + 1;
+    length_x = 2 * POOL_SIZE;
+    for (int i = 0; i < length_x; i++)
+      ahb_ram[i] = (i % 2) ? -32'sd100 : 32'sd50 + i;
+    clear_scratch(0, length_x / POOL_SIZE);
+    do_reset();
+    launch(MODE_E, '0, '0, length_x, '0, '0, '0, POOL_MAX);
+    wait_done();
+    if (!error) check_mode_e(0, 0, length_x, POOL_MAX);
+    else begin $display("\t[FAIL] unexpected error"); errors++; end
+    report();
+
+    test_id = test_id + 1;
+    clear_scratch(0, length_x / POOL_SIZE);
+    do_reset();
+    launch(MODE_E, '0, '0, length_x, '0, '0, '0, POOL_MIN);
+    wait_done();
+    if (!error) check_mode_e(0, 0, length_x, POOL_MIN);
+    else begin $display("\t[FAIL] unexpected error"); errors++; end
+    report();
+
+    // T13: Mode E, average reduction
+    test_id = test_id + 1;
+    length_x = 4 * POOL_SIZE;
+    fill_ram_incr(0, length_x, 'h20);
+    clear_scratch(0, length_x / POOL_SIZE);
+    do_reset();
+    launch(MODE_E, '0, '0, length_x, '0, '0, '0, POOL_AVG);
+    wait_done();
+    if (!error) check_mode_e(0, 0, length_x, POOL_AVG);
+    else begin $display("\t[FAIL] unexpected error"); errors++; end
+    report();
+
+    // T14: Mode E rejects a non-multiple window length
+    test_id = test_id + 1;
+    do_reset();
+    launch(MODE_E, '0, '0, POOL_SIZE + 1, '0, '0, '0, POOL_SUM);
+    wait_done();
+    if (!error) begin $display("\t[FAIL] expected invalid length error"); errors++; end
     report();
 
 
