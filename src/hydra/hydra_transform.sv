@@ -111,6 +111,8 @@ module hydra_transform (
     bus_state_type state, next_state;
 
     assign currBeat         = beat;
+    assign HWRITE           = 1'b0;
+    assign HWDATA           = '0;
     assign next_done_read   = (count == length-1) && HREADY && (state == BUSY); // done reading when last word of last column is read from AHB
     assign invalid_length   = (length == '0) || ((mode == MODE_B) && (length[ELEM_WIDTH-1:0] != '0)) ||
                   ((mode == MODE_E) && (length[POOL_BITS-1:0] != '0)) ||
@@ -217,8 +219,6 @@ module hydra_transform (
             HBURST          <= '0;
             HSIZE           <= '0;
             HTRANS          <= AHB_IDLE;
-            HWDATA          <= '0;
-            HWRITE          <= 0;
             first_trans     <= 1;
             start_fill      <= 0;
             fill_sel        <= 0;
@@ -282,11 +282,9 @@ module hydra_transform (
                     if (state == BUSY) begin
                         beat <= (beat == NUM_BEATS-1) ? '0 : (!first_trans ? beat + 1 : beat);
                         if (start_fill || (HTRANS == AHB_SEQ)) begin
-                            // if (start_fill || (HTRANS == AHB_SEQ)) begin
                             count   <= (count == length-1)      ? count : count + 1;
                             pos_mat <= (pos_mat == NUM_ELEMS-1) ? '0 : pos_mat + 1;
                             burst   <= (count == length-1)      ? '0 : ((beat == NUM_BEATS-1)   ? burst + 1 : burst);
-                            // end
 
                             if (mode == MODE_B) begin
                                 col                     <= (col == BLOCK_COLS-1)    ? '0 : col + 1;
