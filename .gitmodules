@@ -1,4 +1,0 @@
-[submodule "wally"]
-	path = wally
-	url = https://github.com/openhwgroup/cvw
-	ignore = dirty
