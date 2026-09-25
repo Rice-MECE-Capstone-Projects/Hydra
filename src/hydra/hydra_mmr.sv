@@ -26,7 +26,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Register map:
-    // Offset CTRL      : [0]=START, [2:1]=MODE[1:0], [7:3]=SCALE_SHIFT[4:0], [8]=SIGNED_OUT, [9]=ROUND_EN
+    // Offset CTRL      : [0]=START, [3:1]=MODE[2:0], [8:4]=SCALE_SHIFT[4:0], [9]=SIGNED_OUT, [10]=ROUND_EN, [12:11]=REDUCE_OP
     // Offset SRC       : [ADDR_WIDTH-1:0]
     // Offset DST       : [ADDR_WIDTH-1:0]
     // Offset LEN       : [LEN_WIDTH-1:0]
@@ -58,6 +58,7 @@ module hydra_mmr (
     output logic [DATA_BITS-1:0]    scale_shift,
     output logic                    signed_out,
     output logic                    round_en,
+    output hydra_reduce_op          reduce_op,
     output logic [ADDR_WIDTH-1:0]   src_addr,
     output logic [ADDR_WIDTH-1:0]   dst_addr,
     output logic [LEN_WIDTH-1:0]    length
@@ -87,6 +88,7 @@ module hydra_mmr (
             scale_shift     <= '0;
             signed_out      <= 0;
             round_en        <= 0;
+            reduce_op       <= POOL_SUM;
             src_addr        <= '0;
             dst_addr        <= '0;
             length          <= '0;
@@ -101,7 +103,7 @@ module hydra_mmr (
             mmr_offset_w  <= (HTRANS[1] && HSEL && HREADY) ? mmr_offset_r : mmr_offset_w;
             if (phase_valid_r && HREADY) begin
                 case (mmr_offset_r)
-                    CTRL    : HRDATA <= {(DATA_WIDTH - MODE_BITS - DATA_BITS - 3)'(0), round_en, signed_out, scale_shift, mode, start};
+                    CTRL    : HRDATA <= {(DATA_WIDTH - MODE_BITS - DATA_BITS - 5)'(0), reduce_op, round_en, signed_out, scale_shift, mode, start};
                     SRC     : HRDATA <= src_addr;
                     DST     : HRDATA <= dst_addr;
                     LEN     : HRDATA <= length;
@@ -117,6 +119,7 @@ module hydra_mmr (
                         scale_shift     <= HWDATA[DATA_BITS+MODE_BITS:MODE_BITS+1];
                         signed_out      <= HWDATA[DATA_BITS+MODE_BITS+1];
                         round_en        <= HWDATA[DATA_BITS+MODE_BITS+2];
+                        reduce_op       <= hydra_reduce_op'(HWDATA[DATA_BITS+MODE_BITS+4:DATA_BITS+MODE_BITS+3]);
                     end
                     SRC     : src_addr  <= HWDATA[ADDR_WIDTH-1:0];
                     DST     : dst_addr  <= HWDATA[ADDR_WIDTH-1:0];

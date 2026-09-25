@@ -66,6 +66,7 @@ package hydra_pkg;
 
     parameter ahb_burst_type    BURST_TYPE      = INCR16;
     parameter int unsigned      QUANT_DIM       = 8;
+    parameter int unsigned      POOL_SIZE       = 4;
     
     // Scratchpad has 4 MB at 32-bit words
     parameter int unsigned      MEM_SIZE        = 1048576;
@@ -75,14 +76,23 @@ package hydra_pkg;
     localparam int unsigned     LEN_WIDTH       = $clog2(MEM_SIZE);
     localparam int unsigned     NUM_BEATS       = getLen_fn(BURST_TYPE);
     localparam int unsigned     BEATS_WIDTH     = $clog2(NUM_BEATS);
+    localparam int unsigned     POOL_BITS       = $clog2(POOL_SIZE);
 
   // -------------------------HYDRA Typedefs-------------------------
-    typedef enum logic [1:0] {
-        IDLE   = 2'b00,
-        MODE_A = 2'b01,     // scatter-gather
-        MODE_B = 2'b10,     // matrix transposition
-        MODE_C = 2'b11      // quantization
+    typedef enum logic [2:0] {
+      IDLE   = 3'b000,
+      MODE_A = 3'b001,     // scatter-gather
+      MODE_B = 3'b010,     // matrix transposition
+      MODE_C = 3'b011,     // quantization
+      MODE_E = 3'b100      // reduction/pooling
     } hydra_mode;
+
+    typedef enum logic [1:0] {
+      POOL_SUM = 2'b00,
+      POOL_MAX = 2'b01,
+      POOL_MIN = 2'b10,
+      POOL_AVG = 2'b11
+    } hydra_reduce_op;
 
     typedef enum logic [7:0] { 
         CTRL    = 8'(0 * REG_STRIDE),
@@ -142,6 +152,25 @@ package hydra_pkg;
         if      (signed_out  && ovf_signed)   return {neg, {(QUANT_DIM-1){~neg}}};
         else if (!signed_out && ovf_unsigned) return {QUANT_DIM{~neg}};
         else                                  return scaled[QUANT_DIM-1:0];
+    endfunction
+
+    function automatic logic [DATA_WIDTH-1:0] reduce_fn (
+      logic [DATA_WIDTH-1:0] acc,
+      logic [DATA_WIDTH-1:0] elem,
+      hydra_reduce_op        op,
+      logic                   first
+    );
+      logic signed [DATA_WIDTH-1:0] s_acc, s_elem;
+      s_acc  = $signed(acc);
+      s_elem = $signed(elem);
+      if (first) begin
+        return elem;
+      end
+      case (op)
+        POOL_MAX: return (s_elem > s_acc) ? elem : acc;
+        POOL_MIN: return (s_elem < s_acc) ? elem : acc;
+        default:  return acc + elem;
+      endcase
     endfunction
 
 endpackage
