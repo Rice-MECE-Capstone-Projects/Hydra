@@ -10,8 +10,6 @@ transcript
 vsim.wlf
 questa.ini
 modelsim.ini
-*.vcd
-*.log
 
 # Synthesis — DC
 *.ddc
