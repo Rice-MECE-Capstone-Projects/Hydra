@@ -1,13 +1,12 @@
 # ASAP7 Flow - genus.tcl
 # Created by Matthew Nutt (and Gemini)
-set PDK_DIR /storage-home/m/mcn5/asap7_pdk_r1p7
-set asap7sc7p5t $PDK_DIR/asap7sc7p5t_28
+set PDK_DIR $env(PDK_DIR)
 set_db common_ui true
 
 # Set search paths for LIBs, LEFs, and RTL
-set_db init_lib_search_path [list   $asap7sc7p5t/LIB/CCS/unzipped \
-                                    $asap7sc7p5t/LEF/scaled/ \
-                                    $asap7sc7p5t/techlef_misc/ ]
+set_db init_lib_search_path [list   $PDK_DIR/LIB/CCS/unzipped \
+                                    $PDK_DIR/LEF/scaled/ \
+                                    $PDK_DIR/techlef_misc/ ]
 set_db init_hdl_search_path /storage-home/m/mcn5/elec422/snake/source/verilog/
 
 # Set library LEFs, using the 4x scaled versions

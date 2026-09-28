@@ -11,15 +11,13 @@ vsim.wlf
 questa.ini
 modelsim.ini
 
-# Synthesis — DC
-*.ddc
-*.svf
-*.mr
-*.syn
-*.pvl
-command.log
-default.svf
-filenames*.log
+# Genus
+genus.log*
+genus.cmd*
+genus_*.log
+genus_*.cmd
+.rs_*.tstamp
+fv/
 
 # Innovus
 *.enc
