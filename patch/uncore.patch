@@ -1,12 +1,12 @@
 diff --git a/src/uncore/uncore.sv b/src/uncore/uncore.sv
-index 96f40cd30..82a07ad32 100644
+index 96f40cd30..a727d5d7d 100644
 --- a/src/uncore/uncore.sv
 +++ b/src/uncore/uncore.sv
 @@ -3,6 +3,7 @@
  //
  // Written: David_Harris@hmc.edu 9 January 2021
  // Modified: Ben Bracker 6 Mar 2021 to better fit AMBA 3 AHB-Lite spec
-+//           Giovanni Sirtori <gs86@rice.edu> (HYDRA integration), 3 May 2026 
++//           Giovanni Sirtori <gs86@rice.edu> (HYDRA integration), 3 May 2026
  //
  // Purpose: System-on-Chip components outside the core
  //          Memories, peripherals, external bus control

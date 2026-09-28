@@ -1,12 +1,12 @@
 diff --git a/config/rv32gc/config.vh b/config/rv32gc/config.vh
-index 890bc5208..c22b5f0e5 100644
+index 890bc5208..060d8d063 100644
 --- a/config/rv32gc/config.vh
 +++ b/config/rv32gc/config.vh
 @@ -3,6 +3,7 @@
  //
  // Written: David_Harris@hmc.edu 4 January 2021
  // Modified: Jordan Carlin jcarlin@hmc.edu 14 May 2024
-+//           Giovanni Sirtori <gs86@rice.edu> (HYDRA integration), 3 May 2026 
++//           Giovanni Sirtori <gs86@rice.edu> (HYDRA integration), 3 May 2026
  //
  // Purpose: Specify which features of Wally are enabled and set
  //          configuration parameters

@@ -37,12 +37,14 @@ PATCH_DIR="$REPO_ROOT/patch"
 
 # NOTE: add a line here when you start modifying a new Wally file.
 declare -A FILES=(
+  ["adrdecs.patch"]="src/mmu/adrdecs.sv"
   ["config_rv32gc.patch"]="config/rv32gc/config.vh"
   ["cvw.patch"]="src/cvw.sv"
-  ["wallypipelinedsoc.patch"]="src/wally/wallypipelinedsoc.sv"
-  ["uncore.patch"]="src/uncore/uncore.sv"
-  ["adrdecs.patch"]="src/mmu/adrdecs.sv"
+  ["parameter-defs.patch"]="config/shared/parameter-defs.vh"
   ["plic_apb.patch"]="src/uncore/plic_apb.sv"
+  ["pmachecker.patch"]="src/mmu/pmachecker.sv"
+  ["uncore.patch"]="src/uncore/uncore.sv"
+  ["wallypipelinedsoc.patch"]="src/wally/wallypipelinedsoc.sv"
 )
 
 cmd_update() {

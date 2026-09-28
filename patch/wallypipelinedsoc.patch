@@ -1,5 +1,5 @@
 diff --git a/src/wally/wallypipelinedsoc.sv b/src/wally/wallypipelinedsoc.sv
-index 51d2f6124..f813ed629 100644
+index 51d2f6124..fc7f7c498 100644
 --- a/src/wally/wallypipelinedsoc.sv
 +++ b/src/wally/wallypipelinedsoc.sv
 @@ -2,7 +2,7 @@
@@ -24,7 +24,7 @@ index 51d2f6124..f813ed629 100644
 +  logic [1:0]                 HTRANS_bus, HTRANS_hydra;
 +  logic [2:0]                 HSIZE_bus, HSIZE_hydra;
 +  logic [P.AHBW-1:0]          HWDATA_bus, HWDATA_hydra;
-+  logic [P.XLEN/8-1:0]        HWSTRB_bus, HWSTRB_hydra; 
++  logic [P.XLEN/8-1:0]        HWSTRB_bus, HWSTRB_hydra;
 +  logic                       HWRITE_bus, HWRITE_hydra;
 +  logic [3:0]                 HPROT_bus, HPROT_hydra;
 +  logic                       HMASTLOCK_bus, HMASTLOCK_hydra;
@@ -78,7 +78,7 @@ index 51d2f6124..f813ed629 100644
 +  ) hydra (
 +    .clk,
 +    .rst_n        (!reset),
-+    
++
 +    .hydra_HSEL,                      // from cpu to hydra (scratchpad / mmr)
 +    .HADDR_s      (HADDR_bus),        // from cpu to hydra (scratchpad / mmr)
 +    .HWDATA_s     (HWDATA_bus),       // from cpu to hydra (scratchpad / mmr)
@@ -113,8 +113,8 @@ index 51d2f6124..f813ed629 100644
      uncore #(P) uncore(.HCLK, .HRESETn, .TIMECLK,
 -      .HADDR, .HWDATA, .HWSTRB, .HWRITE, .HSIZE, .HBURST, .HPROT, .HTRANS, .HMASTLOCK, .HRDATAEXT,
 -      .HREADYEXT, .HRESPEXT, .HRDATA, .HREADY, .HRESP, .HSELEXT,
-+      .HADDR(HADDR_bus), .HWDATA(HWDATA_bus), .HWSTRB(HWSTRB_bus), .HWRITE(HWRITE_bus), .HSIZE(HSIZE_bus), 
-+      .HBURST(HBURST_bus), .HPROT(HPROT_bus), .HTRANS(HTRANS_bus), .HMASTLOCK(HMASTLOCK_bus), .HRDATAEXT, .HREADYEXT, 
++      .HADDR(HADDR_bus), .HWDATA(HWDATA_bus), .HWSTRB(HWSTRB_bus), .HWRITE(HWRITE_bus), .HSIZE(HSIZE_bus),
++      .HBURST(HBURST_bus), .HPROT(HPROT_bus), .HTRANS(HTRANS_bus), .HMASTLOCK(HMASTLOCK_bus), .HRDATAEXT, .HREADYEXT,
 +      .HRESPEXT, .HRDATA, .HREADY, .HRESP, .HSELEXT, .HRDATAHYDRA, .HREADYHYDRA, .HRESPHYDRA, .HYDRAIntr, .HSELHYDRA,
        .MTimerInt, .MSwInt, .MExtInt, .SExtInt, .GPIOIN, .GPIOOUT, .GPIOEN, .UARTSin,
        .UARTSout, .MTIME_CLINT, .SPIIn, .SPIOut, .SPICS, .SPICLK, .SDCIn, .SDCCmd, .SDCCS, .SDCCLK);

@@ -1,0 +1,22 @@
+diff --git a/src/mmu/pmachecker.sv b/src/mmu/pmachecker.sv
+index 8a8e8d7f7..6cf778665 100644
+--- a/src/mmu/pmachecker.sv
++++ b/src/mmu/pmachecker.sv
+@@ -2,7 +2,7 @@
+ // pmachecker.sv
+ //
+ // Written: tfleming@hmc.edu & jtorrey@hmc.edu 20 April 2021
+-// Modified:
++// Modified: Giovanni Sirtori <gs86@rice.edu> (HYDRA integration), 26 Sep 2026
+ //
+ // Purpose: Examines all physical memory accesses and identifies attributes of
+ //          the memory region accessed.
+@@ -46,7 +46,7 @@ module pmachecker import cvw::*;  #(parameter cvw_t P) (
+ 
+   logic                        PMAAccessFault;
+   logic                        AccessRW, AccessRWXC, AccessRX;
+-  logic [11:0]                 SelRegions;
++  logic [12:0]                 SelRegions;
+   logic                        AtomicAllowed;
+   logic                        CacheableRegion, IdempotentRegion;
+ 
