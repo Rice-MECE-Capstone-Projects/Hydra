@@ -4,8 +4,8 @@
 # Clock definition (0.5 GHz)
 # clk_port_name should match the name in the design
 set clk_period 2000
-set clk_name core_clock
-set clk_port_name in_clka
+set clk_name hydra_clk
+set clk_port_name clk
 
 # Create clock
 set clk_port [get_ports $clk_port_name]
