@@ -60,9 +60,9 @@ module hydra_transform (
     input  logic                    HRESP,
 
     // Scratchpad sideband write port
-    output logic                    SCRATCH_WE,
-    output logic [ADDR_WIDTH-1:0]   SCRATCH_WADDR,
-    output logic [DATA_WIDTH-1:0]   SCRATCH_WDATA,
+    output logic [BLOCK_ROWS-1:0]                  SCRATCH_WE,
+    output logic [BLOCK_ROWS-1:0][ADDR_WIDTH-1:0] SCRATCH_WADDR,
+    output logic [BLOCK_ROWS-1:0][DATA_WIDTH-1:0] SCRATCH_WDATA,
 
     // Status
     output logic [BEATS_WIDTH-1:0]  currBeat,
@@ -77,7 +77,6 @@ module hydra_transform (
     localparam QUANT_BITS   = $clog2(QUANT_DEPTH);
     localparam QUANT_WIDTH  = NUM_ELEMS / QUANT_DEPTH;
     localparam QUANT_SIZE   = $clog2(QUANT_WIDTH);
-    localparam TRANSP_START = (BLOCK_ROWS - 1) * (BLOCK_COLS - 1);      // we can start writing scratchpad before first buffer is full
     localparam ROWS_WIDTH   = $clog2(BLOCK_ROWS);
     localparam COLS_WIDTH   = $clog2(BLOCK_COLS);
     localparam BURST_WIDTH  = LEN_WIDTH - BEATS_WIDTH;
@@ -88,7 +87,7 @@ module hydra_transform (
     logic [BEATS_WIDTH-1:0] beat;
     logic [BURST_WIDTH-1:0] burst;
     logic [ROWS_WIDTH-1:0]  row; logic [COLS_WIDTH-1:0] col;
-    logic [ROWS_WIDTH-1:0]  SCRATCH_row; logic [COLS_WIDTH-1:0] SCRATCH_col;
+    logic [COLS_WIDTH-1:0]  SCRATCH_col;
     logic [LEN_WIDTH-1:0]   count, SCRATCH_count;
     logic [LEN_WIDTH:0]     offset;
     logic [ADDR_WIDTH-1:0]  next_HADDR;
@@ -105,6 +104,8 @@ module hydra_transform (
     logic                   invalid_length;
     logic                   first_trans, start_fill;
     logic                   fill_sel, drain_sel;
+    logic [BLOCK_COLS-1:0]  buffer_a_valid, buffer_b_valid;
+    logic                   scratch_group_ready, scratch_group_write;
     logic                   next_done_read, done_read, next_done;
 
     typedef enum logic [1:0] {IDLE, BUSY, FLUSH, ERROR} bus_state_type;
@@ -118,6 +119,8 @@ module hydra_transform (
                   ((mode == MODE_E) && (length[POOL_BITS-1:0] != '0)) ||
                               ((mode == MODE_C) && (length[QUANT_BITS-1:0] != '0));
     assign error            = (state == ERROR);
+    assign scratch_group_ready = drain_sel ? buffer_a_valid[SCRATCH_col] : buffer_b_valid[SCRATCH_col];
+    assign scratch_group_write = (mode == MODE_B) && (&SCRATCH_WE);
     always_ff @(posedge clk) begin
         if (rst_n && start) begin
             if (invalid_length) begin
@@ -185,26 +188,24 @@ module hydra_transform (
 
         case (mode)
             MODE_B  : begin
-                SCRATCH_WADDR   = dst_addr + (SCRATCH_col << (ROWS_WIDTH + 2)) + (SCRATCH_row << 2) + offset;
-                SCRATCH_WE      = ((state == BUSY) && HREADY && (count > TRANSP_START)) || (next_state == FLUSH);
-                SCRATCH_WDATA   = drain_sel ? mbtb_buffer_a[SCRATCH_row][SCRATCH_col] : mbtb_buffer_b[SCRATCH_row][SCRATCH_col];
-                // if (drain_sel)
-                //     $display("scratch[%0d, %0d] <= mbtb_buffer_a[%0d][%0d] = %0h", SCRATCH_WADDR/32, (SCRATCH_WADDR/4)%8, SCRATCH_row, SCRATCH_col, mbtb_buffer_a[SCRATCH_row][SCRATCH_col]);
-                // else
-                //     $display("scratch[%0d, %0d] <= mbtb_buffer_b[%0d][%0d] = %0h", SCRATCH_WADDR/32, (SCRATCH_WADDR/4)%8, SCRATCH_row, SCRATCH_col, mbtb_buffer_b[SCRATCH_row][SCRATCH_col]);
-                next_done       = (SCRATCH_count == length-1) && SCRATCH_WE;
+                for (int lane = 0; lane < BLOCK_ROWS; lane++) begin
+                    SCRATCH_WADDR[lane] = dst_addr + (SCRATCH_col << (ROWS_WIDTH + 2)) + (lane << 2) + offset;
+                    SCRATCH_WDATA[lane] = drain_sel ? mbtb_buffer_a[lane][SCRATCH_col] : mbtb_buffer_b[lane][SCRATCH_col];
+                    SCRATCH_WE[lane] = scratch_group_ready && ((state == BUSY) || (state == FLUSH));
+                end
+                next_done = (SCRATCH_count == length-BLOCK_ROWS) && scratch_group_write;
             end
             MODE_C  : begin
-                SCRATCH_WADDR   = dst_addr + (quant_curr << 2) + offset;
-                SCRATCH_WE      = (state == BUSY) && HREADY && (count_bytes == QUANT_DEPTH-1);
-                SCRATCH_WDATA   = {quant_fn(HRDATA, scale_shift, signed_out, round_en), quant[DATA_WIDTH-QUANT_DIM-1:0]}; 
+                SCRATCH_WADDR[0] = dst_addr + (quant_curr << 2) + offset;
+                SCRATCH_WE[0]    = (state == BUSY) && HREADY && (count_bytes == QUANT_DEPTH-1);
+                SCRATCH_WDATA[0] = {quant_fn(HRDATA, scale_shift, signed_out, round_en), quant[DATA_WIDTH-QUANT_DIM-1:0]};
                 next_done       = next_done_read;
             end
             MODE_E  : begin
                 next_accum      = reduce_fn(accum, HRDATA, reduce_op, pool_count == 0);
-                SCRATCH_WADDR   = dst_addr + (pool_idx << 2);
-                SCRATCH_WE      = (state == BUSY) && HREADY && (pool_count == POOL_SIZE-1);
-                SCRATCH_WDATA   = (reduce_op == POOL_AVG) ? (next_accum >>> POOL_BITS) : next_accum;
+                SCRATCH_WADDR[0] = dst_addr + (pool_idx << 2);
+                SCRATCH_WE[0]    = (state == BUSY) && HREADY && (pool_count == POOL_SIZE-1);
+                SCRATCH_WDATA[0] = (reduce_op == POOL_AVG) ? (next_accum >>> POOL_BITS) : next_accum;
                 next_done       = next_done_read;
             end
         endcase
@@ -237,8 +238,9 @@ module hydra_transform (
             row             <= '0;
             offset          <= '0;
             SCRATCH_count   <= '0;
-            SCRATCH_row     <= '0;
             SCRATCH_col     <= '0;
+            buffer_a_valid  <= '0;
+            buffer_b_valid  <= '0;
             done_read       <= 0;
             done            <= 0;
         end else begin
@@ -272,8 +274,9 @@ module hydra_transform (
                 row             <= '0;
                 offset          <= '0;
                 SCRATCH_count   <= '0;
-                SCRATCH_row     <= '0;
                 SCRATCH_col     <= '0;
+                buffer_a_valid  <= '0;
+                buffer_b_valid  <= '0;
             end else begin
                 first_trans <= (HTRANS == AHB_NONSEQ)       ? 0 : first_trans;
                 start_fill  <= (HTRANS == AHB_SEQ)          ? 1 : start_fill;
@@ -292,6 +295,10 @@ module hydra_transform (
                                 fill_sel                <= (pos_mat == NUM_ELEMS-1) ? !fill_sel : fill_sel;     // toggle buffer after each block
                                 mbtb_buffer_a[row][col] <= fill_sel                 ? HRDATA : mbtb_buffer_a[row][col];
                                 mbtb_buffer_b[row][col] <= !fill_sel                ? HRDATA : mbtb_buffer_b[row][col];
+                                if (row == BLOCK_ROWS-1) begin
+                                    if (fill_sel) buffer_a_valid[col] <= 1'b1;
+                                    else          buffer_b_valid[col] <= 1'b1;
+                                end
                             end else if (mode == MODE_C) begin
                                 count_bytes                                 <= (count_bytes == QUANT_DEPTH-1) ? '0 : count_bytes + 1;
                                 quant_curr                                  <= (count_bytes == QUANT_DEPTH-1) ? ((quant_curr == QUANT_WIDTH-1) ? '0 : quant_curr + 1) : quant_curr;
@@ -302,17 +309,32 @@ module hydra_transform (
                                 accum      <= next_accum;
                             end
                         end
-                    end if (SCRATCH_WE) begin
-                        if (mode == MODE_B) begin
-                            drain_sel       <= (SCRATCH_count == length-1)      ? 0 : ((SCRATCH_count[ELEM_WIDTH-1:0] == NUM_ELEMS-1 && SCRATCH_WE) ? !drain_sel : drain_sel);
-
-                            offset          <= (SCRATCH_count[ELEM_WIDTH-1:0] == NUM_ELEMS-1 && SCRATCH_WE) ? offset + NUM_ELEMS*4 : offset;
-                            SCRATCH_count   <= (SCRATCH_count == length-1)      ? '0 : SCRATCH_count + 1;
-                            SCRATCH_col     <= (SCRATCH_col == BLOCK_COLS-1)    ? '0 : SCRATCH_col + 1;
-                            SCRATCH_row     <= (SCRATCH_col == BLOCK_COLS-1)    ? ((SCRATCH_row == BLOCK_ROWS-1) ? '0 : SCRATCH_row + 1) : SCRATCH_row;
-                        end else if (mode == MODE_C)
+                    end
+                    if (|SCRATCH_WE) begin
+                        if (mode == MODE_C)
                             offset <= (quant_curr == QUANT_WIDTH-1) ? offset + QUANT_WIDTH*QUANT_DEPTH : offset;
-                    end                    
+                    end
+                end
+
+                if (scratch_group_write) begin
+                    if (drain_sel) buffer_a_valid[SCRATCH_col] <= 1'b0;
+                    else           buffer_b_valid[SCRATCH_col] <= 1'b0;
+
+                    if (SCRATCH_count == length-BLOCK_ROWS) begin
+                        SCRATCH_count <= '0;
+                        drain_sel <= 1'b0;
+                    end else begin
+                        SCRATCH_count <= SCRATCH_count + BLOCK_ROWS;
+                    end
+
+                    if (SCRATCH_col == BLOCK_COLS-1) begin
+                        SCRATCH_col <= '0;
+                        offset <= offset + NUM_ELEMS * (DATA_WIDTH/8);
+                        if (SCRATCH_count != length-BLOCK_ROWS)
+                            drain_sel <= !drain_sel;
+                    end else begin
+                        SCRATCH_col <= SCRATCH_col + 1;
+                    end
                 end
             end
         end

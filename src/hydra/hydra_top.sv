@@ -90,9 +90,9 @@ module hydra_top #(
     logic [DATA_WIDTH-1:0]  HRDATA_scratch;
     logic                   HRESP_scratch;
     logic                   HREADYOUT_scratch;
-    logic                   SCRATCH_WE;
-    logic [ADDR_WIDTH-1:0]  SCRATCH_WADDR;
-    logic [DATA_WIDTH-1:0]  SCRATCH_WDATA;
+    logic [BLOCK_ROWS-1:0]                  SCRATCH_WE;
+    logic [BLOCK_ROWS-1:0][ADDR_WIDTH-1:0] SCRATCH_WADDR;
+    logic [BLOCK_ROWS-1:0][DATA_WIDTH-1:0] SCRATCH_WDATA;
 
     // Internal signals
     logic                   HSEL_none;       

@@ -50,9 +50,9 @@ module hydra_scratchpad (
     output logic                   HRESP,
 
     // Sideband write port — HYDRA private write
-    input  logic                   SCRATCH_WE,
-    input  logic [ADDR_WIDTH-1:0]  SCRATCH_WADDR,
-    input  logic [DATA_WIDTH-1:0]  SCRATCH_WDATA
+    input  logic [BLOCK_ROWS-1:0]                  SCRATCH_WE,
+    input  wire logic [BLOCK_ROWS-1:0][ADDR_WIDTH-1:0] SCRATCH_WADDR,
+    input  wire logic [BLOCK_ROWS-1:0][DATA_WIDTH-1:0] SCRATCH_WDATA
 );
 
     // MEM_SIZE is the word count for a 32-bit DATA_WIDTH baseline. The
@@ -61,8 +61,10 @@ module hydra_scratchpad (
     localparam int unsigned MEM_DEPTH  = 32 * MEM_SIZE / DATA_WIDTH;
     localparam int unsigned ADDR_BITS  = $clog2(MEM_DEPTH);
     localparam int unsigned BYTE_SHIFT = $clog2(DATA_WIDTH/8);
+    localparam int unsigned BANK_BITS  = $clog2(BLOCK_ROWS);
+    localparam int unsigned BANK_DEPTH = (MEM_DEPTH + BLOCK_ROWS - 1) / BLOCK_ROWS;
 
-    logic [DATA_WIDTH-1:0]  mem [0:MEM_DEPTH-1];
+    logic [DATA_WIDTH-1:0]  mem [0:BLOCK_ROWS-1][0:BANK_DEPTH-1];
     logic                   read_access;
 
     assign read_access      = HTRANS[1] && HSEL && !HWRITE && HREADY;
@@ -78,12 +80,22 @@ module hydra_scratchpad (
         end else begin
             // AHB read
             if (read_access) begin
-                HRDATA <= mem[HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT]];
+                HRDATA <= mem[HADDR[BANK_BITS+BYTE_SHIFT-1:BYTE_SHIFT]]
+                            [HADDR[ADDR_BITS+BYTE_SHIFT-1:BANK_BITS+BYTE_SHIFT]];
             end
+        end
+    end
 
-            // Sideband write
-            if (SCRATCH_WE) begin
-                mem[SCRATCH_WADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT]] <= SCRATCH_WDATA;
+    for (genvar bank = 0; bank < BLOCK_ROWS; bank++) begin : BANK_WRITES
+        always_ff @(posedge clk) begin
+            if (rst_n) begin
+                for (int lane = 0; lane < BLOCK_ROWS; lane++) begin
+                    if (SCRATCH_WE[lane] &&
+                        SCRATCH_WADDR[lane][BANK_BITS+BYTE_SHIFT-1:BYTE_SHIFT] == bank) begin
+                        mem[bank][SCRATCH_WADDR[lane][ADDR_BITS+BYTE_SHIFT-1:BANK_BITS+BYTE_SHIFT]]
+                            <= SCRATCH_WDATA[lane];
+                    end
+                end
             end
         end
     end

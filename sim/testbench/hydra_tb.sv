@@ -50,6 +50,7 @@ module hydra_tb;
   localparam int unsigned QUANT_DEPTH  = DATA_WIDTH / QUANT_DIM;    // 4 words => 1 packed
   localparam int unsigned RAM_WORDS    = 16384;                     // 64 KB AHB slave RAM
   localparam int unsigned TIMEOUT      = 2000;                      // max clock cycles per test
+  localparam int unsigned BYTE_SHIFT   = $clog2(DATA_WIDTH/8);
 
   // -------------------------SIGNALS-------------------------
   // Clock and Reset
@@ -90,9 +91,15 @@ module hydra_tb;
   logic                   HRESP_m;
 
   // Scratchpad
-  logic                   SCRATCH_WE;
-  logic [ADDR_WIDTH-1:0]  SCRATCH_WADDR;
-  logic [DATA_WIDTH-1:0]  SCRATCH_WDATA;
+  logic [BLOCK_ROWS-1:0]                  SCRATCH_WE;
+  logic [BLOCK_ROWS-1:0][ADDR_WIDTH-1:0] SCRATCH_WADDR;
+  logic [BLOCK_ROWS-1:0][DATA_WIDTH-1:0] SCRATCH_WDATA;
+  logic [ADDR_WIDTH-1:0]  scratch_HADDR;
+  logic [1:0]             scratch_HTRANS;
+  logic                   scratch_HSEL, scratch_HWRITE, scratch_HREADY;
+  logic [DATA_WIDTH-1:0]  scratch_HRDATA;
+  logic [DATA_WIDTH-1:0]  scratch_readback;
+  int                     mode_b_group_count, mode_b_groups_during_stall, mode_b_bad_group;
 
   // Status
   logic [BEATS_WIDTH-1:0] currBeat;
@@ -147,18 +154,35 @@ module hydra_tb;
   hydra_scratchpad scratchpad (
     .clk           (clk),
     .rst_n         (rst_n),
-    .HSEL   ('0),
-    .HADDR         ('0),
-    .HTRANS        ('0),    // AHB_IDLE
-    .HWRITE        ('0),
-    .HREADY        ('1),
-    .HRDATA        (),
+    .HSEL          (scratch_HSEL),
+    .HADDR         (scratch_HADDR),
+    .HTRANS        (scratch_HTRANS),
+    .HWRITE        (scratch_HWRITE),
+    .HREADY        (scratch_HREADY),
+    .HRDATA        (scratch_HRDATA),
     .HRESP         (),
     .HREADYOUT     (),
     .SCRATCH_WE    (SCRATCH_WE),
     .SCRATCH_WADDR (SCRATCH_WADDR),
     .SCRATCH_WDATA (SCRATCH_WDATA)
   );
+
+  always @(posedge clk) begin
+    if (rst_n && mode == MODE_B && |SCRATCH_WE) begin
+      mode_b_group_count++;
+      if (SCRATCH_WE !== {BLOCK_ROWS{1'b1}}) mode_b_bad_group++;
+      if (!bus_grant) mode_b_groups_during_stall++;
+      for (int lane = 0; lane < BLOCK_ROWS; lane++) begin
+        if (SCRATCH_WADDR[lane] !== SCRATCH_WADDR[0] + lane * (DATA_WIDTH/8))
+          mode_b_bad_group++;
+        for (int other_lane = lane + 1; other_lane < BLOCK_ROWS; other_lane++) begin
+          if (((int'(SCRATCH_WADDR[lane] >> BYTE_SHIFT)) % BLOCK_ROWS) ==
+              ((int'(SCRATCH_WADDR[other_lane] >> BYTE_SHIFT)) % BLOCK_ROWS))
+            mode_b_bad_group++;
+        end
+      end
+    end
+  end
   hydra_arbiter arbiter (
     .clk            (clk),
     .rst_n          (rst_n),
@@ -235,6 +259,14 @@ module hydra_tb;
     reduce_op   = POOL_SUM;
     cpu_HBUSREQ = 0;
     HRESP_ctrl  = 0;
+    scratch_HADDR = '0;
+    scratch_HTRANS = AHB_IDLE;
+    scratch_HSEL = 0;
+    scratch_HWRITE = 0;
+    scratch_HREADY = 1;
+    mode_b_group_count = 0;
+    mode_b_groups_during_stall = 0;
+    mode_b_bad_group = 0;
     repeat (4) @(posedge clk);
     @(negedge clk); rst_n = 1;
     @(posedge clk);
@@ -248,6 +280,11 @@ module hydra_tb;
     input hydra_reduce_op         r_op = POOL_SUM
   );
     @(negedge clk);
+    if (m == MODE_B) begin
+      mode_b_group_count = 0;
+      mode_b_groups_during_stall = 0;
+      mode_b_bad_group = 0;
+    end
     mode        = m;
     src_addr    = src;
     dst_addr    = dst;
@@ -279,6 +316,13 @@ module hydra_tb;
     @(negedge clk); cpu_HBUSREQ = 0;
   endtask
 
+  task automatic request_cpu_after_first_mode_b_group (input int cycle_dur);
+    wait (mode_b_group_count > 0);
+    @(negedge clk); cpu_HBUSREQ = 1;
+    repeat (cycle_dur) @(posedge clk);
+    @(negedge clk); cpu_HBUSREQ = 0;
+  endtask
+
   // Inject one-cycle HRESP=1 at a specific cycle offset from now
   task automatic inject_error (input int cycle_offset, input int cycle_dur);
     repeat (cycle_offset) @(posedge clk);
@@ -305,7 +349,27 @@ module hydra_tb;
 
   task automatic clear_scratch (input int base, input int n);
     for (int i = 0; i < n; i++)
-      scratchpad.mem[base + i] = '0;
+      scratchpad.mem[(base + i) % BLOCK_ROWS][(base + i) / BLOCK_ROWS] = '0;
+  endtask
+
+  function automatic logic [DATA_WIDTH-1:0] scratch_word (input int logical_index);
+    return scratchpad.mem[logical_index % BLOCK_ROWS][logical_index / BLOCK_ROWS];
+  endfunction
+
+  task automatic read_scratch_ahb (
+    input int logical_index,
+    output logic [DATA_WIDTH-1:0] value
+  );
+    @(negedge clk);
+    scratch_HADDR = logical_index << BYTE_SHIFT;
+    scratch_HTRANS = AHB_NONSEQ;
+    scratch_HSEL = 1;
+    scratch_HWRITE = 0;
+    @(posedge clk); #1;
+    value = scratch_HRDATA;
+    @(negedge clk);
+    scratch_HTRANS = AHB_IDLE;
+    scratch_HSEL = 0;
   endtask
 
   task automatic check_mode_b (
@@ -316,7 +380,7 @@ module hydra_tb;
     logic [DATA_WIDTH-1:0] exp, got;
     for (int i = 0; i < len_words; i++) begin
       exp = golden_b(i, src_base);
-      got = scratchpad.mem[dst_base + i];
+      got = scratch_word(dst_base + i);
       if (got !== exp) begin
         $display("\t[FAIL] T%0d Mode B: scratch[%03d] = %h, expected %h",
                  test_id, dst_base + i, got, exp);
@@ -324,6 +388,15 @@ module hydra_tb;
       end else
         $display("\t[PASS] T%0d Mode B: scratch[%03d] = %h",
                  test_id, dst_base + i, got);
+    end
+    if (mode_b_group_count != len_words / BLOCK_ROWS) begin
+      $display("\t[FAIL] T%0d Mode B: observed %0d write groups, expected %0d",
+               test_id, mode_b_group_count, len_words / BLOCK_ROWS);
+      errors++;
+    end
+    if (mode_b_bad_group != 0) begin
+      $display("\t[FAIL] T%0d Mode B: %0d malformed lane groups", test_id, mode_b_bad_group);
+      errors++;
     end
   endtask
 
@@ -340,7 +413,7 @@ module hydra_tb;
     out_words = len_words / QUANT_DEPTH;
     for (int i = 0; i < out_words; i++) begin
       exp = golden_c(i, src_base, sc, s_out, r_en);
-      got = scratchpad.mem[dst_base + i];
+      got = scratch_word(dst_base + i);
       if (got !== exp) begin
         $display("\t[FAIL] T%0d Mode C: scratch[%03d] = %h, expected %h",
                  test_id, dst_base + i, got, exp);
@@ -360,7 +433,7 @@ module hydra_tb;
     logic [DATA_WIDTH-1:0] exp, got;
     for (int i = 0; i < len_words / POOL_SIZE; i++) begin
       exp = golden_pool(i, src_base, op);
-      got = scratchpad.mem[dst_base + i];
+      got = scratch_word(dst_base + i);
       if (got !== exp) begin
         $display("\t[FAIL] T%0d Mode E: scratch[%03d] = %h, expected %h", test_id, dst_base + i, got, exp);
         errors++;
@@ -610,6 +683,49 @@ module hydra_tb;
     launch(MODE_E, '0, '0, POOL_SIZE + 1, '0, '0, '0, POOL_SUM);
     wait_done();
     if (!error) begin $display("\t[FAIL] expected invalid length error"); errors++; end
+    report();
+
+    // T15: Mode B drains ready groups while the CPU owns the AHB bus
+    test_id = test_id + 1;
+    length_x = NUM_ELEMS;
+    fill_ram_incr(0, length_x, 'h1234_0000);
+    clear_scratch(0, length_x);
+    fork
+      request_cpu_after_first_mode_b_group(60);
+      begin
+        launch(MODE_B, '0, '0, length_x, '0, '0, '0);
+        wait_done();
+      end
+    join
+    if (!error) check_mode_b(0, 0, length_x);
+    if (mode_b_groups_during_stall == 0) begin
+      $display("\t[FAIL] T%0d Mode B: no ready write group drained during CPU bus ownership", test_id);
+      errors++;
+    end
+    report();
+
+    // T16: Three blocks at a bank-unaligned destination; verify logical AHB reads
+    test_id = test_id + 1;
+    length_x = 3 * NUM_ELEMS;
+    fill_ram_incr(512, length_x, 'h7000_0000);
+    clear_scratch(3, length_x);
+    launch(MODE_B, 512 << BYTE_SHIFT, 3 << BYTE_SHIFT, length_x, '0, '0, '0);
+    wait_done();
+    if (!error) begin
+      check_mode_b(512, 3, length_x);
+      for (int sample = 0; sample < 3; sample++) begin
+        int word_index;
+        word_index = 3 + sample * (NUM_ELEMS/2);
+        read_scratch_ahb(word_index, scratch_readback);
+        if (scratch_readback !== golden_b(word_index-3, 512)) begin
+          $display("\t[FAIL] T%0d AHB read scratch[%0d] = %h, expected %h",
+                   test_id, word_index, scratch_readback, golden_b(word_index-3, 512));
+          errors++;
+        end
+      end
+    end else begin
+      $display("\t[FAIL] unexpected error"); errors++;
+    end
     report();
 
 
