@@ -1,7 +1,7 @@
 ## Architectural decisions:
 1. **Scratchpad access:** Dual-port SRAM. CPU reads via AHB, HYDRA writes via private sideband port.
 2. **AHB burst length:** INCR16. One burst per row of the 8x16 block. Arbiter preempts at burst boundaries only — HYDRA completes the current 16-beat burst before yielding grant.
-3. **Error handling:** Abort immediately on HRESP = ERROR. FSM transitions to an ERROR halt state, STATUS.ERROR set in MMR. Transfer must be restarted by the CPU.
+3. **Status and error handling:** Abort immediately on HRESP = ERROR. The FSM transitions to an ERROR halt state and the MMR latches STATUS.ERROR. STATUS.DONE latches successful completion and remains set until the next accepted start. A STATUS write or accepted start clears ERROR; writes are ignored while BUSY.
 4. **Transposition flow:** Fill phase writes row-major into the ping-pong buffer (beat counter = buffer column index). Drain phase transposes on the way out to scratchpad — column-walk through the buffer, writing sequentially to the private sideband port.
 5. **Reduction flow:** Mode E consumes a source stream and writes one flat, sequential output per reduction window. It has no flush phase, unlike Mode B, and uses the streaming shape of Mode C.
 

@@ -26,11 +26,14 @@ HYDRA is integrated into Wally's uncore as an AHB slave (MMR at
 `0x8000_0000` to scratchpad at `0x2001_0000`). Completion is signaled via
 a PLIC interrupt (source 11).
 
-The `STATUS` register reports `ERROR` in bit 0 and `BUSY` in bit 1. While
-`BUSY` is set, writes to all MMR registers are ignored, including descriptor
-updates and `CTRL.START`; they are not queued. Software should wait for
-`BUSY` to clear before programming or starting another job. On error, `BUSY`
-clears so software can inspect the sticky error, clear it, and reprogram.
+The `STATUS` register reports sticky `ERROR` in bit 0, live `BUSY` in bit 1,
+and sticky `DONE` in bit 2. `ERROR` is set when the transform reports an error;
+`DONE` is set on successful completion. Both are cleared when a new
+`CTRL.START` write is accepted while idle. Writing `STATUS` also clears
+`ERROR`; `DONE` is not software-clearable. While `BUSY` is set, writes to all
+MMR registers are ignored, including descriptor updates and `CTRL.START`; they
+are not queued. Software should wait for `BUSY` to clear before programming or
+starting another job.
 
 This is a Rice University capstone project. The design targets functional
 correctness and measured speedup (≥ 10× on matrix transposition vs.

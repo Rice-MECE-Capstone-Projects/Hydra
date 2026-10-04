@@ -30,7 +30,7 @@
     // Offset SRC       : [ADDR_WIDTH-1:0]
     // Offset DST       : [ADDR_WIDTH-1:0]
     // Offset LEN       : [LEN_WIDTH-1:0]
-    // Offset STATUS    : [0]=ERROR, [1]=BUSY
+    // Offset STATUS    : [0]=ERROR, [1]=BUSY, [2]=DONE
 
 import hydra_pkg::*;
 module hydra_mmr (
@@ -67,12 +67,14 @@ module hydra_mmr (
     localparam int unsigned MODE_BITS       = $bits(hydra_mode);
     localparam int unsigned MMR_OFFSET_BITS = $bits(hydra_mmr_map);
 
-    logic error_reg;
-    logic phase_valid_r, phase_valid_w;
+    logic error_reg, done_reg;
+    logic phase_valid_r, phase_valid_w, start_accepted;
     hydra_mmr_map mmr_offset_r, mmr_offset_w;
 
     assign phase_valid_r    = HTRANS[1] && HSEL && !HWRITE;
     assign mmr_offset_r     = hydra_mmr_map'(HADDR[MMR_OFFSET_BITS-1:0]);
+    assign start_accepted   = phase_valid_w && HREADY && !busy &&
+                              (mmr_offset_w == CTRL) && HWDATA[0];
 
     // MMR has no wait states and never signals errors
     assign HREADYOUT    = 1;
@@ -94,21 +96,28 @@ module hydra_mmr (
             dst_addr        <= '0;
             length          <= '0;
             error_reg       <= 0;
+            done_reg        <= 0;
         end else begin
-            // `top` sends interrupt on (done || error), so CPU needs to read
-            // STATUS to understand whether HYDRA was successfull or not
-            error_reg   <= error ? 1 : error_reg;
             start       <= 0;       // single-cycle pulse
 
             phase_valid_w <= HTRANS[1]  && HSEL && HWRITE && HREADY;        // only write during Data Phase
             mmr_offset_w  <= (HTRANS[1] && HSEL && HREADY) ? mmr_offset_r : mmr_offset_w;
+            if (start_accepted) begin
+                error_reg <= 0;
+                done_reg  <= 0;
+            end else begin
+                if (error)
+                    error_reg <= 1;
+                if (done)
+                    done_reg <= 1;
+            end
             if (phase_valid_r && HREADY) begin
                 case (mmr_offset_r)
                     CTRL    : HRDATA <= {(DATA_WIDTH - MODE_BITS - DATA_BITS - 5)'(0), reduce_op, round_en, signed_out, scale_shift, mode, start};
                     SRC     : HRDATA <= src_addr;
                     DST     : HRDATA <= dst_addr;
                     LEN     : HRDATA <= length;
-                    STATUS  : HRDATA <= {(DATA_WIDTH - 2)'(0), busy, error_reg};
+                    STATUS  : HRDATA <= {(DATA_WIDTH - 3)'(0), done_reg, busy, error_reg};
 
                     default : HRDATA <= '0;
                 endcase  

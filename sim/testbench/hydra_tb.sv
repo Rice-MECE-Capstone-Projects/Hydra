@@ -704,7 +704,7 @@ module hydra_tb;
     if (!error) begin $display("\t[FAIL] expected invalid length error"); errors++; end
     report();
 
-    // T15: MMR ignores all writes while busy and reports busy in STATUS[1]
+    // T15: MMR busy protection, sticky DONE, and status clearing on new start
     test_id = test_id + 1;
     mmr_write(SRC, 'h1234);
     if (mmr_test_src !== 'h1234) begin
@@ -725,21 +725,34 @@ module hydra_tb;
       errors++;
     end
     mmr_read(STATUS, status_value);
-    if (status_value[1] !== 1'b1 || status_value[0] !== 1'b1) begin
+    if (status_value[2] !== 1'b0 || status_value[1] !== 1'b1 || status_value[0] !== 1'b1) begin
       $display("\t[FAIL] STATUS did not report BUSY and ERROR");
       errors++;
     end
     mmr_test_busy  = 0;
     mmr_test_error = 0;
+    mmr_test_done  = 1;
+    @(posedge clk); #1;
+    mmr_test_done  = 0;
     mmr_write(SRC, 'h5678);
-    mmr_write(STATUS, '0);
     if (mmr_test_src !== 'h5678) begin
       $display("\t[FAIL] MMR did not resume accepting writes after busy");
       errors++;
     end
     mmr_read(STATUS, status_value);
-    if (status_value[1] !== 1'b0 || status_value[0] !== 1'b0) begin
-      $display("\t[FAIL] STATUS busy/error bits did not clear when idle");
+    if (status_value[2] !== 1'b1 || status_value[1] !== 1'b0 || status_value[0] !== 1'b1) begin
+      $display("\t[FAIL] STATUS did not latch DONE and ERROR while idle");
+      errors++;
+    end
+    mmr_test_error = 0;
+    mmr_write(CTRL, (DATA_WIDTH'(MODE_E) << 1) | 1);
+    if (!mmr_test_start) begin
+      $display("\t[FAIL] MMR did not issue start after accepting CTRL.START");
+      errors++;
+    end
+    mmr_read(STATUS, status_value);
+    if (status_value[2] !== 1'b0 || status_value[1] !== 1'b0 || status_value[0] !== 1'b0) begin
+      $display("\t[FAIL] new start did not clear sticky DONE and ERROR");
       errors++;
     end
     report();
