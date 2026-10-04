@@ -30,7 +30,7 @@
     // Offset SRC       : [ADDR_WIDTH-1:0]
     // Offset DST       : [ADDR_WIDTH-1:0]
     // Offset LEN       : [LEN_WIDTH-1:0]
-    // Offset STATUS    : [0]=ERROR
+    // Offset STATUS    : [0]=ERROR, [1]=BUSY
 
 import hydra_pkg::*;
 module hydra_mmr (
@@ -40,6 +40,7 @@ module hydra_mmr (
     // Status input from hydra_transform
     input  logic                    done,
     input  logic                    error,
+    input  logic                    busy,
 
     // AHB-Lite slave port
     input  logic [ADDR_WIDTH-1:0]   HADDR,
@@ -107,11 +108,11 @@ module hydra_mmr (
                     SRC     : HRDATA <= src_addr;
                     DST     : HRDATA <= dst_addr;
                     LEN     : HRDATA <= length;
-                    STATUS  : HRDATA <= {(DATA_WIDTH - 1)'(0), error_reg};
+                    STATUS  : HRDATA <= {(DATA_WIDTH - 2)'(0), busy, error_reg};
 
                     default : HRDATA <= '0;
                 endcase  
-            end else if (phase_valid_w && HREADY) begin
+            end else if (phase_valid_w && HREADY && !busy) begin
                 case (mmr_offset_w)
                     CTRL    : begin
                         start           <= HWDATA[0];

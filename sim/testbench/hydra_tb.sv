@@ -96,7 +96,22 @@ module hydra_tb;
 
   // Status
   logic [BEATS_WIDTH-1:0] currBeat;
-  logic                   done, error;
+  logic                   done, error, transform_busy;
+
+  // Standalone MMR test signals
+  logic                   mmr_test_busy, mmr_test_error, mmr_test_done;
+  logic [ADDR_WIDTH-1:0]  mmr_test_addr;
+  logic [DATA_WIDTH-1:0]  mmr_test_wdata, mmr_test_rdata;
+  logic                   mmr_test_write, mmr_test_select, mmr_test_ready;
+  logic [1:0]              mmr_test_trans;
+  logic                   mmr_test_readyout, mmr_test_resp, mmr_test_start;
+  hydra_mode              mmr_test_mode;
+  logic [DATA_BITS-1:0]   mmr_test_scale_shift;
+  logic                   mmr_test_signed_out, mmr_test_round_en;
+  hydra_reduce_op         mmr_test_reduce_op;
+  logic [ADDR_WIDTH-1:0]  mmr_test_src, mmr_test_dst;
+  logic [LEN_WIDTH-1:0]   mmr_test_length;
+  logic [DATA_WIDTH-1:0]  status_value;
 
   // -------------------------RAM MODEL-------------------------
   logic [DATA_WIDTH-1:0]  ahb_ram [0:RAM_WORDS-1];
@@ -142,7 +157,33 @@ module hydra_tb;
     .SCRATCH_WDATA (SCRATCH_WDATA),
     .currBeat      (currBeat),
     .done          (done),
-    .error         (error)
+    .error         (error),
+    .busy          (transform_busy)
+  );
+  hydra_mmr u_mmr_test (
+    .clk           (clk),
+    .rst_n         (rst_n),
+    .done          (mmr_test_done),
+    .error         (mmr_test_error),
+    .busy          (mmr_test_busy),
+    .HADDR         (mmr_test_addr),
+    .HWDATA        (mmr_test_wdata),
+    .HWRITE        (mmr_test_write),
+    .HTRANS        (mmr_test_trans),
+    .HSEL          (mmr_test_select),
+    .HREADY        (mmr_test_ready),
+    .HRDATA        (mmr_test_rdata),
+    .HREADYOUT     (mmr_test_readyout),
+    .HRESP         (mmr_test_resp),
+    .start         (mmr_test_start),
+    .mode          (mmr_test_mode),
+    .scale_shift   (mmr_test_scale_shift),
+    .signed_out    (mmr_test_signed_out),
+    .round_en      (mmr_test_round_en),
+    .reduce_op     (mmr_test_reduce_op),
+    .src_addr      (mmr_test_src),
+    .dst_addr      (mmr_test_dst),
+    .length        (mmr_test_length)
   );
   hydra_scratchpad scratchpad (
     .clk           (clk),
@@ -271,6 +312,40 @@ module hydra_tb;
     errors++;
   endtask
 
+  task automatic mmr_write (
+    input logic [ADDR_WIDTH-1:0] reg_addr,
+    input logic [DATA_WIDTH-1:0] write_data
+  );
+    @(negedge clk);
+    mmr_test_addr   = reg_addr;
+    mmr_test_wdata  = write_data;
+    mmr_test_write  = 1;
+    mmr_test_trans  = AHB_NONSEQ;
+    mmr_test_select = 1;
+    @(posedge clk);
+    @(negedge clk);
+    mmr_test_write  = 0;
+    mmr_test_trans  = AHB_IDLE;
+    mmr_test_select = 0;
+    @(posedge clk); #1;
+  endtask
+
+  task automatic mmr_read (
+    input logic [ADDR_WIDTH-1:0] reg_addr,
+    output logic [DATA_WIDTH-1:0] read_data
+  );
+    @(negedge clk);
+    mmr_test_addr   = reg_addr;
+    mmr_test_write  = 0;
+    mmr_test_trans  = AHB_NONSEQ;
+    mmr_test_select = 1;
+    @(posedge clk); #1;
+    read_data = mmr_test_rdata;
+    @(negedge clk);
+    mmr_test_trans  = AHB_IDLE;
+    mmr_test_select = 0;
+  endtask
+
   // Inject one-cycle HREADY=0 at a specific cycle offset from now
   task automatic inject_wait (input int cycle_offset, input int cycle_dur);
     repeat (cycle_offset) @(posedge clk);
@@ -386,6 +461,15 @@ module hydra_tb;
     $display("-----------------------------------------------------------------");
     $display("HYDRA TESTBENCH (hydra_transform + hydra_scratchpad)");
     $display();   // \n
+    mmr_test_busy   = 0;
+    mmr_test_error  = 0;
+    mmr_test_done   = 0;
+    mmr_test_addr   = '0;
+    mmr_test_wdata  = '0;
+    mmr_test_write  = 0;
+    mmr_test_trans  = AHB_IDLE;
+    mmr_test_select = 0;
+    mmr_test_ready  = 1;
     do_reset();
     prev_errors = 0;
 
@@ -396,7 +480,15 @@ module hydra_tb;
     fill_ram_incr(0, length_x, 'h0000_0001);   // [1, 2, ..., length_x]
     clear_scratch(0, length_x);
     launch(MODE_B, '0, '0, length_x, '0, '0, '0);
+    if (!transform_busy) begin
+      $display("\t[FAIL] transform did not assert busy after start");
+      errors++;
+    end
     wait_done();
+    if (transform_busy) begin
+      $display("\t[FAIL] transform remained busy after completion");
+      errors++;
+    end
     if (!error) check_mode_b(0, 0, length_x);
     else begin $display("[FAIL] unexpected error!"); errors++; end
     report();
@@ -610,6 +702,46 @@ module hydra_tb;
     launch(MODE_E, '0, '0, POOL_SIZE + 1, '0, '0, '0, POOL_SUM);
     wait_done();
     if (!error) begin $display("\t[FAIL] expected invalid length error"); errors++; end
+    report();
+
+    // T15: MMR ignores all writes while busy and reports busy in STATUS[1]
+    test_id = test_id + 1;
+    mmr_write(SRC, 'h1234);
+    if (mmr_test_src !== 'h1234) begin
+      $display("\t[FAIL] MMR did not accept SRC write while idle");
+      errors++;
+    end
+    mmr_test_busy  = 1;
+    mmr_test_error = 1;
+    @(posedge clk); #1;
+    mmr_write(SRC, 'h5678);
+    mmr_write(CTRL, (DATA_WIDTH'(MODE_E) << 1) | 1);
+    mmr_write(DST, 'h9abc);
+    mmr_write(LEN, 4 * POOL_SIZE);
+    mmr_write(STATUS, '0);
+    if (mmr_test_src !== 'h1234 || mmr_test_dst !== '0 ||
+        mmr_test_length !== '0 || mmr_test_mode !== IDLE || mmr_test_start) begin
+      $display("\t[FAIL] MMR changed a descriptor or started while busy");
+      errors++;
+    end
+    mmr_read(STATUS, status_value);
+    if (status_value[1] !== 1'b1 || status_value[0] !== 1'b1) begin
+      $display("\t[FAIL] STATUS did not report BUSY and ERROR");
+      errors++;
+    end
+    mmr_test_busy  = 0;
+    mmr_test_error = 0;
+    mmr_write(SRC, 'h5678);
+    mmr_write(STATUS, '0);
+    if (mmr_test_src !== 'h5678) begin
+      $display("\t[FAIL] MMR did not resume accepting writes after busy");
+      errors++;
+    end
+    mmr_read(STATUS, status_value);
+    if (status_value[1] !== 1'b0 || status_value[0] !== 1'b0) begin
+      $display("\t[FAIL] STATUS busy/error bits did not clear when idle");
+      errors++;
+    end
     report();
 
 

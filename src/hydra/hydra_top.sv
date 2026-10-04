@@ -101,6 +101,7 @@ module hydra_top #(
     logic [BEATS_WIDTH-1:0] hydra_currBeat;
     logic                   hydra_done;
     logic                   hydra_error;
+    logic                   hydra_busy;
     logic                   hydra_HBUSREQ;
 
     assign HPROT_m          = 4'b0011;      // privileged, data, non-cacheable, non-bufferable
@@ -130,6 +131,7 @@ module hydra_top #(
         .clk, .rst_n,
         .done           (hydra_done),
         .error          (hydra_error),
+        .busy           (hydra_busy),
         .HADDR          (HADDR_in),
         .HWDATA         (HWDATA_s),
         .HWRITE         (HWRITE_s),
@@ -194,7 +196,8 @@ module hydra_top #(
         .SCRATCH_WDATA,
         .currBeat       (hydra_currBeat),
         .done           (hydra_done),
-        .error          (hydra_error)
+        .error          (hydra_error),
+        .busy           (hydra_busy)
     );
 
 endmodule
