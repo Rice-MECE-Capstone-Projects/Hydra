@@ -14,7 +14,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 class transform_ctrl_monitor extends uvm_monitor;
-    `uvm_component_utils (transform_ctrl_monitor);
+    `uvm_component_utils (transform_ctrl_monitor)
 
     virtual transform_ctrl_if vif;
 
@@ -28,7 +28,7 @@ class transform_ctrl_monitor extends uvm_monitor;
         super.build_phase(phase);
         ap=new("ap",this);
 
-        if(uvm_config_db#(virtual transform_ctrl_if)::get(this,"","vif",vif))begin
+        if(!uvm_config_db#(virtual transform_ctrl_if)::get(this,"","vif",vif))begin
             `uvm_fatal("NO_VIF","Transform control interface was not found")
         end
     endfunction

@@ -42,7 +42,7 @@ class transform_scratch_monitor extends uvm_monitor;
             if ($isunknown(vif.monitor_cb.SCRATCH_WE))begin
                 `uvm_error("SCRATCH_WE","Scratchpad write enable contains X or Z")
             end
-            else if(vif.monitor_cb.reset===1'b1 && vif.monitor_cb.SCRATCH_WE===1'b1)begin
+            else if(vif.monitor_cb.rst_n===1'b1 && vif.monitor_cb.SCRATCH_WE===1'b1)begin
                 tr=transform_scratch_transaction::type_id::create("tr");
 
                 tr.address=vif.monitor_cb.SCRATCH_WADDR;

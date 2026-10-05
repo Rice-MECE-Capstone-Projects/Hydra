@@ -20,6 +20,9 @@ package transform_pkg;
     `include "../monitor/transform_scratch_monitor.sv"
 
     `include "../scoreboard/transform_scoreboard.sv"
+    `include "../env/transform_env.sv"
+    
+    `include "../test/mode_c_basic_test.sv"
 
 endpackage
     

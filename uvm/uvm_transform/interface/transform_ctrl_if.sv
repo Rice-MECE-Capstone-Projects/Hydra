@@ -31,7 +31,7 @@ interface transform_ctrl_if(
     logic [ADDR_WIDTH-1:0] dst_addr;
     logic [LEN_WIDTH-1:0] length;
 
-    logic [DATA_BITS:0] scale_shift;
+    logic [DATA_BITS-1:0] scale_shift;
     logic signed_out;
     logic round_en;
 

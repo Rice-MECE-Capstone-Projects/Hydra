@@ -18,7 +18,7 @@
 class transform_ctrl_driver extends uvm_driver #(transform_ctrl_transaction);
     `uvm_component_utils(transform_ctrl_driver)
 
-    virtual tranform_ctrl_if vif;
+    virtual transform_ctrl_if vif;
 
     function new(string name="transform_ctrl_driver", uvm_component parent=null);
         super.new(name,parent);
