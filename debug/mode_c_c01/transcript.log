@@ -1,0 +1,132 @@
+# //  Questa Sim-64
+# //  Version 2023.2 linux_x86_64 Apr 11 2023
+# //
+# //  Copyright 1991-2023 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# vsim -debugDB -voptargs=""+acc"" transform_top_tb 
+# Start time: 16:09:08 on Oct 04,2026
+# ** Note: (vsim-8009) Loading existing optimized design _opt
+# Loading sv_std.std
+# Loading work.transform_ctrl_if(fast)
+# Loading work.transform_ram_if(fast)
+# Loading work.transform_scratch_if(fast)
+# Loading work.hydra_pkg(fast)
+# Loading mtiUvm.uvm_pkg(fast)
+# Loading work.transform_pkg(fast)
+# Loading mtiUvm.questa_uvm_pkg(fast)
+# Loading work.transform_top_tb(fast)
+# Loading work.transform_ctrl_if(fast__2)
+# Loading work.transform_ram_if(fast__2)
+# Loading work.transform_scratch_if(fast__2)
+# Loading work.hydra_arbiter_sv_unit(fast)
+# Loading work.hydra_arbiter(fast)
+# Loading work.hydra_transform_sv_unit(fast)
+# Loading work.hydra_transform(fast)
+# Loading /clear/apps/siemens-2023/questa/2023.2/questasim/uvm-1.1d/linux_x86_64/uvm_dpi.so
+# ** Note: (vsim-8716) Reusing existing debug database vsim.dbg.
+add wave -r /*
+add wave sim:/transform_top_tb/dut/state
+add wave sim:/transform_top_tb/dut/first_trans
+add wave sim:/transform_top_tb/dut/start_fill
+add wave -radix unsigned sim:/transform_top_tb/dut/count
+add wave sim:/transform_top_tb/dut/next_done_read
+add wave sim:/transform_top_tb/dut/done_read
+run -all
+# ----------------------------------------------------------------
+# UVM-1.1d
+# (C) 2007-2013 Mentor Graphics Corporation
+# (C) 2007-2013 Cadence Design Systems, Inc.
+# (C) 2006-2013 Synopsys, Inc.
+# (C) 2011-2013 Cypress Semiconductor Corp.
+# ----------------------------------------------------------------
+# 
+#   ***********       IMPORTANT RELEASE NOTES         ************
+# 
+#   You are using a version of the UVM library that has been compiled
+#   with `UVM_NO_DEPRECATED undefined.
+#   See http://www.eda.org/svdb/view.php?id=3313 for more details.
+# 
+#   You are using a version of the UVM library that has been compiled
+#   with `UVM_OBJECT_MUST_HAVE_CONSTRUCTOR undefined.
+#   See http://www.eda.org/svdb/view.php?id=3770 for more details.
+# 
+#       (Specify +UVM_NO_RELNOTES to turn off this notice)
+# 
+# UVM_INFO verilog_src/questa_uvm_pkg-1.2/src/questa_uvm_pkg.sv(277) @ 0: reporter [Questa UVM] QUESTA_UVM-1.2.3
+# UVM_INFO verilog_src/questa_uvm_pkg-1.2/src/questa_uvm_pkg.sv(278) @ 0: reporter [Questa UVM]  questa_uvm::init(+struct)
+# UVM_INFO @ 0: reporter [RNTST] Running test mode_c_basic_test...
+# UVM_INFO ../scoreboard/transform_scoreboard.sv(66) @ 85000: uvm_test_top.m_env.m_scoreboard [CTRL_RECEIVED] Configuration received: mode=3 length=4
+# UVM_INFO ../monitor/transform_ctrl_monitor.sv(63) @ 85000: uvm_test_top.m_env.m_ctrl_agent.m_monitor [CTRL_CAPTURE] mode=MODE_C src=0x80000000 dst=0x00000000 length=4 shift=0 signed=1 round=0
+# UVM_INFO ../driver/transform_ram_driver.sv(84) @ 135000: uvm_test_top.m_env.m_ram_agent.m_driver [RAM_READ] Address=0x80000000 data=0x00000001
+# UVM_INFO ../driver/transform_ram_driver.sv(84) @ 145000: uvm_test_top.m_env.m_ram_agent.m_driver [RAM_READ] Address=0x80000000 data=0x00000001
+# UVM_INFO ../monitor/transform_ram_monitor.sv(70) @ 145000: uvm_test_top.m_env.m_ram_agent.m_monitor [RAM_MON] Read address=0x80000000 data=0x00000001 response=0
+# UVM_INFO ../driver/transform_ram_driver.sv(84) @ 155000: uvm_test_top.m_env.m_ram_agent.m_driver [RAM_READ] Address=0x80000004 data=0x00000002
+# UVM_INFO ../monitor/transform_ram_monitor.sv(70) @ 155000: uvm_test_top.m_env.m_ram_agent.m_monitor [RAM_MON] Read address=0x80000000 data=0x00000001 response=0
+# UVM_INFO ../driver/transform_ram_driver.sv(84) @ 165000: uvm_test_top.m_env.m_ram_agent.m_driver [RAM_READ] Address=0x80000008 data=0x00000003
+# UVM_INFO ../monitor/transform_ram_monitor.sv(70) @ 165000: uvm_test_top.m_env.m_ram_agent.m_monitor [RAM_MON] Read address=0x80000004 data=0x00000002 response=0
+# UVM_INFO ../driver/transform_ram_driver.sv(84) @ 175000: uvm_test_top.m_env.m_ram_agent.m_driver [RAM_READ] Address=0x8000000c data=0x00000004
+# UVM_INFO ../monitor/transform_ram_monitor.sv(70) @ 175000: uvm_test_top.m_env.m_ram_agent.m_monitor [RAM_MON] Read address=0x80000008 data=0x00000003 response=0
+# UVM_INFO ../monitor/transform_scratch_monitor.sv(56) @ 185000: uvm_test_top.m_env.m_scratch_monitor [SCRATCH_MON] write address=0x00000000, write data=0x04030201
+# UVM_FATAL ../model/transform_ram_model.sv(46) @ 185000: reporter [RAM_UNINITIALIZED] No input data prepared at address 0x80000010
+# 
+# --- UVM Report Summary ---
+# 
+# ** Report counts by severity
+# UVM_INFO :   15
+# UVM_WARNING :    0
+# UVM_ERROR :    0
+# UVM_FATAL :    1
+# ** Report counts by id
+# [CTRL_CAPTURE]     1
+# [CTRL_RECEIVED]     1
+# [Questa UVM]     2
+# [RAM_MON]     4
+# [RAM_READ]     5
+# [RAM_UNINITIALIZED]     1
+# [RNTST]     1
+# [SCRATCH_MON]     1
+# ** Note: $finish    : /clear/apps/siemens-2023/questa/2023.2/questasim/linux_x86_64/../verilog_src/uvm-1.1d/src/base/uvm_report_object.svh(292)
+#    Time: 185 ns  Iteration: 5  Region: /uvm_pkg::uvm_task_phase::execute
+# 1
+# Break in Function uvm_pkg/uvm_report_object::die at /clear/apps/siemens-2023/questa/2023.2/questasim/linux_x86_64/../verilog_src/uvm-1.1d/src/base/uvm_report_object.svh line 292
+add wave sim:/transform_top_tb/dut/clk
+add wave sim:/transform_top_tb/dut/HREADY
+add wave -radix hexadecimal sim:/transform_top_tb/dut/HADDR
+add wave sim:/transform_top_tb/dut/HTRANS
+add wave -radix hexadecimal sim:/transform_top_tb/dut/HRDATA
+run -all
+# UVM_INFO ../driver/transform_ram_driver.sv(84) @ 185000: uvm_test_top.m_env.m_ram_agent.m_driver [RAM_READ] Address=0x80000010 data=0xxxxxxxxx
+# UVM_INFO ../monitor/transform_ram_monitor.sv(70) @ 185000: uvm_test_top.m_env.m_ram_agent.m_monitor [RAM_MON] Read address=0x8000000c data=0x00000004 response=0
+# UVM_FATAL ../model/transform_ram_model.sv(46) @ 195000: reporter [RAM_UNINITIALIZED] No input data prepared at address 0x80000014
+# 
+# --- UVM Report Summary ---
+# 
+# ** Report counts by severity
+# UVM_INFO :   17
+# UVM_WARNING :    0
+# UVM_ERROR :    0
+# UVM_FATAL :    2
+# ** Report counts by id
+# [CTRL_CAPTURE]     1
+# [CTRL_RECEIVED]     1
+# [Questa UVM]     2
+# [RAM_MON]     5
+# [RAM_READ]     6
+# [RAM_UNINITIALIZED]     2
+# [RNTST]     1
+# [SCRATCH_MON]     1
+# ** Note: $finish    : /clear/apps/siemens-2023/questa/2023.2/questasim/linux_x86_64/../verilog_src/uvm-1.1d/src/base/uvm_report_object.svh(292)
+#    Time: 195 ns  Iteration: 4  Region: /uvm_pkg::uvm_task_phase::execute
+# 1
+# Break in Function uvm_pkg/uvm_report_object::die at /clear/apps/siemens-2023/questa/2023.2/questasim/linux_x86_64/../verilog_src/uvm-1.1d/src/base/uvm_report_object.svh line 292
+# End time: 18:13:51 on Oct 04,2026, Elapsed time: 2:04:43
+# Errors: 0, Warnings: 0
