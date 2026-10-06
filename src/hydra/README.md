@@ -22,6 +22,6 @@ localparam logic HYDRA_SUPPORTED             = 1;
 localparam logic [63:0] HYDRA_MMR_BASE       = 64'h2000_0000;
 localparam logic [63:0] HYDRA_MMR_RANGE      = 64'h0000_0FFF;
 localparam logic [63:0] HYDRA_SCRATCH_BASE   = 64'h2001_0000;
-localparam logic [63:0] HYDRA_SCRATCH_RANGE  = 64'h003F_FFFF;
+localparam logic [63:0] HYDRA_SCRATCH_RANGE  = 64'h0000_0FFF;
 localparam HYDRA_PLIC_ID                     = 32'd11;
 ```

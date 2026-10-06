@@ -16,11 +16,11 @@ index 890bc5208..060d8d063 100644
  localparam logic [63:0] SPI_RANGE        = 64'h00000FFF;
 +localparam logic HYDRA_SUPPORTED            = 1;
 +localparam logic [63:0] HYDRA_BASE          = 64'h2000_0000;
-+localparam logic [63:0] HYDRA_RANGE         = 64'h0040_FFFF;
++localparam logic [63:0] HYDRA_RANGE         = 64'h0001_0FFF;
 +localparam logic [63:0] HYDRA_MMR_BASE      = 64'h2000_0000;
 +localparam logic [63:0] HYDRA_MMR_RANGE     = 64'h0000_0FFF;
 +localparam logic [63:0] HYDRA_SCRATCH_BASE  = 64'h2001_0000;
-+localparam logic [63:0] HYDRA_SCRATCH_RANGE = 64'h003F_FFFF;
++localparam logic [63:0] HYDRA_SCRATCH_RANGE = 64'h0000_0FFF;
  
  // Bus Interface width
  localparam AHBW = (XLEN);

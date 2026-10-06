@@ -68,8 +68,8 @@ package hydra_pkg;
     parameter int unsigned      QUANT_DIM       = 8;
     parameter int unsigned      POOL_SIZE       = 4;
     
-    // Scratchpad has 4 MB at 32-bit words
-    parameter int unsigned      MEM_SIZE        = 1048576;
+    // Scratchpad has 4 KB at 32-bit words
+    parameter int unsigned      MEM_SIZE        = 1024;
 
     localparam int unsigned     REG_STRIDE      = DATA_WIDTH / 8;
     localparam int unsigned     DATA_BITS       = $clog2(DATA_WIDTH);

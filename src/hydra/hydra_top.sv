@@ -32,7 +32,7 @@ module hydra_top #(
     parameter MMR_BASE      = 'h2000_0000,
     parameter MMR_RANGE     = 'h0000_0FFF,
     parameter SCRATCH_BASE  = 'h2001_0000,
-    parameter SCRATCH_RANGE = 'h003F_FFFF
+    parameter SCRATCH_RANGE = 'h0000_0FFF
 )(
     input  logic                    clk, 
     input  logic                    rst_n,
@@ -75,6 +75,7 @@ module hydra_top #(
     logic [DATA_WIDTH-1:0]  HRDATA_mmr;
     logic                   HRESP_mmr;
     logic                   HREADYOUT_mmr;
+    logic                   HSEL_mmr_d;
     logic                   mmr_start;
     hydra_mode              mmr_mode;
     logic [DATA_BITS-1:0]   mmr_scale_shift;
@@ -90,12 +91,12 @@ module hydra_top #(
     logic [DATA_WIDTH-1:0]  HRDATA_scratch;
     logic                   HRESP_scratch;
     logic                   HREADYOUT_scratch;
+    logic                   HSEL_scratch_d;
     logic                   SCRATCH_WE;
     logic [ADDR_WIDTH-1:0]  SCRATCH_WADDR;
     logic [DATA_WIDTH-1:0]  SCRATCH_WDATA;
 
     // Internal signals
-    logic                   HSEL_none;       
     logic [ADDR_WIDTH-1:0]  HADDR_in;
     logic [ADDR_WIDTH-1:0]  hydra_dst_addr;
     logic [BEATS_WIDTH-1:0] hydra_currBeat;
@@ -109,16 +110,25 @@ module hydra_top #(
     assign HWSTRB_m         = '1;       // word write
     assign HSEL_mmr         = hydra_HSEL && &((MMR_BASE[ADDR_WIDTH-1:0]     ~^ HADDR_s) | MMR_RANGE[ADDR_WIDTH-1:0]);
     assign HSEL_scratch     = hydra_HSEL && &((SCRATCH_BASE[ADDR_WIDTH-1:0] ~^ HADDR_s) | SCRATCH_RANGE[ADDR_WIDTH-1:0]);
-    assign HSEL_none        = !(HSEL_mmr || HSEL_scratch);
-    assign HRDATA_s         = ({DATA_WIDTH{HSEL_mmr}} & HRDATA_mmr) | ({DATA_WIDTH{HSEL_scratch}} & HRDATA_scratch);
-    // Both slaves are zero-wait-state, so HREADYOUT_s is always 1
-    // HSEL_none ensures HREADYOUT_s=1 during idle cycles to prevent bus lockup
-    assign HREADYOUT_s      = (HSEL_mmr && HREADYOUT_mmr) || (HSEL_scratch && HREADYOUT_scratch) || HSEL_none;
-    assign HRESP_s          = (HSEL_mmr && HRESP_mmr)     || (HSEL_scratch && HRESP_scratch);
+    assign HRDATA_s         = ({DATA_WIDTH{HSEL_mmr_d}} & HRDATA_mmr) | ({DATA_WIDTH{HSEL_scratch_d}} & HRDATA_scratch);
+    // Readiness is returned for the prior AHB data phase, so propagate slave
+    // waits independently of the current address-phase decode.
+    assign HREADYOUT_s      = HREADYOUT_mmr && HREADYOUT_scratch;
+    assign HRESP_s          = (HSEL_mmr_d && HRESP_mmr) || (HSEL_scratch_d && HRESP_scratch);
     assign HADDR_in         = HSEL_mmr ? (HADDR_s - MMR_BASE[ADDR_WIDTH-1:0]) : 
                                          (HSEL_scratch ? (HADDR_s - SCRATCH_BASE[ADDR_WIDTH-1:0]) : HADDR_s);
     assign hydra_dst_addr   = mmr_dst_addr - SCRATCH_BASE[ADDR_WIDTH-1:0];
     assign irq_hydra        = hydra_done || hydra_error;
+
+    always_ff @(posedge clk) begin
+        if (!rst_n) begin
+            HSEL_mmr_d     <= 1'b0;
+            HSEL_scratch_d <= 1'b0;
+        end else if (HREADY_s) begin
+            HSEL_mmr_d     <= HSEL_mmr;
+            HSEL_scratch_d <= HSEL_scratch;
+        end
+    end
 
     hydra_arbiter arbiter (
         .clk, .rst_n, .hydra_HBUSREQ,
