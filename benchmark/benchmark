@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+BFLAG=(20 30 40)
+SFLAG=(CICD WICD WIWD)
+OFLAG=("-O1" "-O2" "-O3" "-O3 -funroll-loops")
+
+mkdir -p .log
+
+for ((i=0; i<${#SFLAG[@]}; i++)); do
+    for ((j=0; j<${#BFLAG[@]}; j++)); do
+        echo "Running STATE=${SFLAG[i]}, BLOCKS=${BFLAG[j]}"
+
+        make BFLAG="${BFLAG[j]}" SFLAG="${SFLAG[i]}" || exit 1
+
+        wsim rv32gc --sim questa --elf hydra \
+            > "log/block_sweep/hydra_modeB_${SFLAG[i]}${BFLAG[j]}.log"
+
+        echo "Finished STATE=${SFLAG[i]}, BLOCKS=${BFLAG[j]}"
+    done
+done
+
+for ((i=0; i<${#OFLAG[@]}; i++)); do
+    echo "Running optimization: ${OFLAG[i]}"
+    
+    make BFLAG=30 SFLAG=WICD OFLAG="${OFLAG[i]}" || exit 1
+
+    # Make OFLAGS safe by removing any spaces
+    log_name="${OFLAG[i]// /_}"
+    wsim rv32gc --sim questa --elf hydra \
+    > "log/opt_sweep/hydra_modeB_${log_name}.log"
+
+    echo "Finished optimization: ${OFLAG[i]}"
+done
