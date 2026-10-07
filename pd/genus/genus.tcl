@@ -42,7 +42,7 @@ syn_opt
 
 # Write outputs for Innovus - synthesized netlist and SDC constraints
 write_hdl > ./out/top_synth.v
-write_sdc -view view_typical > ./out/top_synth.sdc
+write_sdc -view typical_view > ./out/top_synth.sdc
 
 # Generate reports
 report_timing > ./rpt/timing.rpt
