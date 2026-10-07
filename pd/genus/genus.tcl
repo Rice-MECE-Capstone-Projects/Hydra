@@ -2,6 +2,7 @@
 # Created by Matthew Nutt (and Gemini)
 set PDK_DIR $env(PDK_DIR)
 set_db common_ui true
+set_multi_cpu_usage -local_cpu 8
 
 # Set search paths for LIBs, LEFs, and RTL
 set_db init_lib_search_path [list   $PDK_DIR/LIB/CCS/ \

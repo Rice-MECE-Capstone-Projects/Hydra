@@ -104,7 +104,7 @@ package hydra_pkg;
 
   // -------------------------Constants Declarations-------------------------
     // Corner cases for MODE C
-    const logic signed [DATA_WIDTH-1:0] corner_vals[] = '{
+    const logic signed [DATA_WIDTH-1:0] corner_vals[4] = '{
       {{(DATA_WIDTH-1){1'b0}}, 1'b1},       // +1 (no clip)
       {1'b0, {(DATA_WIDTH-1){1'b1}}},       // maximum positive (clip)
       {DATA_WIDTH{1'b1}},                   // -1 (no clip)
