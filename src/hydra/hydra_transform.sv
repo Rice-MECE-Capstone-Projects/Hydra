@@ -67,7 +67,8 @@ module hydra_transform (
     // Status
     output logic [BEATS_WIDTH-1:0]  currBeat,
     output logic                    done,
-    output logic                    error
+    output logic                    error,
+    output logic                    busy
 );
 
     localparam AHB_SIZE     = $clog2(DATA_WIDTH/8);     // AHB size encoding for 32-bit words
@@ -106,6 +107,7 @@ module hydra_transform (
     logic                   first_trans, start_fill;
     logic                   fill_sel, drain_sel;
     logic                   next_done_read, done_read, next_done;
+    logic                   flush_complete;
 
     typedef enum logic [1:0] {IDLE, BUSY, FLUSH, ERROR} bus_state_type;
     bus_state_type state, next_state;
@@ -113,13 +115,14 @@ module hydra_transform (
     assign currBeat         = beat;
     assign HWRITE           = 1'b0;
     assign HWDATA           = '0;
+    assign busy             = (state == BUSY) || (state == FLUSH) || start;
     assign next_done_read   = (count == length-1) && HREADY && (state == BUSY); // done reading when last word of last column is read from AHB
     assign invalid_length   = (length == '0) || ((mode == MODE_B) && (length[ELEM_WIDTH-1:0] != '0)) ||
                   ((mode == MODE_E) && (length[POOL_BITS-1:0] != '0)) ||
                               ((mode == MODE_C) && (length[QUANT_BITS-1:0] != '0));
     assign error            = (state == ERROR);
     always_ff @(posedge clk) begin
-        if (rst_n && start) begin
+        if (rst_n && state == IDLE && start) begin
             if (invalid_length) begin
                 $display("\t[ERROR] Fatal error occurred in hydra_transform:");
                 $display("\t\tGot `length`: %0d.", length);
@@ -132,10 +135,11 @@ module hydra_transform (
     begin : NEXT_STATE_SIGNALS
         next_state = state;
 
-        if (HRESP || invalid_length) next_state = ERROR;     // if any AHB error response is received, go to error halt
+        if (HRESP || (((state != IDLE) || start) && invalid_length))
+            next_state = ERROR;     // if any AHB error response is received, go to error halt
         else begin
             case (state)
-                IDLE        : next_state = HREADY           ? (invalid_length ? ERROR : BUSY) : IDLE;
+                IDLE        : next_state = start            ? BUSY : IDLE;
                 BUSY        : begin
                     case (mode)
                         MODE_A: next_state = IDLE;
@@ -145,7 +149,7 @@ module hydra_transform (
                         default: next_state = IDLE;
                     endcase
                 end
-                FLUSH       : next_state = done             ? IDLE          : FLUSH;
+                FLUSH       : next_state = flush_complete   ? IDLE          : FLUSH;
                 ERROR       : next_state = IDLE;
             endcase
         end
@@ -153,7 +157,8 @@ module hydra_transform (
 
     always_comb
     begin : AHB_SIGNALS
-        next_HBUSREQ    = (!invalid_length && start) ? 1 : ((done_read || next_state == ERROR) ? 0 : HBUSREQ);
+        next_HBUSREQ    = ((state == IDLE) && start && !invalid_length) ? 1 :
+                          ((done_read || next_state == ERROR) ? 0 : HBUSREQ);
         next_HADDR      = HADDR;
         next_HBURST     = BURST_TYPE;
         next_HSIZE      = AHB_SIZE;
@@ -241,6 +246,7 @@ module hydra_transform (
             SCRATCH_col     <= '0;
             done_read       <= 0;
             done            <= 0;
+            flush_complete  <= 0;
         end else begin
             state       <= next_state;
             HBUSREQ     <= next_HBUSREQ;
@@ -249,10 +255,13 @@ module hydra_transform (
             HSIZE       <= next_HSIZE;
             HTRANS      <= next_HTRANS;
             done_read   <= next_done_read;
-            done        <= next_done;
+            flush_complete <= next_done;
+            done        <= (mode == MODE_B) ? ((state == FLUSH) && flush_complete) :
+                           ((state == BUSY) && done_read);
 
             if (state == IDLE) begin
                 done_read       <= 0;
+                flush_complete  <= 0;
                 done            <= 0;
                 first_trans     <= 1;
                 start_fill      <= 0;

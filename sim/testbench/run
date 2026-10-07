@@ -4,5 +4,6 @@ vlog ../../src/hydra/hydra_pkg.sv           \
      ../../src/hydra/hydra_arbiter.sv       \
      ../../src/hydra/hydra_scratchpad.sv    \
      ../../src/hydra/hydra_transform.sv     \
+     ../../src/hydra/hydra_mmr.sv           \
      hydra_tb.sv
 vsim -c hydra_tb -do "run -all; quit" > hydra_tb.log
