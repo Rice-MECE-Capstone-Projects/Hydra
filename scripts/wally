@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #################################################################################################
 # wally (patch script)
 #
@@ -34,9 +36,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 WALLY="$REPO_ROOT/wally"
 PATCH_DIR="$REPO_ROOT/patch"
+WALLY_HYDRA="$WALLY/src/hydra"
 
 # NOTE: add a line here when you start modifying a new Wally file.
 declare -A FILES=(
+  ["setupSH.patch"]="setup.sh"
   ["adrdecs.patch"]="src/mmu/adrdecs.sv"
   ["config_rv32gc.patch"]="config/rv32gc/config.vh"
   ["cvw.patch"]="src/cvw.sv"
@@ -67,6 +71,25 @@ cmd_update() {
     APPLIED=$((APPLIED + 1))
   done
   echo "    $APPLIED patch(es) applied."
+  
+  echo "==> Creating HYDRA symlinks..."
+  mkdir -p "$WALLY_HYDRA"
+
+  # Rename pkg file to `0_pkg.sv` to prevent compiling errors
+  target="$(realpath --relative-to="$WALLY_HYDRA" \
+    "$REPO_ROOT/src/hydra_pkg.sv")"
+  ln -sfn "$target" "$WALLY_HYDRA/0_pkg.sv"
+
+  for f in "$REPO_ROOT"/src/hydra/*.sv; do
+    [ -f "$f" ] || continue
+
+    name="$(basename "$f")"
+    target="$(realpath --relative-to="$WALLY_HYDRA" "$f")"
+
+    ln -sfn "$target" "$WALLY_HYDRA/$name"
+  done
+
+  echo "    Created HYDRA symlinks in Wally."
   echo "==> Done."
 }
 
