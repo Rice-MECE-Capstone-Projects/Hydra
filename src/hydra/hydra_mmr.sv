@@ -26,108 +26,143 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Register map:
-    // Offset CTRL      : [0]=START, [3:1]=MODE[2:0], [8:4]=SCALE_SHIFT[4:0], [9]=SIGNED_OUT, [10]=ROUND_EN, [12:11]=REDUCE_OP
-    // Offset SRC       : [ADDR_WIDTH-1:0]
-    // Offset DST       : [ADDR_WIDTH-1:0]
-    // Offset LEN       : [LEN_WIDTH-1:0]
-    // Offset STATUS    : [0]=ERROR
+// Offset CTRL      : [0]=START, [3:1]=MODE[2:0], [8:4]=SCALE_SHIFT[4:0], [9]=SIGNED_OUT, [10]=ROUND_EN, [12:11]=REDUCE_OP
+// Offset SRC       : [ADDR_WIDTH-1:0]
+// Offset DST       : [ADDR_WIDTH-1:0]
+// Offset LEN       : [LEN_WIDTH-1:0]
+// Offset STATUS    : [1]=ERROR, [0]=DONE
 
 import hydra_pkg::*;
 module hydra_mmr (
-    input  logic                    clk,
-    input  logic                    rst_n,
+    input logic clk,
+    input logic rst_n,
 
     // Status input from hydra_transform
-    input  logic                    done,
-    input  logic                    error,
+    input logic irq,
+    input logic error,
 
     // AHB-Lite slave port
-    input  logic [ADDR_WIDTH-1:0]   HADDR,
-    input  logic [DATA_WIDTH-1:0]   HWDATA,
-    input  logic                    HWRITE,
-    input  logic [1:0]              HTRANS,
-    input  logic                    HSEL,
-    input  logic                    HREADY,
-    output logic [DATA_WIDTH-1:0]   HRDATA,
-    output logic                    HREADYOUT,
-    output logic                    HRESP,
+    input  logic [ADDR_WIDTH-1:0] HADDR,
+    input  logic [DATA_WIDTH-1:0] HWDATA,
+    input  logic                  HWRITE,
+    input  logic [           1:0] HTRANS,
+    input  logic                  HSEL,
+    input  logic                  HREADY,
+    output logic [DATA_WIDTH-1:0] HRDATA,
+    output logic                  HREADYOUT,
+    output logic                  HRESP,
 
     // Decoded control outputs to hydra_transform
-    output logic                    start,
-    output hydra_mode               mode,
-    output logic [DATA_BITS-1:0]    scale_shift,
-    output logic                    signed_out,
-    output logic                    round_en,
-    output hydra_reduce_op          reduce_op,
-    output logic [ADDR_WIDTH-1:0]   src_addr,
-    output logic [ADDR_WIDTH-1:0]   dst_addr,
-    output logic [LEN_WIDTH-1:0]    length
+    output logic                            start,
+    output hydra_mode                       mode,
+    output logic           [ DATA_BITS-1:0] scale_shift,
+    output logic                            signed_out,
+    output logic                            round_en,
+    output hydra_reduce_op                  reduce_op,
+    output logic           [ADDR_WIDTH-1:0] src_addr,
+    output logic           [ADDR_WIDTH-1:0] dst_addr,
+    output logic           [ LEN_WIDTH-1:0] length
 );
-    localparam int unsigned MODE_BITS       = $bits(hydra_mode);
-    localparam int unsigned MMR_OFFSET_BITS = $bits(hydra_mmr_map);
+  localparam int unsigned MODE_BITS       = $bits(hydra_mode);
+  localparam int unsigned MMR_OFFSET_BITS = $bits(hydra_mmr_map);
 
-    logic error_reg;
-    logic phase_valid_r, phase_valid_w;
-    hydra_mmr_map mmr_offset_r, mmr_offset_w;
+  logic error_reg, irq_reg;
+  logic phase_valid_r, phase_valid_w;
+  hydra_mmr_map mmr_offset_r, mmr_offset_w;
 
-    assign phase_valid_r    = HTRANS[1] && HSEL && !HWRITE;
-    assign mmr_offset_r     = hydra_mmr_map'(HADDR[MMR_OFFSET_BITS-1:0]);
+  assign phase_valid_r = HTRANS[1] && HSEL && !HWRITE;
+  assign mmr_offset_r  = hydra_mmr_map'(HADDR[MMR_OFFSET_BITS-1:0]);
 
-    // MMR has no wait states and never signals errors
-    assign HREADYOUT    = 1;
-    assign HRESP        = 0;
+  // MMR has no wait states and never signals errors
+  assign HREADYOUT     = 1;
+  assign HRESP         = 0;
 
-    always_ff @(posedge clk)
-    begin
-        if (!rst_n) begin
-            HRDATA          <= '0;
-            phase_valid_w   <= 0;
-            mmr_offset_w    <= hydra_mmr_map'('0);
-            start           <= 0;
-            mode            <= IDLE;
-            scale_shift     <= '0;
-            signed_out      <= 0;
-            round_en        <= 0;
-            reduce_op       <= POOL_SUM;
-            src_addr        <= '0;
-            dst_addr        <= '0;
-            length          <= '0;
-            error_reg       <= 0;
-        end else begin
-            // `top` sends interrupt on (done || error), so CPU needs to read
-            // STATUS to understand whether HYDRA was successfull or not
-            error_reg   <= error ? 1 : error_reg;
-            start       <= 0;       // single-cycle pulse
+  always_comb begin
+    if (phase_valid_r && HREADY) begin
+      case (mmr_offset_r)
+        CTRL:
+        HRDATA = {
+          (DATA_WIDTH - MODE_BITS - DATA_BITS - 5)'(0),
+          reduce_op,
+          round_en,
+          signed_out,
+          scale_shift,
+          mode,
+          start
+        };
+        SRC: HRDATA = src_addr;
+        DST: HRDATA = dst_addr;
+        LEN: HRDATA = length;
+        STATUS: HRDATA = {(DATA_WIDTH - 2)'(0), error_reg, irq_reg};
 
-            phase_valid_w <= HTRANS[1]  && HSEL && HWRITE && HREADY;        // only write during Data Phase
-            mmr_offset_w  <= (HTRANS[1] && HSEL && HREADY) ? mmr_offset_r : mmr_offset_w;
-            if (phase_valid_r && HREADY) begin
-                case (mmr_offset_r)
-                    CTRL    : HRDATA <= {(DATA_WIDTH - MODE_BITS - DATA_BITS - 5)'(0), reduce_op, round_en, signed_out, scale_shift, mode, start};
-                    SRC     : HRDATA <= src_addr;
-                    DST     : HRDATA <= dst_addr;
-                    LEN     : HRDATA <= length;
-                    STATUS  : HRDATA <= {(DATA_WIDTH - 1)'(0), error_reg};
+        default: HRDATA = '0;
+      endcase
 
-                    default : HRDATA <= '0;
-                endcase  
-            end else if (phase_valid_w && HREADY) begin
-                case (mmr_offset_w)
-                    CTRL    : begin
-                        start           <= HWDATA[0];
-                        mode            <= hydra_mode'(HWDATA[MODE_BITS:1]);
-                        scale_shift     <= HWDATA[DATA_BITS+MODE_BITS:MODE_BITS+1];
-                        signed_out      <= HWDATA[DATA_BITS+MODE_BITS+1];
-                        round_en        <= HWDATA[DATA_BITS+MODE_BITS+2];
-                        reduce_op       <= hydra_reduce_op'(HWDATA[DATA_BITS+MODE_BITS+4:DATA_BITS+MODE_BITS+3]);
-                    end
-                    SRC     : src_addr  <= HWDATA[ADDR_WIDTH-1:0];
-                    DST     : dst_addr  <= HWDATA[ADDR_WIDTH-1:0];
-                    LEN     : length    <= HWDATA[LEN_WIDTH-1:0];
-                    STATUS  : error_reg <= 0;
-                endcase
-            end
-            end
-        end
+      $display(" [HYDRA]: Reading: %0h from MMR offset: %0h", HRDATA, mmr_offset_r);
+    end
+  end
+
+  always_ff @(posedge clk) begin
+    if (!rst_n) begin
+      phase_valid_w <= 0;
+      mmr_offset_w  <= hydra_mmr_map'('0);
+      start         <= 0;
+      mode          <= IDLE;
+      scale_shift   <= '0;
+      signed_out    <= 0;
+      round_en      <= 0;
+      reduce_op     <= POOL_SUM;
+      src_addr      <= '0;
+      dst_addr      <= '0;
+      length        <= '0;
+      error_reg     <= 0;
+      irq_reg       <= 0;
+    end else begin
+      // `top` sends interrupt on irq_hydra = (done || error), so CPU needs to read
+      // STATUS to understand whether HYDRA was successfull or not
+      error_reg     <= error ? 1 : error_reg;
+      irq_reg       <= irq ? 1 : irq_reg;
+      start         <= 0;  // single-cycle pulse
+
+      phase_valid_w <= HTRANS[1] && HSEL && HWRITE && HREADY;  // only write during Data Phase
+      mmr_offset_w  <= (HTRANS[1] && HSEL && HREADY) ? mmr_offset_r : mmr_offset_w;
+      if (phase_valid_r && HREADY) begin
+        // case (mmr_offset_r)
+        //   CTRL:
+        //   HRDATA <= {
+        //     (DATA_WIDTH - MODE_BITS - DATA_BITS - 5)'(0),
+        //     reduce_op,
+        //     round_en,
+        //     signed_out,
+        //     scale_shift,
+        //     mode,
+        //     start
+        //   };
+        //   SRC: HRDATA <= src_addr;
+        //   DST: HRDATA <= dst_addr;
+        //   LEN: HRDATA <= length;
+        //   STATUS: HRDATA <= {(DATA_WIDTH - 2)'(0), error_reg, irq_reg};
+
+        //   default: HRDATA <= '0;
+        // endcase
+      end else if (phase_valid_w && HREADY) begin
+        $display(" [HYDRA]: Writing to MMR offset: %0h with data: %0h", mmr_offset_w, HWDATA);
+        case (mmr_offset_w)
+          CTRL: begin
+            start       <= HWDATA[0];
+            mode        <= hydra_mode'(HWDATA[MODE_BITS:1]);
+            scale_shift <= HWDATA[DATA_BITS+MODE_BITS:MODE_BITS+1];
+            signed_out  <= HWDATA[DATA_BITS+MODE_BITS+1];
+            round_en    <= HWDATA[DATA_BITS+MODE_BITS+2];
+            reduce_op   <= hydra_reduce_op'(HWDATA[DATA_BITS+MODE_BITS+4:DATA_BITS+MODE_BITS+3]);
+          end
+          SRC:    src_addr <= HWDATA[ADDR_WIDTH-1:0];
+          DST:    dst_addr <= HWDATA[ADDR_WIDTH-1:0];
+          LEN:    length <= HWDATA[LEN_WIDTH-1:0];
+          STATUS: {error_reg, irq_reg} <= '0;
+        endcase
+      end
+    end
+  end
 
 endmodule
