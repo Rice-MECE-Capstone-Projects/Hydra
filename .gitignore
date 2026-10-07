@@ -1,4 +1,6 @@
 # Simulation
+sim/*.log
+*.vcd
 *.vvp
 *.wlf
 wlf*
@@ -43,6 +45,17 @@ Thumbs.db
 *.swo
 .vscode/
 .idea/
+
+# Benchmarks
+benchmark/*
+!benchmark/*.c
+!benchmark/*.h
+!benchmark/Makefile
+!benchmark/*.md
+!benchmark/benchmark
+
+# Patch
+patch/*SH.patch
 
 # Generic
 *.bak
