@@ -1,8 +1,8 @@
 #!/bin/sh
 
-vlog ../../src/hydra/hydra_pkg.sv           \
+vlog ../../src/hydra_pkg.sv                 \
      ../../src/hydra/hydra_arbiter.sv       \
      ../../src/hydra/hydra_scratchpad.sv    \
      ../../src/hydra/hydra_transform.sv     \
      hydra_tb.sv
-vsim -c hydra_tb -do "run -all; quit" > hydra_tb.log
+vsim -c -quiet +questa_mvc_core+wlf_disable hydra_tb -nostdout -l hydra_tb.log -do "run -all; quit"
