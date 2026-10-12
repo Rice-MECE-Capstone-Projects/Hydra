@@ -11,7 +11,6 @@ Before the fix, the first source address was accepted twice. With `length=4`, th
 ## Files
 
 - [Fix investigation and regression results](mode_c_ram_read_debug.md)
-- [Original cycle-level report](Mode_C.pdf)
 - [Original failing simulation transcript](transcript.log)
 
 ## Reproduction
