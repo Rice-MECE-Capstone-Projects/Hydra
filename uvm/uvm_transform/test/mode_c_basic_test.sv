@@ -34,8 +34,6 @@ class mode_c_basic_test extends uvm_test;
         m_env.ram_model.write_word(32'h8000_0004, 32'h0000_0002);
         m_env.ram_model.write_word(32'h8000_0008, 32'h0000_0003);
         m_env.ram_model.write_word(32'h8000_000C, 32'h0000_0004);
-        /*m_env.ram_model.write_word(32'h8000_0010, 32'h0000_0005);
-        m_env.ram_model.write_word(32'h8000_0014, 32'h0000_0006);*/
         
 
         seq=mode_c_basic_seq::type_id::create("seq");
