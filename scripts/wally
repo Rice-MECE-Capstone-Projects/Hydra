@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #################################################################################################
 # wally (patch script)
 #
@@ -45,6 +46,8 @@ declare -A FILES=(
   ["pmachecker.patch"]="src/mmu/pmachecker.sv"
   ["uncore.patch"]="src/uncore/uncore.sv"
   ["wallypipelinedsoc.patch"]="src/wally/wallypipelinedsoc.sv"
+  ["ram1p1rwbe.patch"]="src/generic/mem/ram1p1rwbe.sv"
+  ["rom1p1r.patch"]="src/generic/mem/rom1p1r.sv"
 )
 
 cmd_update() {

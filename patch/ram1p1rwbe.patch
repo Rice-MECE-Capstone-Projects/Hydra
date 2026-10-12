@@ -1,0 +1,13 @@
+diff --git a/src/generic/mem/ram1p1rwbe.sv b/src/generic/mem/ram1p1rwbe.sv
+index 500524042..8cd0996a6 100644
+--- a/src/generic/mem/ram1p1rwbe.sv
++++ b/src/generic/mem/ram1p1rwbe.sv
+@@ -101,7 +101,7 @@ module ram1p1rwbe import cvw::*; #(parameter USE_SRAM=0, DEPTH=64, WIDTH=44, PRE
+             string       WALLY_DIR = getenvval("WALLY");
+             $readmemh({WALLY_DIR,"/fpga/src/data.mem"}, RAM, 0);  // load boot RAM for FPGA
+           `else
+-            $readmemh({"$WALLY/fpga/src/data.mem"}, RAM, 0);  // load boot RAM for FPGA
++            $readmemh("$WALLY/fpga/src/data.mem", RAM, 0);  // load boot RAM for FPGA
+           `endif
+         end else begin // put something in the RAM so it is not optimized away
+         RAM[0] = 'h00002197;

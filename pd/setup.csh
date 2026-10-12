@@ -1,3 +1,5 @@
+#!/usr/bin/env csh
+
 # Filepath variables
 # TODO: move files to a common area on CLEAR
 source /storage-home/m/mcn5/license_address.csh

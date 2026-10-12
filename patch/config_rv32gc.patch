@@ -1,5 +1,5 @@
 diff --git a/config/rv32gc/config.vh b/config/rv32gc/config.vh
-index 890bc5208..060d8d063 100644
+index 890bc5208..e6e1ea4f0 100644
 --- a/config/rv32gc/config.vh
 +++ b/config/rv32gc/config.vh
 @@ -3,6 +3,7 @@
@@ -32,3 +32,11 @@ index 890bc5208..060d8d063 100644
  
  // Branch prediction
  localparam logic BPRED_SUPPORTED = 1;
+@@ -228,6 +237,6 @@ localparam RADIX = 32'd4;
+ localparam DIVCOPIES = 32'd2;
+ 
+ // Memory synthesis configuration
+-localparam logic USE_SRAM = 0;
++localparam logic USE_SRAM = 1;
+ 
+ `include "config-shared.vh"

@@ -7,7 +7,10 @@ set_db common_ui true
 set_db init_lib_search_path [list   $PDK_DIR/LIB/CCS/ \
                                     $PDK_DIR/LEF/scaled/ \
                                     $PDK_DIR/techlef_misc/ ]
-set_db init_hdl_search_path ../../src/hydra/
+set_db init_hdl_search_path [list   ../../src/hydra \
+                                    ../../wally/src \
+                                    ../../wally/config/shared \
+                                    ../../wally/config/rv32gc ]
 
 # Set library LEFs, using the 4x scaled versions
 set_db lef_library [list    asap7_tech_4x_201209.lef \
@@ -20,13 +23,8 @@ set_db lef_library [list    asap7_tech_4x_201209.lef \
 read_mmmc ./mmmc.tcl
 
 # Read RTL and elaborate
-read_hdl -language sv { hydra_pkg.sv \
-                        hydra_arbiter.sv \
-                        hydra_mmr.sv \
-                        hydra_scratchpad.sv \
-                        hydra_transform.sv \
-                        hydra_top.sv }
-elaborate hydra_top
+read_hdl -language sv -f rtl_list.f
+elaborate wallypipelinedsoc
 
 # Init design
 init_design

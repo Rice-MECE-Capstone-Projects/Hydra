@@ -1,5 +1,5 @@
 diff --git a/src/wally/wallypipelinedsoc.sv b/src/wally/wallypipelinedsoc.sv
-index 51d2f6124..fc7f7c498 100644
+index 51d2f6124..3a6cc14a4 100644
 --- a/src/wally/wallypipelinedsoc.sv
 +++ b/src/wally/wallypipelinedsoc.sv
 @@ -2,7 +2,7 @@
@@ -11,6 +11,15 @@ index 51d2f6124..fc7f7c498 100644
  //
  // Purpose: System on chip including pipelined processor and uncore memories/peripherals
  //
+@@ -27,7 +27,7 @@
+ // and limitations under the License.
+ ////////////////////////////////////////////////////////////////////////////////////////////////
+ 
+-module wallypipelinedsoc import cvw::*; #(parameter cvw_t P)  (
++module wallypipelinedsoc import cvw::*; #(parameter cvw_t P = wally_cfg_pkg::TOP_P)  (
+   input  logic                clk,
+   input  logic                reset_ext,        // external asynchronous reset pin
+   output logic                reset,            // reset synchronized to clk to prevent races on release
 @@ -72,6 +72,48 @@ module wallypipelinedsoc import cvw::*; #(parameter cvw_t P)  (
    logic                       MTimerInt, MSwInt;// timer and software interrupts from CLINT
    logic [63:0]                MTIME_CLINT;      // from CLINT to CSRs
