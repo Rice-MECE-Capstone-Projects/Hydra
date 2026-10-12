@@ -1,31 +1,22 @@
 # Mode C C01 Debug Report
 
-## Summary
+## Status
 
-The basic Mode C test produces the expected output `0x04030201`, but the RAM request sequence includes a duplicate first address and an additional read beyond the configured inputs. The simulation stops with `RAM_UNINITIALIZED`.
+The Mode C RAM read-request duplication and overrun have been fixed in `src/hydra/hydra_transform.sv`. The zero-wait-state tests for `length=4` and `length=8` now pass: RAM read counts and addresses, scratchpad writes, and output data match the scoreboard expectations. Wait states and arbitration stalls have not yet been tested.
 
-The issue is under review; the test has not passed.
+## Original issue
 
-## Test Setup
-
-- `MODE_C`, `length=4`, `scale_shift=0`, `round_en=0`, `signed_out=1`.
-- RAM inputs: 1, 2, 3, 4 at `0x80000000`, `0x80000004`, `0x80000008`, and `0x8000000C`.
-- Zero-wait-state RAM responses; no competing CPU traffic.
-- Expected: four reads and one scratchpad write of `0x04030201` at address 0.
-
-## Observed Issue
-
-- **135 ns and 145 ns:** duplicate requests at `0x80000000`.
-- **185 ns:** correct scratchpad output is observed, but a request at `0x80000010` triggers `RAM_UNINITIALIZED`.
+Before the fix, the first source address was accepted twice. With `length=4`, the DUT produced the correct `0x04030201` scratchpad word but then requested uninitialized address `0x80000010`, stopping the simulation with `RAM_UNINITIALIZED`. The `length=8` case similarly requested `0x80000020` beyond its configured inputs.
 
 ## Files
 
-- [Detailed report](Mode_C.pdf): cycle tables, waveform, and relevant RTL code.
-- [Simulation transcript](transcript.log): complete simulation log.
+- [Fix investigation and regression results](mode_c_ram_read_debug.md)
+- [Original cycle-level report](Mode_C.pdf)
+- [Original failing simulation transcript](transcript.log)
 
 ## Reproduction
 
-UVM code is on branch `HYDRA_UVM_Verification`, commit `1caa771`.
-
+- Branch: `HYDRA_UVM_Verification`
+- RTL: `src/hydra/hydra_transform.sv`
 - Test: `uvm/uvm_transform/test/mode_c_basic_test.sv`
 - Top: `uvm/uvm_transform/transform_top_tb.sv`
