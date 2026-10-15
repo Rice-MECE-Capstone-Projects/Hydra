@@ -31,18 +31,19 @@
     // Note that there seem to be some discrepancies between the UART and Spike
     // such that using \n\r for new lines works best.
 
-// Compile with:
-//      make [TARGET=...] [OFLAG=...] [BFLAG=...] [SFLAG=...]
-//          Defaults:
-//              TARGET=hydra
-//              OFLAG=-O3 -funroll-loops
-//              BFLAG=MAX_BLOCKS
-//              SFLAG=WICD
-//          Valid BFLAG values: [1, MAX_BLOCKS]
-//          Valid SFLAG values: CICD, WICD, WIWD
-// Simulate with: wsim rv32gc --sim questa --elf hydra
+//  Run with:
+//      make T=hydra [S=...] [B=...] [O=...]
+//  Examples:
+//	    make T=hydra O="-O2 -O3" B=1-20 S="WICD WIWD"
+//	    make T=hydra O=-O3_fun-roll-loops B="5-20 40-40" S="CICD WIWD"
+//  Defaults:
+//  	S=WICD
+//  	B=1-MAX_BLOCKS
+//  	O=-O3_-funroll-loops
+//  Valid B values: [1, MAX_BLOCKS]
+//  Valid S values: CICD, WICD, WIWD
 
-#include "hydra.h"
+#include "../hydra.h"
 
 
 // -------------------------Benchmark configuration-------------------------
@@ -50,18 +51,19 @@
 //       src and dst in the cache. This changes their cache-set mapping and
 //       can cause write-back fluctuations that distort the measured speedup.
 //       Instead, sweep BENCH_BLOCKS using the provided Makefile.
-
-#define MIN_BLOCKS       1
 #define MAX_BLOCKS       64 // default
 #define MAX_LEN          (NUM_ELEMS * MAX_BLOCKS)
 #define POISON           0xDEADBEEFu
 #define SEED             0x1234ABCDu
 
+#ifndef MIN_BLOCKS
+    #define MIN_BLOCKS 1
+#endif
 #ifndef BENCH_BLOCKS
     #define BENCH_BLOCKS MAX_BLOCKS
 #endif
-#if (BENCH_BLOCKS < 1) || (BENCH_BLOCKS > MAX_BLOCKS)
-    #error "BENCH_BLOCKS must be in [1, MAX_BLOCKS]"
+#if (BENCH_BLOCKS < MIN_BLOCKS) || (BENCH_BLOCKS > MAX_BLOCKS)
+    #error "BENCH_BLOCKS must be in [MIN_BLOCKS, MAX_BLOCKS]"
 #endif
 
 // CICD (Cold I$, Cold D$), WICD (Warm I$, Cold D$), WIWD (Warm I$, Warm D$)
@@ -255,8 +257,8 @@ int main(void) {
     measure_overhead(&ovh); // warm-up call
     measure_overhead(&ovh); // measured call
 
-    printf("\n\r-------------------------HYDRA MODE B CHARACTERIZATION (%s, %" PRIu32 " blocks)-------------------------\r", 
-            STATE_NAME[STATE], BENCH_BLOCKS);
+    printf("\n\r-------------------------HYDRA MODE B CHARACTERIZATION (%s, blocks %"PRIu32":%" PRIu32 ")-------------------------\r", 
+            STATE_NAME[STATE], MIN_BLOCKS, BENCH_BLOCKS);
     printf("\t\t\t\t\t\t\t counter overhead: %" PRIu64 " cyc, %" PRIu64 " inst\n\r", ovh.cycles, ovh.instret);
 
     for (uint32_t b = MIN_BLOCKS; b <= BENCH_BLOCKS; b++)

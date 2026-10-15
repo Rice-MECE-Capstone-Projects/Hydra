@@ -47,12 +47,12 @@ Thumbs.db
 .idea/
 
 # Benchmarks
-benchmark/*
-!benchmark/*.c
-!benchmark/*.h
-!benchmark/Makefile
-!benchmark/*.md
-!benchmark/benchmark
+benchmark/*/*
+!benchmark/*/*.c
+!benchmark/*/Makefile
+!benchmark/*/*.h
+!benchmark/*/*.md
+!benchmark/*/*.py
 
 # Patch
 patch/*SH.patch
