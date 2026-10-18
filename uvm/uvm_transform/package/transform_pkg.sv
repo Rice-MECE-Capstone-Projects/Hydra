@@ -23,7 +23,15 @@ package transform_pkg;
     `include "../env/transform_env.sv"
     
     `include "../test/mode_c_basic_test.sv"
-
+    `include "../test/mode_c_shift_test.sv"
+    `include "../test/mode_c_round_test.sv"
+    `include "../test/mode_c_signed_saturation_test.sv"
+    `include "../test/mode_c_unsigned_saturation_test.sv"
+    `include "../test/mode_c_wait_state_test.sv"
+    `include "../test/mode_c_arbitration_test.sv"
+    `include "../test/mode_c_invalid_length_test.sv"
+    `include "../test/mode_c_back_to_back_test.sv"
+    `include "../test/mode_c_combined_arithmetic_test.sv"
 endpackage
     
   

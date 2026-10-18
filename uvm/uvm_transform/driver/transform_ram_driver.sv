@@ -25,6 +25,9 @@ class transform_ram_driver extends uvm_component;
 
     virtual transform_ram_if vif;
     transform_ram_model ram_model;
+    int unsigned wait_cycles_after_first_read = 0; // wait cycles the test requests
+    int unsigned stall_remaining = 0; // wait cycles left in the current stall
+    bit wait_injected = 0; // whether the driver has inserted the wait states
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
@@ -58,9 +61,21 @@ class transform_ram_driver extends uvm_component;
                 vif.driver_cb.HREADY<=1'b1;
                 vif.driver_cb.HRESP<=1'b0;
                 vif.driver_cb.HRDATA<='0;
+                stall_remaining = 0;
+                wait_injected = 0;
             end
-            else begin
-                if(vif.driver_cb.hydra_grant===1'b1 && vif.driver_cb.HTRANS[1]===1'b1)begin
+            else if(vif.driver_cb.HREADY === 1'b0)begin
+                // the current data phase is stalled
+                // do not accept a new address or change HRDATA during the wait
+                if(stall_remaining>1)begin
+                    stall_remaining--;
+                end
+                else begin
+                    stall_remaining=0;
+                    vif.driver_cb.HREADY<=1'b1;
+                end
+            end
+            else if (vif.driver_cb.hydra_grant===1'b1 && vif.driver_cb.HTRANS[1]===1'b1)begin
 
                     // this responder supports reads only
                     if(vif.driver_cb.HWRITE!==1'b0)begin
@@ -82,13 +97,18 @@ class transform_ram_driver extends uvm_component;
                     // provide data for the following data phase
                     vif.driver_cb.HRDATA<=read_data;
                     `uvm_info("RAM_READ",$sformatf("Address=0x%08h data=0x%08h", vif.driver_cb.HADDR,read_data),UVM_MEDIUM)
+
+                    // stall the data phase of the first accepted read
+                    if(!wait_injected && wait_cycles_after_first_read>0)begin
+                        wait_injected=1;
+                        stall_remaining=wait_cycles_after_first_read;
+                        vif.driver_cb.HREADY<=1'b0;
+                    end
                 end
-                else begin
-                    // no valid new address; the next data phase is inactive
-                    vif.driver_cb.HRDATA<='0;
+                else if (vif.driver_cb.hydra_grant === 1'b1) begin
+                    vif.driver_cb.HRDATA <= '0;
                 end
-            end
-        end
+                end
     endtask
 
 endclass

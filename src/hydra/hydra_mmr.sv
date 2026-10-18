@@ -27,8 +27,8 @@
 
 // Register map:
     // Offset CTRL      : [0]=START, [2:1]=MODE[1:0], [7:3]=SCALE_SHIFT[4:0], [8]=SIGNED_OUT, [9]=ROUND_EN
-    // Offset SRC       : [ADDR_WIDTH-1:0]
-    // Offset DST       : [ADDR_WIDTH-1:0]
+    // Offset SRC       : [ADDR_WIDTH-1:0] main RAM source address
+    // Offset DST       : [ADDR_WIDTH-1:0] scratchpad destination address
     // Offset LEN       : [LEN_WIDTH-1:0]
     // Offset STATUS    : [0]=ERROR
 
@@ -46,7 +46,7 @@ module hydra_mmr (
     input  logic [DATA_WIDTH-1:0]   HWDATA,
     input  logic                    HWRITE,
     input  logic [1:0]              HTRANS,
-    input  logic                    HSEL,
+    input  logic                    HSEL,// HSEL=1 mmr
     input  logic                    HREADY,
     output logic [DATA_WIDTH-1:0]   HRDATA,
     output logic                    HREADYOUT,

@@ -27,6 +27,7 @@ module transform_top_tb;
     logic hydra_HBUSREQ;
     logic hydra_grant;
     logic [BEATS_WIDTH-1:0] hydra_currBeat;
+    logic cpu_HBUSREQ;
 
     logic transform_HREADY;
 
@@ -59,13 +60,45 @@ module transform_top_tb;
     // transform advances only when RAM is ready and the arbiter grants HYDRA access
     assign transform_HREADY = ram_if.HREADY & hydra_grant;
 
+    // cpu holds the bus briefly before HYDRA receives grant
+    initial begin
+        cpu_HBUSREQ=1'b0;
+
+        if($test$plusargs("C07_DELAY_GRANT"))begin
+            cpu_HBUSREQ=1'b1;
+            wait(rst_n===1'b1);
+            wait(hydra_HBUSREQ===1'b1);
+            repeat(3) @(negedge clk);
+            cpu_HBUSREQ=1'b0;
+        end
+        else if ($test$plusargs("C07_MID_REQUEST"))begin
+            int unsigned cycles_waited;
+            wait(rst_n===1'b1);
+            wait(hydra_grant===1'b1);
+            wait(hydra_currBeat==4);
+            @(negedge clk);
+            cpu_HBUSREQ=1'b1;
+
+            for(cycles_waited=0;
+                cycles_waited<40&&hydra_grant!==1'b0;
+                cycles_waited++)
+              @(negedge clk);
+
+            if(hydra_grant!==1'b0)
+            $fatal(1,"C07:HYDRA didn't release grant within 40 cycles");
+
+            repeat(3) @(negedge clk);
+            cpu_HBUSREQ=1'b0;
+        end
+    end
+
     // no competing CPU traffic in the first test
     hydra_arbiter arbiter(
         .clk(clk),
         .rst_n(rst_n),
         .hydra_HBUSREQ(hydra_HBUSREQ),
         .hydra_currBeat(hydra_currBeat),
-        .cpu_HBUSREQ(1'b0),
+        .cpu_HBUSREQ(cpu_HBUSREQ),
         .hydra_grant(hydra_grant)
     );
 
@@ -114,7 +147,7 @@ initial begin
     uvm_config_db#(virtual transform_ram_if)::set(null,"uvm_test_top.m_env.m_ram_agent.*","vif",ram_if);
     uvm_config_db#(virtual transform_scratch_if)::set(null,"uvm_test_top.m_env.m_scratch_monitor","vif",scratch_if);
 
-    run_test("mode_c_basic_test");
+    run_test();
 end
 
 endmodule

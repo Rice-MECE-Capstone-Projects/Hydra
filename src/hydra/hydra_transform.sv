@@ -133,7 +133,8 @@ module hydra_transform (
         if (HRESP || invalid_length) next_state = ERROR;     // if any AHB error response is received, go to error halt
         else begin
             case (state)
-                IDLE        : next_state = HREADY           ? (invalid_length ? ERROR : BUSY) : IDLE;
+            //
+                IDLE        : next_state = (HBUSREQ && HREADY) ? (invalid_length ? ERROR : BUSY) : IDLE;
                 BUSY        : next_state = (mode == MODE_B) ? (done_read ? FLUSH : BUSY) : ((mode == MODE_C) ? (done_read ? IDLE : BUSY) : IDLE);
                 FLUSH       : next_state = done             ? IDLE          : FLUSH;
                 ERROR       : next_state = IDLE;

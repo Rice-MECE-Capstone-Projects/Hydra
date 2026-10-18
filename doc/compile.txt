@@ -1,0 +1,24 @@
+// mmr
+rm -rf work
+vlib work
+
+vlog -sv ../interface/cpu_ahb_if.sv
+vlog -sv ../../src/hydra/hydra_pkg.sv
+vlog -sv ../../src/hydra/hydra_mmr.sv
+vlog -sv cpu_ahb_pkg.sv
+vlog -sv ../top_tb.sv
+vsim top_tb
+
+// transform
+vlog -sv ../../../src/hydra/hydra_pkg.sv
+
+vlog -sv ../interface/transform_ctrl_if.sv
+vlog -sv ../interface/transform_ram_if.sv
+vlog -sv ../interface/transform_scratch_if.sv
+
+vlog -sv ../../../src/hydra/hydra_arbiter.sv
+vlog -sv ../../../src/hydra/hydra_transform.sv
+
+vlog -sv transform_pkg.sv
+vlog -sv ../transform_top_tb.sv
+vsim transform_top_tb

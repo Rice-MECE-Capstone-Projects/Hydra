@@ -1,0 +1,127 @@
+# HYDRA UVM Verification Roadmap
+
+## Phase 1: MMR Standalone Verification
+
+Verify `hydra_mmr` as a standalone DUT.
+
+The main objective of this phase is to develop and validate a reusable CPU-side AHB master agent. 
+The agent will be used to write and read the HYDRA memory-mapped registers.
+
+The initial tests will verify:
+
+✅ Basic SRC register write and readback
+✅ SRC, DST, and LEN readback and basic register independence
+✅ Data patterns: all zeros, all ones, alternating bits, and walking ones
+✅ Reset values
+
+Completion criterion:
+
+The CPU AHB agent can reliably write and read all HYDRA registers, and the scoreboard reports no mismatches.
+
+
+## Phase 2: Transform Mode C Standalone Verification
+
+Verify Mode C in `hydra_transform` as a standalone DUT.
+
+The main objective of this phase is to develop:
+
+- A reactive RAM responder
+- A scratchpad write monitor
+- A Mode C reference model
+- A datapath scoreboard
+
+The tests will verify:
+
+✅ Signed and unsigned quantization
+✅ Scale shifting
+✅ Optional rounding
+✅ Positive and negative saturation
+✅ Packing four INT8 results into one 32-bit word
+✅ Correct scratchpad write addresses and data
+
+Completion criterion:
+
+The reference model and scoreboard correctly predict and verify all Mode C scratchpad writes.
+
+
+## Phase 3: Transform Mode B Standalone Verification
+
+Verify Mode B in `hydra_transform` as a standalone DUT.
+
+This phase will reuse the RAM responder, scratchpad monitor, and scoreboard framework developed for Mode C.
+
+The tests will verify:
+
+- A single 8×16 INT32 matrix block
+- Multiple consecutive matrix blocks
+- Correct matrix transposition
+- Ping-pong buffer switching
+- Final buffer flushing
+- Correct output addresses and ordering
+- No missing, duplicated, or additional data
+
+Completion criterion:
+
+The Mode B reference model and scoreboard correctly verify single-block and multi-block matrix transposition.
+
+
+## Phase 4: HYDRA Top-Level Integration Verification
+
+Use `hydra_top` as the DUT and reuse the UVM components developed in the previous phases.
+
+The end-to-end flow will be:
+
+1. The CPU AHB agent programs the HYDRA MMRs.
+2. The CPU starts a Mode B or Mode C operation.
+3. HYDRA requests access to the AHB bus.
+4. The RAM responder provides the source data.
+5. HYDRA transforms the data.
+6. HYDRA writes the results into the internal scratchpad.
+7. HYDRA asserts the completion or error interrupt.
+8. The CPU AHB agent reads the status and scratchpad results.
+9. The scoreboard compares the actual results with the reference model.
+
+The tests will also verify:
+
+- Top-level address decoding
+- MMR and scratchpad selection
+- Read-data multiplexing
+- Arbitration behavior
+- Status reporting
+- Interrupt generation
+
+Completion criterion:
+
+Mode B and Mode C operations pass through the complete CPU-to-HYDRA-to-memory-to-scratchpad flow with no scoreboard mismatches or protocol errors.
+
+## Phase 5: Random, Error, and Coverage-Driven Verification
+
+After the basic end-to-end flow is working, additional robustness tests will be added.
+
+The tests will include:
+
+- Random input data
+- Random legal source and destination addresses
+- Random legal transfer lengths
+- Random AHB wait states
+- Random CPU bus requests
+- AHB error-response injection
+- Invalid transfer lengths
+- Reset during active operations
+- Repeated operations
+- Error recovery and restart
+
+Functional coverage and assertions will be added to measure:
+
+- Mode B and Mode C scenarios
+- Register operations
+- Quantization parameters and saturation cases
+- Ping-pong buffer boundaries
+- Arbitration at different burst beats
+- Wait states and error responses
+- State-machine transitions
+- Interrupt and error behavior
+
+Completion criterion:
+
+All required regression tests pass, planned functional coverage goals are met, assertions report no failures, and any remaining uncovered code is reviewed and documented.

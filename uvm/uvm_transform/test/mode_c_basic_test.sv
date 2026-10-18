@@ -1,16 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////////////////////////
-// File: mode_c_basic_test.sv
-//
-// Author: Yulia Zhou
-//
-// Description:
-// Tests one basic Mode C operation using four input words.
-// Preloads RAM with 1, 2, 3, and 4, then starts the control sequence.
-// The scoreboard checks the observed transfers and packed output.
-//
-// Project: HYDRA UVM Verification
-//////////////////////////////////////////////////////////////////////////////////////////////////
-
 class mode_c_basic_test extends uvm_test;
     transform_env m_env;
     `uvm_component_utils(mode_c_basic_test)
@@ -34,8 +21,6 @@ class mode_c_basic_test extends uvm_test;
         m_env.ram_model.write_word(32'h8000_0004, 32'h0000_0002);
         m_env.ram_model.write_word(32'h8000_0008, 32'h0000_0003);
         m_env.ram_model.write_word(32'h8000_000C, 32'h0000_0004);
-        
-
         seq=mode_c_basic_seq::type_id::create("seq");
         seq.start(m_env.m_ctrl_agent.m_sequencer);
 

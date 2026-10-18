@@ -1,0 +1,52 @@
+### C01: Basic Data Flow and Packing ✅
+- Configuration: `length=4`, `scale_shift=0`, `round_en=0`, `signed_out=1`.
+- Input: `1, 2, 3, 4`.
+- Expected: Four RAM reads and one write of `32'h04030201` to `dst_addr`, with correct byte order.
+
+### C02: Multiple Output Words ✅
+- Configuration: `length=8`; other settings unchanged from C01.
+- Input: `1–8`.
+- Expected: `04030201` written to `dst_addr`, followed by `08070605` at `dst_addr+4`. Check grouping, address increments, and write count.
+
+### C03: Shifting ✅
+- Configuration: Same as C01, but `scale_shift=1`.
+- Input: `1, 2, 3, 4`.
+- Expected: `32'h02010100`. Compare with the no-shift case.
+
+### C04: Rounding ✅
+- Configuration: `length=4`, `scale_shift=1`, `signed_out=1`; run separately with `round_en=0` and `1`.
+- Input: `1, 2, 3, 4`.
+- Expected: `02010100` without rounding and `02020101` with rounding.
+
+### C05: Signed/Unsigned Saturation Boundaries ✅
+- Configuration: No shifting or rounding; test signed and unsigned outputs separately.
+- Input: Values inside, at, and outside the signed range `[-128,127]` and unsigned range `[0,255]`. Each input set must contain a multiple of four words.
+- Expected: In-range values remain unchanged; out-of-range values saturate to the corresponding limit. For example, signed inputs `-129, -128, -127, 0` produce `32'h00818080`.
+
+Common checks: Correct read/write addresses, transfer counts, and output data; normal completion with no errors or timeout.
+
+### C06: RAM Wait States ✅
+- Configuration: Start with C01 (`length=4`).
+- Stimulus: Insert one or more cycles of `HREADY=0` during RAM reads, including the first and last transfer.
+- Expected: While a transfer is stalled, its address and `HTRANS` remain stable. The accepted-read count advances only when the transfer is accepted. Exactly `length` addresses are read in order, with no duplicate or extra reads; scratchpad data and write count remain correct.
+
+### C07: Bus Arbitration ✅
+- Configuration: Start with C02 (`length=8`).
+- Stimulus: Delay `hydra_grant` before the first transfer and, if the arbiter supports it, interrupt the read sequence with competing CPU traffic.
+- Expected: Mode C does not count an ungranted transfer as accepted. Once access resumes, it continues at the correct address without losing or repeating data. The final scratchpad contents match C02.
+
+### C08: Length Validation ✅
+- Configuration: `scale_shift=0`, `round_en=0`, `signed_out=1`.
+- Stimulus: `length=9` was rejected as expected. 
+- Expected: The DUT asserted `error`; no RAM reads or scratchpad writes occurred.
+
+### C09: Back-to-Back Mode C Operations ✅
+- Configuration: Run two Mode C operations in the same simulation, using different source/destination addresses and input values.
+- Expected: The second operation starts at its own first source address. Read counters and packing state reset between operations; neither operation adds an extra read or contaminates the other’s output.
+
+### C10: Combined Arithmetic Corner Cases ✅
+- Configuration: Exercise `scale_shift > 0` with rounding both enabled and disabled, for signed and unsigned outputs.
+- Input: Include positive and negative values near rounding thresholds and saturation limits.
+- Expected: Each output byte matches an independently calculated reference value. Confirm that rounding, shifting, and saturation are applied in the specified order.
+
+Common checks for C06–C10: Accepted RAM addresses and transfer count, scratchpad addresses and data, completion, and absence of errors or timeout. Record the wait-state and arbitration stimulus used for each run.

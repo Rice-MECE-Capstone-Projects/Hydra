@@ -52,10 +52,7 @@ class transform_ram_monitor extends uvm_monitor;
                 pending_valid = 1'b0;
             end
             else begin
-                // This version expects the responder to remain ready
-                if(vif.monitor_cb.HREADY!==1'b1) begin
-                    `uvm_fatal("RAM_READY", "This monitor expects zero-wait-state response")
-                end
+              if (vif.monitor_cb.HREADY === 1'b1 && vif.monitor_cb.hydra_grant === 1'b1) begin
 
                 // Complete the previous read's data phase
                 if (pending_valid) begin
@@ -88,6 +85,7 @@ class transform_ram_monitor extends uvm_monitor;
                     pending_valid=1'b1;
                 end
             end
+        end
         end
     endtask
 endclass

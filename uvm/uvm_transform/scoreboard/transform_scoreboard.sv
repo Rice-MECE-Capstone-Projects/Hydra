@@ -31,8 +31,8 @@ class transform_scoreboard extends uvm_scoreboard;
     uvm_analysis_imp_scratch #(transform_scratch_transaction,transform_scoreboard) scratch_imp;
 
     // store the configuration of one operation
-    transform_ctrl_transaction cfg;
-    bit cfg_valid = 1'b0;
+    transform_ctrl_transaction cfg_queue[$];
+    bit expect_invalid_length =1'b0;
 
     // store observed reads and writes
     transform_ram_transaction ram_queue[$];
@@ -54,16 +54,14 @@ class transform_scoreboard extends uvm_scoreboard;
 
     // receive one operation's configuration
     virtual function void write_ctrl(transform_ctrl_transaction tr);
-        if(cfg_valid)begin
-            `uvm_error("MULTIPLE_OPS","This scoreboard supports one operation per simulation")
-            return;
-        end
+        transform_ctrl_transaction saved_cfg;
 
-    cfg=transform_ctrl_transaction::type_id::create("cfg");
-    cfg.copy(tr);
-    cfg_valid=1'b1;
+        saved_cfg=transform_ctrl_transaction::type_id::create("saved_cfg");
+        saved_cfg.copy(tr);
+        cfg_queue.push_back(saved_cfg);
 
-    `uvm_info("CTRL_RECEIVED",$sformatf("Configuration received: mode=%0d length=%0d", cfg.mode, cfg.length),UVM_LOW)
+        `uvm_info("CTRL_RECEIVED",$sformatf("Operation %0d: mode=%0d length=%0d src=0x%08h dst=0x%08h",
+                    cfg_queue.size(),saved_cfg.mode,saved_cfg.length, saved_cfg.src_addr,saved_cfg.dst_addr),UVM_LOW)
     endfunction
 
     // save one completed RAM read
@@ -132,6 +130,10 @@ class transform_scoreboard extends uvm_scoreboard;
     endfunction
 
     virtual function void check_phase(uvm_phase phase);
+        int unsigned total_reads;
+        int unsigned total_writes;
+        int unsigned read_base;
+        int unsigned write_base;
         int unsigned expected_reads;
         int unsigned expected_writes;
 
@@ -142,38 +144,53 @@ class transform_scoreboard extends uvm_scoreboard;
         bit failed;
 
         super.check_phase(phase);
+        total_reads=0;
+        total_writes=0;
+        read_base=0;
+        write_base=0;
         failed=1'b0;
 
-        // check configuration
-        if(!cfg_valid||cfg==null)begin
+        if(cfg_queue.size()==0)begin
             `uvm_error("NO_CONFIG","No Transform configuration was received")
             return;
         end
 
-        // check mode c 
-        if(cfg.mode!=hydra_pkg::MODE_C)begin
-            `uvm_error("UNSUPPORTED_MODE","This scoreboard currently checks Mode C")
+        if(expect_invalid_length)begin
+            if(cfg_queue.size()!=1||cfg_queue[0].mode!=hydra_pkg::MODE_C||(cfg_queue[0].length!=0&&cfg_queue[0].length%4==0))begin
+                `uvm_error("EXPECTED_INVALID_LENGTH","Expected exactly one invalid Mode C configuration")
+            end
+
+            if(ram_queue.size()!=0||scratch_queue.size()!=0)begin
+                `uvm_error("INVALID_LENGTH_TRAFFIC",$sformatf("Expected 0 reads and 0 writes; observed %0d reads and %0d writes", ram_queue.size(),scratch_queue.size()))
+            end else begin
+                `uvm_info("INVALID_LENGTH_NO_TRAFFIC","No RAM reads or scratchpad writes were observed", UVM_LOW)
+            end
             return;
         end
 
-        // normal mode c operations require a nonzero
-        // input length that is a multiple of four
-        if(cfg.length==0||cfg.length%4!=0)begin
-                `uvm_error("INVALID_LENGTH",$sformatf("Expected a nonzero multiple of four, got length=%0d",cfg.length))
+        // first calculate totals, so no queue entry is accessed if traffic is missing
+        foreach(cfg_queue[op])begin
+            if(cfg_queue[op].mode!=hydra_pkg::MODE_C)begin
+                `uvm_error("UNSUPPORTED_MODE",$sformatf("Operation %0d is not MODE C",op))
+                return;
+            end
+            if(cfg_queue[op].length==0||cfg_queue[op].length%4!=0)begin
+                `uvm_error("INVALID_LENGTH",$sformatf("Operation %0d has invalid length=%0d",op,cfg_queue[op].length))
                 return;
         end
 
-        expected_reads=cfg.length; // 32-bit
-        expected_writes=cfg.length/4; //8-bit
+        total_reads+=cfg_queue[op].length;
+        total_writes+=cfg_queue[op].length/4;
+        end
 
         // check transaction counts
-        if(ram_queue.size()!=expected_reads)begin
-            `uvm_error("RAM_COUNT",$sformatf("Expected %0d RAM reads, observed %0d", expected_reads, ram_queue.size()))
+        if(ram_queue.size()!=total_reads)begin
+            `uvm_error("RAM_COUNT",$sformatf("Expected %0d RAM reads, observed %0d", total_reads, ram_queue.size()))
             failed=1'b1;
         end
 
-        if(scratch_queue.size()!=expected_writes)begin
-            `uvm_error("SCRATCH_COUNT",$sformatf("Expected %0d scratchpad writes, observed %0d", expected_writes,scratch_queue.size()))
+        if(scratch_queue.size()!=total_writes)begin
+            `uvm_error("SCRATCH_COUNT",$sformatf("Expected %0d scratchpad writes, observed %0d", total_writes,scratch_queue.size()))
             failed=1'b1;
         end
 
@@ -181,55 +198,61 @@ class transform_scoreboard extends uvm_scoreboard;
         if(failed)
         return;
 
+        foreach (cfg_queue[op]) begin
+        expected_reads = cfg_queue[op].length;
+        expected_writes = expected_reads / 4;
+
         // check RAM read addresses, responses, and data validity
         for(int i=0; i<expected_reads; i++)begin
-            expected_address=cfg.src_addr+i*4;
-            if(ram_queue[i].address!==expected_address)begin
-                `uvm_error("RAM_ADDRESS",$sformatf("Read %0d:expected address=0x%08h, actual=0x%08h",i,expected_address,ram_queue[i].address))
+            expected_address=cfg_queue[op].src_addr+i*4;
+
+            if(ram_queue[read_base+i].address!==expected_address)begin
+                `uvm_error("RAM_ADDRESS",$sformatf("Operation %0d Read %0d:expected address=0x%08h, actual=0x%08h",op,i,expected_address,ram_queue[read_base+i].address))
                 failed=1'b1;
             end
 
-            if(ram_queue[i].response!==1'b0)begin
-                `uvm_error("RAM_RESPONSE",$sformatf("Read %0d:non-OKAY or unknown response",i))
+            if(ram_queue[read_base+i].response!==1'b0)begin
+                `uvm_error("RAM_RESPONSE",$sformatf("Operation %0d Read %0d:non-OKAY response",op,i))
                 failed=1'b1;
             end
 
-            if($isunknown(ram_queue[i].read_data))begin
-                `uvm_error("RAM_DATA_UNKNOWN",$sformatf("Read %0d: data contains X or Z",i))
+            if($isunknown(ram_queue[read_base+i].read_data))begin
+                `uvm_error("RAM_DATA_UNKNOWN",$sformatf("Operation %0d Read %0d contains X or Z",op,i))
                 failed=1'b1;
             end
         end
-
-        if(failed)
-        return;
 
         // predict and check each packed output word
         for(int w=0; w<expected_writes; w++)begin // word
             expected_word='0;
             for(int b=0;b<4;b++)begin //byte
                 expected_byte=predict_mode_c_byte(
-                    ram_queue[w*4+b].read_data,
-                    cfg.scale_shift,
-                    cfg.signed_out,
-                    cfg.round_en
+                    ram_queue[read_base+w*4+b].read_data,
+                    cfg_queue[op].scale_shift,
+                    cfg_queue[op].signed_out,
+                    cfg_queue[op].round_en
                 );
                 expected_word[b*8+:8]=expected_byte;
             end
-            expected_address=cfg.dst_addr+w*4;
+            expected_address=cfg_queue[op].dst_addr+w*4;
 
-            if(scratch_queue[w].address!==expected_address)begin
-                `uvm_error("SCRATCH_ADDRESS",$sformatf("Wirte %0d:expected address=0x%08h, actual=0x%08h",w,expected_address,scratch_queue[w].address))
+            if(scratch_queue[write_base+w].address!==expected_address)begin
+                `uvm_error("SCRATCH_ADDRESS",$sformatf("Operation %0d Wirte %0d:expected address=0x%08h, actual=0x%08h",op,w,expected_address,scratch_queue[write_base+w].address))
                 failed=1'b1;
             end
 
-            if(scratch_queue[w].write_data!==expected_word)begin
-                `uvm_error("MODE_C_DATA",$sformatf("Write %0d:expected data=0x%08h,actual=0x%08h",w,expected_word,scratch_queue[w].write_data))
+            if(scratch_queue[write_base+w].write_data!==expected_word)begin
+                `uvm_error("MODE_C_DATA",$sformatf("Operation %0d Write %0d:expected data=0x%08h,actual=0x%08h",op,w,expected_word,scratch_queue[write_base+w].write_data))
                 failed=1'b1;
             end
         end
 
+        read_base+=expected_reads;
+        write_base+=expected_writes;
+        end
+
         if(!failed)begin
-            `uvm_info("MODE_C_MATCH",$sformatf("Checked %0d RAM reads and %0d scratchpad writes:addresses and data matched",expected_reads, expected_writes),UVM_LOW)
+            `uvm_info("MODE_C_MATCH",$sformatf("Checked %0d operations, %0d RAM reads and %0d scratchpad writes",cfg_queue.size(),total_reads,total_writes),UVM_LOW)
         end
         
     endfunction
@@ -238,7 +261,7 @@ class transform_scoreboard extends uvm_scoreboard;
     virtual function void report_phase(uvm_phase phase);
         super.report_phase(phase);
 
-        `uvm_info("SB_COUNTS",$sformatf("Configuration received=%0b, RAM reads=%0d, scratchpad writes=%0d", cfg_valid,ram_queue.size(),scratch_queue.size()),UVM_LOW)
+        `uvm_info("SB_COUNTS",$sformatf("Configuration received=%0d, RAM reads=%0d, scratchpad writes=%0d", cfg_queue.size(),ram_queue.size(),scratch_queue.size()),UVM_LOW)
     endfunction
 
 endclass 

@@ -19,12 +19,12 @@ class transform_ctrl_driver extends uvm_driver #(transform_ctrl_transaction);
     `uvm_component_utils(transform_ctrl_driver)
 
     virtual transform_ctrl_if vif;
+    int unsigned timeout_cycles = 1000;
+    bit expect_error=1'b0;
 
     function new(string name="transform_ctrl_driver", uvm_component parent=null);
         super.new(name,parent);
     endfunction
-
-    int unsigned timeout_cycles=1000;
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
@@ -91,12 +91,18 @@ class transform_ctrl_driver extends uvm_driver #(transform_ctrl_transaction);
             end
 
             if(vif.driver_cb.error===1'b1)begin
+                if(expect_error)
+                `uvm_info("EXPECTED_ERROR","Transform rejected the invalid configuration", UVM_LOW)
+                else
                 `uvm_error("TRANSFORM_ERROR","Transform reported an error")
                 completed=1'b1;
                 break;
             end
             else if (vif.driver_cb.done===1'b1)begin
-                `uvm_info("TRANSFORM_DONE","Transform reported completion",UVM_LOW)
+                if(expect_error)
+                    `uvm_error("UNEXPECTED_DONE","Expected an error, but Transform completed")
+                else
+                    `uvm_info("TRANSFORM_DONE","Transform reported completion",UVM_LOW)
                 completed=1'b1;
                 break;
             end

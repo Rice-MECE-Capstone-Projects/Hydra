@@ -72,7 +72,7 @@ package hydra_pkg;
 
     localparam int unsigned     REG_STRIDE      = DATA_WIDTH / 8;
     localparam int unsigned     DATA_BITS       = $clog2(DATA_WIDTH);
-    localparam int unsigned     LEN_WIDTH       = $clog2(MEM_SIZE);
+    localparam int unsigned     LEN_WIDTH       = $clog2(MEM_SIZE); //20x
     localparam int unsigned     NUM_BEATS       = getLen_fn(BURST_TYPE);
     localparam int unsigned     BEATS_WIDTH     = $clog2(NUM_BEATS);
 
@@ -84,12 +84,13 @@ package hydra_pkg;
         MODE_C = 2'b11      // quantization
     } hydra_mode;
 
+    // mmr addr
     typedef enum logic [7:0] { 
-        CTRL    = 8'(0 * REG_STRIDE),
-        SRC     = 8'(1 * REG_STRIDE),
-        DST     = 8'(2 * REG_STRIDE),
-        LEN     = 8'(3 * REG_STRIDE),
-        STATUS  = 8'(4 * REG_STRIDE)
+        CTRL    = 8'(0 * REG_STRIDE), // 0x00
+        SRC     = 8'(1 * REG_STRIDE), // 0x04
+        DST     = 8'(2 * REG_STRIDE), // 0x08
+        LEN     = 8'(3 * REG_STRIDE), // 0x0c
+        STATUS  = 8'(4 * REG_STRIDE)  // 0x10
     } hydra_mmr_map;
 
   // -------------------------Constants Declarations-------------------------
@@ -119,20 +120,20 @@ package hydra_pkg;
     //                    0 = UINT_QUANT_DIM [0,2^(QUANT_DIM)-1]
     //      round_en    : 1 = add rounding correction before shift
     function automatic logic [QUANT_DIM-1:0] quant_fn (
-        logic [DATA_WIDTH-1:0]  src, 
-        logic [DATA_BITS-1:0]   scale_shift, 
-        logic                   signed_out, 
-        logic                   round_en
+        logic [DATA_WIDTH-1:0]  src, // 32 bit input
+        logic [DATA_BITS-1:0]   scale_shift, // right shifting （1-31）
+        logic                   signed_out, // unsigned or signed output
+        logic                   round_en // apply rounding correction before right shifting
     );
         // one extra bit to absorb rounding carry safely
-        logic signed [DATA_WIDTH:0] val, rounded, scaled;
+        logic signed [DATA_WIDTH:0] val, rounded, scaled; // 33 bit to avoid overflowing
         logic                       neg, ovf_signed, ovf_unsigned;
 
         val     = {src[DATA_WIDTH-1], src};     // sign-extend
         // if rounded is enabled, add half of target scale to improve accuracy
         rounded = (round_en && |scale_shift)
                     ? val + ({{DATA_WIDTH{1'b0}}, 1'b1} << (scale_shift - 1))
-                    : val;
+                    : val; // rounding correction
         scaled = rounded >>> scale_shift;
 
         neg          = scaled[DATA_WIDTH];
