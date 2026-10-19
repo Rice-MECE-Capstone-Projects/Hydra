@@ -42,6 +42,8 @@
 
 
 WALLY_DIR	= ../../wally/examples/C
+# Pre-build the memfile here: elf2hex fails when Questa runs it (Questa's libstdc++ is too old)
+WALLY_BIN	= ../../wally/bin
 OUT_DIR		= ./log
 
 T	?= hydra
@@ -88,6 +90,8 @@ compile:
 			-T$(WALLY_DIR)/common/test.ld -I$(WALLY_DIR)/common						\
 			$${t}.c $(WALLY_DIR)/common/crt.S $(WALLY_DIR)/common/syscalls.c -lgcc;	\
 		riscv64-unknown-elf-objdump -S -d $$t > "$${t}.objdump";			\
+		$(WALLY_BIN)/elf2hex $$t "$${t}.memfile";							\
+		$(WALLY_BIN)/extractFunctionRadix.sh "$${t}.objdump";				\
 	done
 	
 # Compiler flags:
