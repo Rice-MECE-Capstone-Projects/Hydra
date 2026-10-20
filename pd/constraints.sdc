@@ -3,6 +3,7 @@
 
 # Clock definition (0.5 GHz)
 # clk_port_name should match the name in the design
+set_time_unit -picoseconds
 set clk_period 2000
 set clk_name soc_clk
 set clk_port_name clk

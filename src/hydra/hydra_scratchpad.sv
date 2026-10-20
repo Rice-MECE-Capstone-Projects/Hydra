@@ -59,10 +59,9 @@ module hydra_scratchpad (
     // MEM_DEPTH localparam rescales this so capacity stays 4 KB for any
     // DATA_WIDTH.
     localparam int unsigned MEM_DEPTH  = 32 * MEM_SIZE / DATA_WIDTH;
-    localparam int unsigned ADDR_BITS  = $clog2(MEM_DEPTH);
+    localparam int unsigned ADDR_BITS  = $clog2(MEM_DEPTH); // = 10 for 1024 words
     localparam int unsigned BYTE_SHIFT = $clog2(DATA_WIDTH/8);
 
-    logic [DATA_WIDTH-1:0]  mem [0:MEM_DEPTH-1];
     logic                   read_access;
     logic                   read_pending;
     logic                   read_response_valid;
@@ -74,34 +73,74 @@ module hydra_scratchpad (
     // response-ready flag allows the registered read data to settle first.
     assign HREADYOUT        = !read_pending || read_response_valid;
     assign HRESP            = 0;
+    
+    // If config matches SRAM macro, use it instead of regs
+    // Adopt the same surrounding collision logic
+    if (DATA_WIDTH == 32 && MEM_DEPTH == 1024) begin
 
-    always_ff @(posedge clk) begin
-        if (!rst_n) begin
-            HRDATA              <= '0;
-            read_pending       <= 1'b0;
-            read_response_valid <= 1'b0;
-            pending_read_addr  <= '0;
-        end else begin
-            if (read_response_valid && HREADY) begin
+        logic sram_read;
+        logic [9:0] sram_addr; // Word address
+        assign sram_read = !SCRATCH_WE && (read_pending || read_access);
+        assign sram_addr = SCRATCH_WE ? SCRATCH_WADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT] :
+            (read_pending ? pending_read_addr : HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT]);
+
+        srambank_256x4x32_6t122 sram_macro(.clk(clk), .ADDRESS(sram_addr), .wd(SCRATCH_WDATA),
+            .banksel(1'b1), .read(sram_read), .write(SCRATCH_WE), .dataout(HRDATA));
+
+        always_ff @(posedge clk) begin
+            if (!rst_n) begin
+                read_pending       <= 1'b0;
                 read_response_valid <= 1'b0;
-            end
-
-            if (SCRATCH_WE) begin
-                // HYDRA writes have priority; save a colliding CPU read for
-                // service once the port is free.
-                mem[SCRATCH_WADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT]] <= SCRATCH_WDATA;
-                if (read_access) begin
-                    pending_read_addr <= HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT];
-                    read_pending      <= 1'b1;
+                pending_read_addr  <= '0;
+            end else begin
+                if (read_response_valid && HREADY) begin
+                    read_response_valid <= 1'b0;
                 end
-            end else if (read_pending) begin
-                HRDATA               <= mem[pending_read_addr];
-                read_pending        <= 1'b0;
-                read_response_valid <= 1'b1;
-            end else if (read_access) begin
-                HRDATA <= mem[HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT]];
+                if (SCRATCH_WE) begin
+                    if(read_access) begin
+                        pending_read_addr <= HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT];
+                        read_pending      <= 1'b1;
+                    end
+                end else if (read_pending) begin
+                    read_pending        <= 1'b0;
+                    read_response_valid <= 1'b1;
+                end
             end
         end
+
+    // Original reg-based code
+    end else begin
+
+        logic [DATA_WIDTH-1:0]  mem [0:MEM_DEPTH-1];
+        always_ff @(posedge clk) begin
+            if (!rst_n) begin
+                HRDATA              <= '0;
+                read_pending       <= 1'b0;
+                read_response_valid <= 1'b0;
+                pending_read_addr  <= '0;
+            end else begin
+                if (read_response_valid && HREADY) begin
+                    read_response_valid <= 1'b0;
+                end
+
+                if (SCRATCH_WE) begin
+                    // HYDRA writes have priority; save a colliding CPU read for
+                    // service once the port is free.
+                    mem[SCRATCH_WADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT]] <= SCRATCH_WDATA;
+                    if (read_access) begin
+                        pending_read_addr <= HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT];
+                        read_pending      <= 1'b1;
+                    end
+                end else if (read_pending) begin
+                    HRDATA               <= mem[pending_read_addr];
+                    read_pending        <= 1'b0;
+                    read_response_valid <= 1'b1;
+                end else if (read_access) begin
+                    HRDATA <= mem[HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT]];
+                end
+            end
+        end
+
     end
 
 endmodule

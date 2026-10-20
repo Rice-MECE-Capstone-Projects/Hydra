@@ -1,0 +1,1086 @@
+Cadence Genus(TM) Synthesis Solution.
+Copyright 2025 Cadence Design Systems, Inc. All rights reserved worldwide.
+Cadence and the Cadence logo are registered trademarks and Genus is a trademark
+of Cadence Design Systems, Inc. in the United States and other countries.
+
+[20:16:21.380769] Configured Lic search path (25.01-s002): 5280@cadence.lic.rice.edu
+
+Version: 25.10-p002_1, built Thu Apr 17 13:35:38 PDT 2025
+Options: -files genus.tcl 
+Date:    Mon Oct 19 20:16:21 2026
+Host:    onyx.clear9.rice.edu (x86_64 w/Linux 5.14.0-687.36.1.el9_8.x86_64) (10cores*40cpus*2physical cpus*Intel(R) Xeon(R) CPU E5-2640 v4 @ 2.40GHz 25600KB) (131369960KB)
+PID:     2539502
+OS:      Red Hat Enterprise Linux 9.8 (Plow)
+
+Checking out license: Genus_Synthesis
+[20:16:21.426482] Periodic Lic check successful
+[20:16:21.950800] Feature usage summary:
+[20:16:21.950801] Genus_Synthesis  
+
+
+***********************************************************************************************************
+***********************************************************************************************************
+
+
+
+Finished executable startup (9 seconds elapsed).
+
+Loading tool scripts...
+Finished loading tool scripts (22 seconds elapsed).
+
+WARNING: The genus.tcl file in the current directory /storage-home/m/mcn5/Hydra/pd/genus is no longer loaded at startup.
+         You should change the name to genus_startup.tcl if you want it loaded at startup.
+#@ Processing -files option
+@genus:root: 1> source genus.tcl
+#@ Begin verbose source ./genus.tcl
+@file(genus.tcl) 3: set PDK_DIR $env(PDK_DIR)
+@file(genus.tcl) 4: set_db common_ui true
+  Setting attribute of root '/': 'common_ui' = true
+@file(genus.tcl) 7: set_db init_lib_search_path [list   $PDK_DIR/asap7sc7p5t_28/LIB/CCS/ \
+                                    $PDK_DIR/asap7sc7p5t_28/LEF/scaled/ \
+                                    $PDK_DIR/asap7sc7p5t_28/techlef_misc/ \
+                                    $PDK_DIR/asap7_sram_0p0/generated/LIB/ \
+                                    $PDK_DIR/asap7_sram_0p0/generated/LEF/4xLEF/ ]
+  Setting attribute of root '/': 'init_lib_search_path' = /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/LIB/CCS/ /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/LEF/scaled/ /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc/ /storage-home/m/mcn5/asap7_pdk_r1p7/asap7_sram_0p0/generated/LIB/ /storage-home/m/mcn5/asap7_pdk_r1p7/asap7_sram_0p0/generated/LEF/4xLEF/
+@file(genus.tcl) 12: set_db init_hdl_search_path [list   ../../src/hydra/ \
+                                    ../../wally/src/ \
+                                    ../../wally/config/shared/ \
+                                    ../../wally/config/rv32gc/ ]
+  Setting attribute of root '/': 'init_hdl_search_path' = ../../src/hydra/ ../../wally/src/ ../../wally/config/shared/ ../../wally/config/rv32gc/
+@file(genus.tcl) 18: read_mmmc ./mmmc.tcl
+  Setting attribute of root '/': 'is_read_mmmc_flow' = true
+Sourcing './mmmc.tcl' (Mon Oct 19 20:16:43 CDT 2026)...
+#@ Begin verbose source ./mmmc.tcl
+@file(mmmc.tcl) 5: create_constraint_mode -name sdc_constraints -sdc_files { ../constraints.sdc }
+@file(mmmc.tcl) 9: create_library_set -name slow_lib \
+    -timing {   asap7sc7p5t_AO_LVT_SS_ccs_211120.lib \
+                asap7sc7p5t_AO_RVT_SS_ccs_211120.lib \
+                asap7sc7p5t_AO_SLVT_SS_ccs_211120.lib \
+                asap7sc7p5t_AO_SRAM_SS_ccs_211120.lib \
+                asap7sc7p5t_INVBUF_LVT_SS_ccs_220122.lib \
+                asap7sc7p5t_INVBUF_RVT_SS_ccs_220122.lib \
+                asap7sc7p5t_INVBUF_SLVT_SS_ccs_220122.lib \
+                asap7sc7p5t_INVBUF_SRAM_SS_ccs_220122.lib \
+                asap7sc7p5t_OA_LVT_SS_ccs_211120.lib \
+                asap7sc7p5t_OA_RVT_SS_ccs_211120.lib \
+                asap7sc7p5t_OA_SLVT_SS_ccs_211120.lib \
+                asap7sc7p5t_OA_SRAM_SS_ccs_211120.lib \
+                asap7sc7p5t_SEQ_LVT_SS_ccs_220123.lib \
+                asap7sc7p5t_SEQ_RVT_SS_ccs_220123.lib \
+                asap7sc7p5t_SEQ_SLVT_SS_ccs_220123.lib \
+                asap7sc7p5t_SEQ_SRAM_SS_ccs_220123.lib \
+                asap7sc7p5t_SIMPLE_LVT_SS_ccs_211120.lib \
+                asap7sc7p5t_SIMPLE_RVT_SS_ccs_211120.lib \
+                asap7sc7p5t_SIMPLE_SLVT_SS_ccs_211120.lib \
+                asap7sc7p5t_SIMPLE_SRAM_SS_ccs_211120.lib }
+@file(mmmc.tcl) 30: create_timing_condition -name slow_condition -library_set slow_lib
+@file(mmmc.tcl) 32: create_library_set -name typical_lib \
+    -timing {   asap7sc7p5t_AO_LVT_TT_ccs_211120.lib \
+                asap7sc7p5t_AO_RVT_TT_ccs_211120.lib \
+                asap7sc7p5t_AO_SLVT_TT_ccs_211120.lib \
+                asap7sc7p5t_AO_SRAM_TT_ccs_211120.lib \
+                asap7sc7p5t_INVBUF_LVT_TT_ccs_220122.lib \
+                asap7sc7p5t_INVBUF_RVT_TT_ccs_220122.lib \
+                asap7sc7p5t_INVBUF_SLVT_TT_ccs_220122.lib \
+                asap7sc7p5t_INVBUF_SRAM_TT_ccs_220122.lib \
+                asap7sc7p5t_OA_LVT_TT_ccs_211120.lib \
+                asap7sc7p5t_OA_RVT_TT_ccs_211120.lib \
+                asap7sc7p5t_OA_SLVT_TT_ccs_211120.lib \
+                asap7sc7p5t_OA_SRAM_TT_ccs_211120.lib \
+                asap7sc7p5t_SEQ_LVT_TT_ccs_220123.lib \
+                asap7sc7p5t_SEQ_RVT_TT_ccs_220123.lib \
+                asap7sc7p5t_SEQ_SLVT_TT_ccs_220123.lib \
+                asap7sc7p5t_SEQ_SRAM_TT_ccs_220123.lib \
+                asap7sc7p5t_SIMPLE_LVT_TT_ccs_211120.lib \
+                asap7sc7p5t_SIMPLE_RVT_TT_ccs_211120.lib \
+                asap7sc7p5t_SIMPLE_SLVT_TT_ccs_211120.lib \
+                asap7sc7p5t_SIMPLE_SRAM_TT_ccs_211120.lib }
+@file(mmmc.tcl) 53: create_timing_condition -name typical_condition -library_set typical_lib
+@file(mmmc.tcl) 55: create_library_set -name fast_lib \
+    -timing {   asap7sc7p5t_AO_LVT_FF_ccs_211120.lib \
+                asap7sc7p5t_AO_RVT_FF_ccs_211120.lib \
+                asap7sc7p5t_AO_SLVT_FF_ccs_211120.lib \
+                asap7sc7p5t_AO_SRAM_FF_ccs_211120.lib \
+                asap7sc7p5t_INVBUF_LVT_FF_ccs_220122.lib \
+                asap7sc7p5t_INVBUF_RVT_FF_ccs_220122.lib \
+                asap7sc7p5t_INVBUF_SLVT_FF_ccs_220122.lib \
+                asap7sc7p5t_INVBUF_SRAM_FF_ccs_220122.lib \
+                asap7sc7p5t_OA_LVT_FF_ccs_211120.lib \
+                asap7sc7p5t_OA_RVT_FF_ccs_211120.lib \
+                asap7sc7p5t_OA_SLVT_FF_ccs_211120.lib \
+                asap7sc7p5t_OA_SRAM_FF_ccs_211120.lib \
+                asap7sc7p5t_SEQ_LVT_FF_ccs_220123.lib \
+                asap7sc7p5t_SEQ_RVT_FF_ccs_220123.lib \
+                asap7sc7p5t_SEQ_SLVT_FF_ccs_220123.lib \
+                asap7sc7p5t_SEQ_SRAM_FF_ccs_220123.lib \
+                asap7sc7p5t_SIMPLE_LVT_FF_ccs_211120.lib \
+                asap7sc7p5t_SIMPLE_RVT_FF_ccs_211120.lib \
+                asap7sc7p5t_SIMPLE_SLVT_FF_ccs_211120.lib \
+                asap7sc7p5t_SIMPLE_SRAM_FF_ccs_211120.lib }
+@file(mmmc.tcl) 76: create_timing_condition -name fast_condition -library_set fast_lib
+@file(mmmc.tcl) 79: create_rc_corner -name slow_rc -temperature 125
+@file(mmmc.tcl) 80: create_delay_corner -name slow_delay -timing_condition slow_condition -rc_corner slow_rc
+@file(mmmc.tcl) 82: create_rc_corner -name typical_rc -temperature 25
+@file(mmmc.tcl) 83: create_delay_corner -name typical_delay -timing_condition typical_condition -rc_corner typical_rc
+@file(mmmc.tcl) 85: create_rc_corner -name fast_rc -temperature -40
+@file(mmmc.tcl) 86: create_delay_corner -name fast_delay -timing_condition fast_condition -rc_corner fast_rc
+@file(mmmc.tcl) 89: create_analysis_view -name slow_view -delay_corner slow_delay -constraint_mode sdc_constraints
+@file(mmmc.tcl) 90: create_analysis_view -name typical_view -delay_corner typical_delay -constraint_mode sdc_constraints
+@file(mmmc.tcl) 91: create_analysis_view -name fast_view -delay_corner fast_delay -constraint_mode sdc_constraints
+@file(mmmc.tcl) 95: set_analysis_view -setup slow_view -hold fast_view -leakage typical_view -dynamic typical_view
+
+  Message Summary for Library all 20 libraries:
+  *********************************************
+  An unsupported construct was detected in this library. [LBR-40]: 40
+  *********************************************
+ 
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_AO_LVT_SS_ccs_211120.lib'.
+        : The nominal operating condition is represented, either by the nominal PVT values specified in the library source (via nom_process,nom_voltage and nom_temperature respectively), or by the default PVT values (1.0,1.0,1.0).
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_AO_RVT_SS_ccs_211120.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_AO_SLVT_SS_ccs_211120.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_AO_SRAM_SS_ccs_211120.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_INVBUF_LVT_SS_ccs_220122.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_INVBUF_RVT_SS_ccs_220122.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_INVBUF_SLVT_SS_ccs_220122.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_INVBUF_SRAM_SS_ccs_220122.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_OA_LVT_SS_ccs_211120.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_OA_RVT_SS_ccs_211120.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_OA_SLVT_SS_ccs_211120.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_OA_SRAM_SS_ccs_211120.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_SEQ_LVT_SS_ccs_220123.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_SEQ_RVT_SS_ccs_220123.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_SEQ_SLVT_SS_ccs_220123.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_SEQ_SRAM_SS_ccs_220123.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_SIMPLE_LVT_SS_ccs_211120.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_SIMPLE_RVT_SS_ccs_211120.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_SIMPLE_SLVT_SS_ccs_211120.lib'.
+Info    : Created nominal operating condition. [LBR-412]
+        : Operating condition '_nominal_' was created for the PVT values (1.000000, 0.630000, 100.000000) in library 'asap7sc7p5t_SIMPLE_SRAM_SS_ccs_211120.lib'.
+Info    : Set default library domain. [LBR-109]
+        : The default library domain is 'library_domain:slow_condition'.
+#@ End verbose source ./mmmc.tcl
+@file(genus.tcl) 24: read_physical -lefs [list   asap7_tech_4x_201209.lef \
+                            asap7sc7p5t_28_R_4x_220121a.lef \
+                            asap7sc7p5t_28_L_4x_220121a.lef \
+                            asap7sc7p5t_28_SL_4x_220121a.lef \
+                            asap7sc7p5t_28_SRAM_4x_220121a.lef ]
+Info    : Via with no resistance will have a value of '0.0' assigned for resistance value. [PHYS-129]
+        : Via 'VIA9Pad' has no resistance value.
+        : If this is the expected behavior, this message can be ignored.
+Info    : Via with no resistance will have a value of '0.0' assigned for resistance value. [PHYS-129]
+        : Via 'VIA89' has no resistance value.
+Info    : Via with no resistance will have a value of '0.0' assigned for resistance value. [PHYS-129]
+        : Via 'VIA78' has no resistance value.
+Info    : Via with no resistance will have a value of '0.0' assigned for resistance value. [PHYS-129]
+        : Via 'VIA67' has no resistance value.
+Info    : Via with no resistance will have a value of '0.0' assigned for resistance value. [PHYS-129]
+        : Via 'VIA56' has no resistance value.
+Info    : Via with no resistance will have a value of '0.0' assigned for resistance value. [PHYS-129]
+        : Via 'VIA45' has no resistance value.
+Info    : Via with no resistance will have a value of '0.0' assigned for resistance value. [PHYS-129]
+        : Via 'VIA34' has no resistance value.
+Info    : Via with no resistance will have a value of '0.0' assigned for resistance value. [PHYS-129]
+        : Via 'VIA23' has no resistance value.
+Info    : Via with no resistance will have a value of '0.0' assigned for resistance value. [PHYS-129]
+        : Via 'VIA12' has no resistance value.
+Warning : Site already defined before, duplicated site will be ignored. [PHYS-106]
+        : Site 'asap7sc7p5t' read already, this site in file '/storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/LEF/scaled//asap7sc7p5t_28_L_4x_220121a.lef' is ignored.
+Warning : Site already defined before, duplicated site will be ignored. [PHYS-106]
+        : Site 'asap7sc7p5t' read already, this site in file '/storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/LEF/scaled//asap7sc7p5t_28_SL_4x_220121a.lef' is ignored.
+Warning : Site already defined before, duplicated site will be ignored. [PHYS-106]
+        : Site 'asap7sc7p5t' read already, this site in file '/storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/LEF/scaled//asap7sc7p5t_28_SRAM_4x_220121a.lef' is ignored.
+
+  According to lef_library, there are total 10 routing layers [ V(5) / H(5) ]
+
+Warning : Missing wire parameter. [PHYS-15]
+        : 'EDGECAPACITANCE' parameter is missing for layer 'M1' [line 132 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+        : Check the wire parameter in LEF technology files.
+Warning : Missing wire parameter. [PHYS-15]
+        : 'EDGECAPACITANCE' parameter is missing for layer 'M2' [line 197 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'EDGECAPACITANCE' parameter is missing for layer 'M3' [line 248 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'EDGECAPACITANCE' parameter is missing for layer 'M4' [line 328 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'EDGECAPACITANCE' parameter is missing for layer 'M5' [line 413 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'EDGECAPACITANCE' parameter is missing for layer 'M6' [line 494 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'EDGECAPACITANCE' parameter is missing for layer 'M7' [line 570 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'EDGECAPACITANCE' parameter is missing for layer 'M8' [line 598 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'EDGECAPACITANCE' parameter is missing for layer 'M9' [line 625 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'EDGECAPACITANCE' parameter is missing for layer 'Pad' [line 649 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'CPERSQDIST' parameter is missing for layer 'M1' [line 132 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'CPERSQDIST' parameter is missing for layer 'M2' [line 197 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'CPERSQDIST' parameter is missing for layer 'M3' [line 248 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'CPERSQDIST' parameter is missing for layer 'M4' [line 328 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'CPERSQDIST' parameter is missing for layer 'M5' [line 413 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'CPERSQDIST' parameter is missing for layer 'M6' [line 494 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'CPERSQDIST' parameter is missing for layer 'M7' [line 570 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'CPERSQDIST' parameter is missing for layer 'M8' [line 598 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'CPERSQDIST' parameter is missing for layer 'M9' [line 625 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Missing wire parameter. [PHYS-15]
+        : 'CPERSQDIST' parameter is missing for layer 'Pad' [line 649 in file /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28/techlef_misc//asap7_tech_4x_201209.lef]
+Warning : Maximum message print count reached. [MESG-11]
+        : Maximum print count of '20' reached for message 'PHYS-15'.
+Warning : The variant range of wire parameters is too large. An example of wire parameters are, a WIDTH for layer, PITCH for layer, MINSPACING for layers, etc. [PHYS-12]
+        : The variant range (0.012, 0.16) of 'OFFSET' for layers 'M4' and 'Pad' is too large.
+        : Check the consistency of the parameters, and see if you can ignore this message or you're using different LEF file with wrong parameters.
+Warning : The value of the wire parameter is too small. [PHYS-14]
+        : The 'OFFSET: 0.012' of layer 'M4' is much less than others.
+        : Check the consistency of the specified wire parameter.
+Warning : The value of the wire parameter is too small. [PHYS-14]
+        : The 'OFFSET: 0.012' of layer 'M4' is much less than others.
+Warning : The value of the wire parameter is too small. [PHYS-14]
+        : The 'OFFSET: 0.012' of layer 'M4' is much less than others.
+Warning : The value of the wire parameter is too small. [PHYS-14]
+        : The 'OFFSET: 0.012' of layer 'M4' is much less than others.
+Warning : The value of the wire parameter is too small. [PHYS-14]
+        : The 'OFFSET: 0.012' of layer 'M4' is much less than others.
+Warning : The variant range of wire parameters is too large. An example of wire parameters are, a WIDTH for layer, PITCH for layer, MINSPACING for layers, etc. [PHYS-12]
+        : The variant range (0.072, 8) of 'MINSPACING' for layers 'M1' and 'Pad' is too large.
+Warning : The value of the wire parameter is too big. [PHYS-13]
+        : The 'MINSPACING: 8' of layer 'Pad' is much bigger than others.
+        : Check the consistency of the specified wire parameter.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell DECAPx10_ASAP7_75t_R cannot be found in library.
+        : Ensure that the proper library files are available and have been imported.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell DECAPx1_ASAP7_75t_R cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell DECAPx2_ASAP7_75t_R cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell DECAPx2b_ASAP7_75t_R cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell DECAPx4_ASAP7_75t_R cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell DECAPx6_ASAP7_75t_R cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell FILLER_ASAP7_75t_R cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell FILLERxp5_ASAP7_75t_R cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell TAPCELL_ASAP7_75t_R cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell TAPCELL_WITH_FILLER_ASAP7_75t_R cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell DECAPx10_ASAP7_75t_L cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell DECAPx1_ASAP7_75t_L cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell DECAPx2_ASAP7_75t_L cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell DECAPx2b_ASAP7_75t_L cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell DECAPx4_ASAP7_75t_L cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell DECAPx6_ASAP7_75t_L cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell FILLER_ASAP7_75t_L cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell FILLERxp5_ASAP7_75t_L cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell TAPCELL_ASAP7_75t_L cannot be found in library.
+Warning : Physical cell not defined in library. [PHYS-279]
+        : The physical (LEF) cell TAPCELL_WITH_FILLER_ASAP7_75t_L cannot be found in library.
+Warning : Maximum message print count reached. [MESG-11]
+        : Maximum print count of '20' reached for message 'PHYS-279'.
+@file(genus.tcl) 31: read_hdl -language sv -f rtl_list.f
+  function integer log2 (integer value);
+                 |
+Warning : Usage of non-static tasks or functions might result in simulation-synthesis mismatch. [VLOGPT-692]
+        : in file '../../wally/src/cache/cacheLRU.sv' on line 75, column 18.
+        : Use the 'automatic' keyword for declaring functions and tasks.
+  initial
+        |
+Warning : Ignoring unsynthesizable construct. [VLOGPT-37]
+        : Initial in file '../../wally/src/generic/mem/rom1p1r.sv' on line 54, column 9.
+        : For example, the following constructs will be ignored:
+    - initial block
+    - final block
+    - program block
+    - property block
+    - sequence block
+    - covergroup
+    - checker block
+    - gate drive strength
+    - system task enable
+    - reg declaration with initial value
+    - specify block.
+(* mark_debug = "true" *)  statetype CurrState, NextState;
+   |
+Warning : Unused attribute. [VLOGPT-506]
+        : Attribute 'mark_debug' in file '../../wally/src/rvvi/packetizer.sv' on line 68, column 4.
+(* mark_debug = "true" *)   logic [31:0]      FrameCount;
+   |
+Warning : Unused attribute. [VLOGPT-506]
+        : Attribute 'mark_debug' in file '../../wally/src/rvvi/packetizer.sv' on line 71, column 4.
+(* mark_debug = "true" *)  statetype CurrState, NextState;
+   |
+Warning : Unused attribute. [VLOGPT-506]
+        : Attribute 'mark_debug' in file '../../wally/src/rvvi/triggergen.sv' on line 39, column 4.
+        $write("%c",Din); // for testbench
+              |
+Warning : Ignoring unsynthesizable construct. [VLOGPT-37]
+        : Call to system task '$write' in file '../../wally/src/uncore/uartPC16550D.sv' on line 448, column 15.
+%DLS-E-AuxAttrExists, DeclarationList node already has auxiliary
+	attribute NODE_BASE_FILE_INFO; in AddAttribute.
+%DLS-E-AuxAttrExists, DeclarationList node already has auxiliary
+	attribute NODE_BASE_FILE_INFO; in AddAttribute.
+%DLS-E-AuxAttrExists, DeclarationList node already has auxiliary
+	attribute NODE_BASE_FILE_INFO; in AddAttribute.
+%DLS-E-AuxAttrExists, DeclarationList node already has auxiliary
+	attribute NODE_BASE_FILE_INFO; in AddAttribute.
+@file(genus.tcl) 32: elaborate wallypipelinedsoc
+  Libraries have 668 usable logic and 92 usable sequential lib-cells.
+Info    : Elaborating Design. [ELAB-1]
+        : Elaborating top-level block 'wallypipelinedsoc' from file '../../wally/src/wally/wallypipelinedsoc.sv'.
+Warning : Using default parameter value for module elaboration. [CDFG-818]
+        : Elaborating block 'wallypipelinedsoc' with default parameters value.
+
+
+
+
+Warning : In legacy_ui mode, Genus creates a blackbox as description for a module is not found. Black boxes represent unresolved references in the design and are usually not expected. Another possible reason is, some libraries are not read and the tool could not get the content for some macros or lib_cells. [CDFG-428]
+        : A blackbox was created for instance 'sramIP' in file '../../wally/src/generic/mem/ram1p1rwbe_64x22.sv' on line 41.
+        : Check the kind of module a black box is. If it is a lib_cell or a macro, check why the corresponding .lib was not read in. This could be either due to a missing or faulty file or due to an incomplete init_lib_search_path attribute value making restricting access to the missing file. If it is a module of your design, verify whether the path to this module is a part of the files you read or else check that the init_hdl_search_path attribute is not missing some paths.
+Warning : In legacy_ui mode, Genus creates a blackbox as description for a module is not found. Black boxes represent unresolved references in the design and are usually not expected. Another possible reason is, some libraries are not read and the tool could not get the content for some macros or lib_cells. [CDFG-428]
+        : A blackbox was created for instance 'sramIP' in file '../../wally/src/generic/mem/ram1p1rwbe_64x128.sv' on line 40.
+
+Warning : In legacy_ui mode, Genus creates a blackbox as description for a module is not found. Black boxes represent unresolved references in the design and are usually not expected. Another possible reason is, some libraries are not read and the tool could not get the content for some macros or lib_cells. [CDFG-428]
+        : A blackbox was created for instance 'sramIP' in file '../../wally/src/generic/mem/ram2p1r1wbe_64x32.sv' on line 48.
+Warning : In legacy_ui mode, Genus creates a blackbox as description for a module is not found. Black boxes represent unresolved references in the design and are usually not expected. Another possible reason is, some libraries are not read and the tool could not get the content for some macros or lib_cells. [CDFG-428]
+        : A blackbox was created for instance 'sramIP' in file '../../wally/src/generic/mem/ram2p1r1wbe_1024x36.sv' on line 50.
+Warning : Loop condition is always false. [CDFG-485]
+        : 'for' loop condition is always false in file '../../wally/src/ieu/bmu/clmul.sv' on line 42.
+        : Loop body will not be synthesized.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/ieu/kmu/packer.sv' on line 48, column 46.
+        : The prefix expression of a replication generally must evaluate to a positive constant.  The value of a replication with a non-positive prefix depends on the setting of the attribute 'hdl_zero_replicate_is_null'.  If true, the replication is treated as a zero-width expression.  If false, the replication evaluates to 1'b0.
+
+Warning : In legacy_ui mode, Genus creates a blackbox as description for a module is not found. Black boxes represent unresolved references in the design and are usually not expected. Another possible reason is, some libraries are not read and the tool could not get the content for some macros or lib_cells. [CDFG-428]
+        : A blackbox was created for instance 'CacheDataMem' in file '../../wally/src/cache/cacheway.sv' on line 136.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/lsu/subwordread.sv' on line 67, column 57.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csr.sv' on line 145, column 62.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csrm.sv' on line 226, column 41.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csrm.sv' on line 226, column 41.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csrm.sv' on line 226, column 41.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csrm.sv' on line 226, column 41.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csrm.sv' on line 226, column 41.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csrm.sv' on line 226, column 41.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csrm.sv' on line 226, column 41.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csrm.sv' on line 226, column 41.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csrm.sv' on line 226, column 41.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csrm.sv' on line 226, column 41.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csrm.sv' on line 226, column 41.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csrm.sv' on line 226, column 41.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csrm.sv' on line 226, column 41.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csrm.sv' on line 226, column 41.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csrm.sv' on line 226, column 41.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csrm.sv' on line 226, column 41.
+Warning : Detected non-positive value for replication prefix. [CDFG-236]
+        : Prefix value = 0; replication evaluates to null in file '../../wally/src/privileged/csrm.sv' on line 239, column 46.
+Warning : Maximum message print count reached. [MESG-11]
+        : Maximum print count of '20' reached for message 'CDFG-236'.
+Warning : Connected signal is wider than module port. [CDFG-464]
+        : Signal width (34) does not match width of input port 'HADDR_s' (32) of instance 'hydra' of module 'hydra_top_MMR_BASE64h0000000020000000_MMR_RANGE64h0000000000000fff_SCRATCH_BASE64h0000000020010000_SCRATCH_RANGE64h0000000000000fff' in file '../../wally/src/wally/wallypipelinedsoc.sv' on line 134.
+        : This may cause simulation mismatches between the original and synthesized designs.
+Warning : Connected signal is wider than module port. [CDFG-464]
+        : Signal width (34) does not match width of output port 'HADDR_m' (32) of instance 'hydra' of module 'hydra_top_MMR_BASE64h0000000020000000_MMR_RANGE64h0000000000000fff_SCRATCH_BASE64h0000000020010000_SCRATCH_RANGE64h0000000000000fff' in file '../../wally/src/wally/wallypipelinedsoc.sv' on line 134.
+Warning : In legacy_ui mode, Genus creates a blackbox as description for a module is not found. Black boxes represent unresolved references in the design and are usually not expected. Another possible reason is, some libraries are not read and the tool could not get the content for some macros or lib_cells. [CDFG-428]
+        : A blackbox was created for instance 'memory' in file '../../wally/src/uncore/ram_ahb.sv' on line 73.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[0]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+        : The undriven signal handling can be controlled by setting the attribute 'hdl_unconnected_value' before syn_generic command.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[1]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[2]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[3]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[4]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[5]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[6]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[7]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[8]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[9]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[10]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[11]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[12]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[13]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[14]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[15]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[16]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[17]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[18]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Undriven signal detected. [ELABUTL-125]
+        : Undriven bits of signal 'ROM[19]' in module 'rom1p1r_ADDR_WIDTH9_DATA_WIDTH32_PRELOAD_ENABLED1h0' in file '../../wally/src/generic/mem/rom1p1r.sv' on line 70, column 20, hid = 0.
+Warning : Maximum message print count reached. [MESG-11]
+        : Maximum print count of '20' reached for message 'ELABUTL-125'.
+Warning : Undriven module input port. [ELABUTL-127]
+        : Undriven bits of port 'wwatermarklevel' of instance 'txFIFO' of module 'spi_fifo_M3_N8' in file '../../wally/src/uncore/spi_apb.sv' on line 277, column 25, hid = 0.
+        : Run check_design to check 'Undriven Port(s)/Pin(s)' section for all undriven module input ports. It is better to double confirm with designer if these undriven ports are expected. During syn_gen the undriven ports are controlled by attribute 'hdl_unconnected_value', the default value is 0.
+Warning : Undriven module input port. [ELABUTL-127]
+        : Undriven bits of port 'rwatermarklevel' of instance 'rxFIFO' of module 'spi_fifo_M3_N8' in file '../../wally/src/uncore/spi_apb.sv' on line 298, column 25, hid = 0.
+Warning : Undriven module input port. [ELABUTL-127]
+        : Undriven bits of port 'PREADY' of instance 'ahbapbbridge' of module 'ahbapbbridge_Px0000000800028225e0000004000000001c083f38fdf800000100000001000000002000008000000010000000002000008000000010000000040000000010000000400000001000000002000000000000004000000001000000000000000000fffffe000000008000000000000000007fffff800000000000080000000000000007ffa0000000100000000000000000ffffffe00000000400000000000000003ffffffc0000000008000000000000000003fffe00000000200c000000000000000001ff0000000010000000000000000000000780000000060000000000000001ffffff8000000000004c0000000000000003ffe00000000200800000000000000001fff00000000200000000000000000010fff00000000200000000000000000000fff00000000200100000000000000000fffc000000040000002a00000006000000140000000c000000120000001100000001000000060000000a0000000a0000001080000002000000017fffe800000014000000280000002c00000044000000020000002c0000001203135eec0000001400000008000002000000003c000001c00000ffff000000400000000b00000034000003ff400000080000000200000005c000001fc00000010000000050000000a0000000f800000100000000180000002c000000d1000003ff00000003000000020000002000000008000000170000001fc00000040000000140000002a0000000f000000540000004000000007000000a400000008000000a200000002000000040000000e00000004000000360000000600000022_PERIPHS6' in file '../../wally/src/uncore/uncore.sv' on line 109, column 37, hid = 0.
+Warning : Undriven module input port. [ELABUTL-127]
+        : Undriven bits of port 'PRDATA[5]' of instance 'ahbapbbridge' of module 'ahbapbbridge_Px0000000800028225e0000004000000001c083f38fdf800000100000001000000002000008000000010000000002000008000000010000000040000000010000000400000001000000002000000000000004000000001000000000000000000fffffe000000008000000000000000007fffff800000000000080000000000000007ffa0000000100000000000000000ffffffe00000000400000000000000003ffffffc0000000008000000000000000003fffe00000000200c000000000000000001ff0000000010000000000000000000000780000000060000000000000001ffffff8000000000004c0000000000000003ffe00000000200800000000000000001fff00000000200000000000000000010fff00000000200000000000000000000fff00000000200100000000000000000fffc000000040000002a00000006000000140000000c000000120000001100000001000000060000000a0000000a0000001080000002000000017fffe800000014000000280000002c00000044000000020000002c0000001203135eec0000001400000008000002000000003c000001c00000ffff000000400000000b00000034000003ff400000080000000200000005c000001fc00000010000000050000000a0000000f800000100000000180000002c000000d1000003ff00000003000000020000002000000008000000170000001fc00000040000000140000002a0000000f000000540000004000000007000000a400000008000000a200000002000000040000000e00000004000000360000000600000022_PERIPHS6' in file '../../wally/src/uncore/uncore.sv' on line 109, column 37, hid = 0.
+Warning : Unconnected instance input port detected. [ELABUTL-124]
+        : Unconnected input port 'iof0' of instance 'gpio.gpio' of module 'gpio_apb_Px0000000800028225e0000004000000001c083f38fdf800000100000001000000002000008000000010000000002000008000000010000000040000000010000000400000001000000002000000000000004000000001000000000000000000fffffe000000008000000000000000007fffff800000000000080000000000000007ffa0000000100000000000000000ffffffe00000000400000000000000003ffffffc0000000008000000000000000003fffe00000000200c000000000000000001ff0000000010000000000000000000000780000000060000000000000001ffffff8000000000004c0000000000000003ffe00000000200800000000000000001fff00000000200000000000000000010fff00000000200000000000000000000fff00000000200100000000000000000fffc000000040000002a00000006000000140000000c000000120000001100000001000000060000000a0000000a0000001080000002000000017fffe800000014000000280000002c00000044000000020000002c0000001203135eec0000001400000008000002000000003c000001c00000ffff000000400000000b00000034000003ff400000080000000200000005c000001fc00000010000000050000000a0000000f800000100000000180000002c000000d1000003ff00000003000000020000002000000008000000170000001fc00000040000000140000002a0000000f000000540000004000000007000000a400000008000000a200000002000000040000000e00000004000000360000000600000022' in file '../../wally/src/uncore/uncore.sv' on line 146, column 23, hid = 0.
+        : Run check_design to check 'Undriven Port(s)/Pin(s)' section for all unconnected instance input ports. It is better to double confirm with designer these unconnected instance input port are expected. During syn_gen the unconnected instance input ports are controlled by attribute 'hdl_unconnected_value', the default value is 0.
+Warning : Unconnected instance input port detected. [ELABUTL-124]
+        : Unconnected input port 'iof1' of instance 'gpio.gpio' of module 'gpio_apb_Px0000000800028225e0000004000000001c083f38fdf800000100000001000000002000008000000010000000002000008000000010000000040000000010000000400000001000000002000000000000004000000001000000000000000000fffffe000000008000000000000000007fffff800000000000080000000000000007ffa0000000100000000000000000ffffffe00000000400000000000000003ffffffc0000000008000000000000000003fffe00000000200c000000000000000001ff0000000010000000000000000000000780000000060000000000000001ffffff8000000000004c0000000000000003ffe00000000200800000000000000001fff00000000200000000000000000010fff00000000200000000000000000000fff00000000200100000000000000000fffc000000040000002a00000006000000140000000c000000120000001100000001000000060000000a0000000a0000001080000002000000017fffe800000014000000280000002c00000044000000020000002c0000001203135eec0000001400000008000002000000003c000001c00000ffff000000400000000b00000034000003ff400000080000000200000005c000001fc00000010000000050000000a0000000f800000100000000180000002c000000d1000003ff00000003000000020000002000000008000000170000001fc00000040000000140000002a0000000f000000540000004000000007000000a400000008000000a200000002000000040000000e00000004000000360000000600000022' in file '../../wally/src/uncore/uncore.sv' on line 146, column 23, hid = 0.
+Info    : Done Elaborating Design. [ELAB-3]
+        : Done elaborating 'wallypipelinedsoc'.
+Warning : Black-boxes are represented as unresolved references in the design. [TUI-273]
+        : Cannot resolve reference to 'TS1N28HPCPSVTB64X44M4SW'.
+        : Run check_design to get all unresolved instance. To resolve the reference, either load a technology library containing the cell by appending to the 'library' attribute, or read in the hdl file containing the module before performing elaboration. As the design is incomplete, synthesis results may not correspond to the entire design.
+Warning : Black-boxes are represented as unresolved references in the design. [TUI-273]
+        : Cannot resolve reference to 'TS1N28HPCPSVTB64X128M4SW'.
+Warning : Black-boxes are represented as unresolved references in the design. [TUI-273]
+        : Cannot resolve reference to 'TSDN28HPCPA64X32M4MW'.
+Warning : Black-boxes are represented as unresolved references in the design. [TUI-273]
+        : Cannot resolve reference to 'TSDN28HPCPA1024X68M4MW'.
+Warning : Black-boxes are represented as unresolved references in the design. [TUI-273]
+        : Cannot resolve reference to 'ram1p1rwbe_USE_SRAM1_DEPTH64_WIDTH128'.
+Warning : Black-boxes are represented as unresolved references in the design. [TUI-273]
+        : Cannot resolve reference to 'ram1p1rwbe_1_x0000000000ffffff_32_0'.
+Checking for source RTL...
+Check completed for source RTL.
+Running Unified Mux Engine Tricks...
+Completed Unified Mux Engine Tricks
+
+Stage: post_elab
+-------------------------------------------------------
+| Trick             | Accepts | Rejects | Runtime (s) | 
+-------------------------------------------------------
+| ume_constant_bmux |       2 |       0 |        0.06 | 
+| ume_merge         |       0 |       0 |        0.00 | 
+| ume_ssm           |       1 |       0 |        0.09 | 
+| ume_cse           |       1 |       0 |        0.87 | 
+| ume_shrink        |      20 |       0 |        0.04 | 
+| ume_sweep         |       0 |       0 |        0.83 | 
+| ume_constant_bmux |       0 |       0 |        0.01 | 
+| ume_merge         |       0 |       0 |        0.00 | 
+| ume_ssm           |       0 |       0 |        0.09 | 
+| ume_cse           |       0 |       0 |        0.66 | 
+| ume_shrink        |       0 |       0 |        0.01 | 
+| ume_sweep         |       0 |       0 |        0.83 | 
+-------------------------------------------------------
+Starting optimize datapath shifters [v1.0] (stage: post_elab, startdef: wallypipelinedsoc, recur: true)
+Completed optimize datapath shifters (accepts: 0, rejects: 0, runtime: 0.004s)
+Starting clip mux common data inputs [v1.0] (stage: post_elab, startdef: wallypipelinedsoc, recur: true)
+Completed clip mux common data inputs (accepts: 1, rejects: 0, runtime: 0.017s)
+Starting clip the non-user hierarchies [v2.0] (stage: post_elab, startdef: wallypipelinedsoc, recur: true)
+Completed clip the non-user hierarchies (accepts: 13, rejects: 0, runtime: 0.258s)
+Starting basic netlist cleanup [v1.0] (stage: post_elab, startdef: wallypipelinedsoc, recur: true)
+Completed basic netlist cleanup (accepts: 0, rejects: 0, runtime: 0.006s)
+
+Stage: post_elab
+--------------------------------------------------------------------
+| Transform                      | Accepts | Rejects | Runtime (s) | 
+--------------------------------------------------------------------
+| hlo_optimize_datapath_shifters |       0 |       0 |        0.00 | 
+| hlo_clip_mux_input             |       1 |       0 |        0.02 | 
+| hlo_clip                       |      13 |       0 |        0.26 | 
+| hlo_cleanup                    |       0 |       0 |        0.01 | 
+--------------------------------------------------------------------
+UM:   flow.cputime  flow.realtime  timing.setup.tns  timing.setup.wns  snapshot
+UM:*                                                                   elaborate
+@file(genus.tcl) 35: set module_name "ram1p1rwbe"
+@file(genus.tcl) 38: set insts [get_db instances -if {.module.name == $module_name}]
+Error   : <Start> word is not recognized. [TUI-182] [get_db]
+        : 'instances' is not a recognized object/attribute. Type 'help root:' to get a list of all supported objects and attributes.
+        : Check if the given <Start> word is a valid object_type, object or attribute.
+#@ End verbose source ./genus.tcl
+1
+Encountered problems processing file: genus.tcl
+WARNING: This version of the tool is 550 days old.
+@genus:root: 2> set module_name "ram1p1rwbe"
+ram1p1rwbe
+@genus:root: 3> set insts [get_db [get_db modules $module_name] .instances]
+@genus:root: 4> foreach inst $insts {
+    puts "Instance: [get_db $inst .name]"
+    set params [get_db $inst .hdl_parameters]
+    foreach param $params {
+        puts "  Parameter: [get_db $param .name] = [get_db $param .value]"
+    }
+}
+@genus:root: 5> get_db insts
+inst:wallypipelinedsoc/resetsync/q_reg inst:wallypipelinedsoc/resetsync/mid_reg inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g1 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g2 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g3 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g4 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g5 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g6 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g7 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g8 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g9 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g10 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g11 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g12 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g13 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g14 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g15 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g16 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g17 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g18 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g19 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g20 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g21 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g22 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g23 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g24 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g25 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g26 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g27 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g28 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g29 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g30 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g31 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcplus2mux/mux_35_14/g32 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g1 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g2 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g3 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g4 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g5 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g6 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g7 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g8 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g9 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g10 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g11 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g12 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g13 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g14 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g15 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g16 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g17 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g18 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g19 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g20 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g21 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g22 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g23 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g24 inst:wallypipelinedsoc/core/ifu/Spill.spill/pcnextspillmux/mux_35_14/g25 i... <result is 16158782 characters long and printing is truncated to 4096 characters, use 'puts [command]' to view the entire result>
+@genus:root: 6> set module_name "ram1p1rwbe"
+ram1p1rwbe
+@genus:root: 7> set module_instances [get_db [get_db modules $module_name] .instances]
+@genus:root: 8> get_db module_instances
+Error   : <Start> word is not recognized. [TUI-182] [get_db]
+        : 'module_instances' is not a recognized object/attribute. Type 'help root:' to get a list of all supported objects and attributes.
+1
+@genus:root: 9> $module_instances
+[]
+@genus:root: 10> get_db modules
+module:wallypipelinedsoc/synchronizer module:wallypipelinedsoc/mux2_WIDTH32 module:wallypipelinedsoc/bmux module:wallypipelinedsoc/flopr_WIDTH32 module:wallypipelinedsoc/flopenr_WIDTH16 module:wallypipelinedsoc/bmux_2 module:wallypipelinedsoc/spill_Px0000000800028225e0000004000000001c083f38fdf800000100000001000000002000008000000010000000002000008000000010000000040000000010000000400000001000000002000000000000004000000001000000000000000000fffffe000000008000000000000000007fffff800000000000080000000000000007ffa0000000100000000000000000ffffffe00000000400000000000000003ffffffc0000000008000000000000000003fffe00000000200c000000000000000001ff0000000010000000000000000000000780000000060000000000000001ffffff8000000000004c0000000000000003ffe00000000200800000000000000001fff00000000200000000000000000010fff00000000200000000000000000000fff00000000200100000000000000000fffc000000040000002a00000006000000140000000c000000120000001100000001000000060000000a0000000a0000001080000002000000017fffe800000014000000280000002c00000044000000020000002c0000001203135eec0000001400000008000002000000003c000001c00000ffff000000400000000b00000034000003ff400000080000000200000005c000001fc00000010000000050000000a0000000f800000100000000180000002c000000d1000003ff00000003000000020000002000000008000000170000001fc00000040000000140000002a0000000f000000540000004000000007000000a400000008000000a200000002000000040000000e00000004000000360000000600000022 module:wallypipelinedsoc/and_op module:wallypipelinedsoc/bmux_5_3 module:wallypipelinedsoc/bmux_8 module:wallypipelinedsoc/flopenr_WIDTH1 module:wallypipelinedsoc/flopr_WIDTH1 module:wallypipelinedsoc/vm64check_Px0000000800028225e0000004000000001c083f38fdf800000100000001000000002000008000000010000000002000008000000010000000040000000010000000400000001000000002000000000000004000000001000000000000000000fffffe000000008000000000000000007fffff800000000000080000000000000007ffa0000000100000000000000000ffffffe00000000400000000000000003ffffffc0000000008000000000000000003fffe00000000200c000000000000000001ff0000000010000000000000000000000780000000060000000000000001ffffff8000000000004c0000000000000003ffe00000000200800000000000000001fff00000000200000000000000000010fff00000000200000000000000000000fff00000000200100000000000000000fffc000000040000002a00000006000000140000000c000000120000001100000001000000060000000a0000000a0000001080000002000000017fffe800000014000000280000002c00000044000000020000002c0000001203135eec0000001400000008000002000000003c000001c00000ffff000000400000000b00000034000003ff400000080000000200000005c000001fc00000010000000050000000a0000000f800000100000000180000002c000000d1000003ff00000003000000020000002000000008000000170000001fc00000040000000140000002a0000000f000000540000004000000007000000a400000008000000a200000002000000040000000e00000004000000360000000600000022 module:wallypipelinedsoc/tlbcontrol_Px0000000800028225e0000004000000001c083f38fdf800000100000001000000002000008000000010000000002000008000000010000000040000000010000000400000001000000002000000000000004000000001000000000000000000fffffe000000008000000000000000007fffff800000000000080000000000000007ffa0000000100000000000000000ffffffe00000000400000000000000003ffffffc0000000008000000000000000003fffe00000000200c000000000000000001ff0000000010000000000000000000000780000000060000000000000001ffffff8000000000004c0000000000000003ffe00000000200800000000000000001fff00000000200000000000000000010fff00000000200000000000000000000fff00000000200100000000000000000fffc000000040000002a00000006000000140000000c000000120000001100000001000000060000000a0000000a0000001080000002000000017fffe800000014000000280000002c00000044000000020000002c0000001203135eec0000001400000008000002000000003c000001c00000ffff000000400000000b00000034000003ff400000080000000200000005c000001fc00000010000000050000000a0000000f800000100000000180000002c000000d1000003ff00000003000000020000002000000008000000170000001fc00000040000000140000002a0000000f000000540000004000000007000000a400000008000000a200000002000000040000000e00000004000000360000000600000022_ITLBx0000000000000000000000000000000000000000000000000000000000000000000000000000000... <result is 172201 characters long and printing is truncated to 4096 characters, use 'puts [command]' to view the entire result>
+@genus:root: 11> set module_name "*ram1p1rwbe*"
+*ram1p1rwbe*
+@genus:root: 12> set module_instances [get_db [get_db modules $module_name] .instances]
+{hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[0]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[1]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[2]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[3]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[3]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/word[3].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/word[2].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/word[1].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/word[0].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/word[3].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/word[2].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/word[1].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/word[0].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/word[3].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/word[2].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/word[1].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/word[0].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[3]/word[3].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[3]/word[2].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[3]/word[1].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[3]/word[0].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[0]/word[3].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[0]/word[2].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[0]/word[1].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[0]/word[0].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[1]/word[3].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[1]/word[2].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[1]/word[1].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[1]/word[0].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[2]/word[3].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[2]/word[2].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[2]/word[1].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[2]/word[0].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[3]/word[3].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[3]/word[2].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[3]/word[1].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[3]/word[0].wordram.CacheDataMem} hinst:wallypipelinedsoc/uncoregen.uncore/ram.ram/memory
+@genus:root: 13> foreach inst $module_instances {
+    puts "Instance: [get_db $inst .name]"
+    set params [get_db $inst .hdl_parameters]
+    foreach param $params {
+        puts "  Parameter: [get_db $param .name] = [get_db $param .value]"
+    }
+}
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/CacheTagMem/genblk1.sram1
+Error   : Unrecognized attribute. [TUI-183] [get_db]
+        : 'hdl_parameters' is not a recognized attribute for object 'hinst'.
+        : To see the usage/description for this attribute, type 'help * <attr_name> -detail'.
+1
+@genus:root: 14> foreach inst $module_instances {
+    puts "Instance: [get_db $inst .name]"
+    
+    # Access .hdl_parameters via the referenced .module
+    set params [get_db $inst .module.hdl_parameters]
+    
+    # Iterate through the returned parameter list tuples
+    foreach param $params {
+        set p_name  [lindex $param 0]
+        set p_value [lindex $param 1]
+        puts "  Parameter: $p_name = $p_value"
+    }
+}
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/CacheTagMem/genblk1.sram1
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/CacheTagMem/genblk1.sram1
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/CacheTagMem/genblk1.sram1
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/CacheTagMem/genblk1.sram1
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/CacheTagMem/genblk1.sram1
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/CacheTagMem/genblk1.sram1
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/CacheTagMem/genblk1.sram1
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/CacheTagMem/genblk1.sram1
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[3].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[2].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[1].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[0].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[3].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[2].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[1].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[0].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[3].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[2].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[1].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[0].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[3].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[2].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[1].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[0].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/word[3].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/word[2].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/word[1].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/word[0].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/word[3].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/word[2].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/word[1].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/word[0].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/word[3].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/word[2].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/word[1].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/word[0].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/word[3].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/word[2].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/word[1].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/word[0].wordram.CacheDataMem
+Instance: uncoregen.uncore/ram.ram/memory
+@genus:root: 15> set params [get_db $module_instances[0] .module.hdl_parameters]
+Error   : <Start> word is not recognized. [TUI-182] [get_db]
+        : 'hinst:wallypipelinedsoc/uncoregen.uncore/ram.ram/memory[0]' is not a recognized object/attribute. Type 'help root:' to get a list of all supported objects and attributes.
+1
+@genus:root: 16> foreach inst $module_instances {
+    puts "Instance: [get_db $inst .name]"
+    
+    # Access .hdl_parameters via the referenced .module
+    set module_params [get_db $inst .module.hdl_parameters]
+    
+    # Iterate through the returned parameter list tuples
+    foreach param $module_params {
+        set p_name  [lindex $param 0]
+        set p_value [lindex $param 1]
+        puts "  Parameter: $p_name = $p_value"
+    }
+}
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/CacheTagMem/genblk1.sram1
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/CacheTagMem/genblk1.sram1
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/CacheTagMem/genblk1.sram1
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/CacheTagMem/genblk1.sram1
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/CacheTagMem/genblk1.sram1
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/CacheTagMem/genblk1.sram1
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/CacheTagMem/genblk1.sram1
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/CacheTagMem/genblk1.sram1
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[3].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[2].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[1].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[0].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[3].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[2].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[1].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[0].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[3].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[2].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[1].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[0].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[3].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[2].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[1].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[0].wordram.CacheDataMem/genblk1.sram1A
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/word[3].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/word[2].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/word[1].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/word[0].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/word[3].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/word[2].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/word[1].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/word[0].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/word[3].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/word[2].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/word[1].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/word[0].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/word[3].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/word[2].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/word[1].wordram.CacheDataMem
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/word[0].wordram.CacheDataMem
+Instance: uncoregen.uncore/ram.ram/memory
+@genus:root: 17> $module_instances[0]
+invalid command name "{hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[0]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[1]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[2]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[3]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[3]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/word[3].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/word[2].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/word[1].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/word[0].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/word[3].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/word[2].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/word[1].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/word[0].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/word[3].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/word[2].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/word[1].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/word[0].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[3]/word[3].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[3]/word[2].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[3]/word[1].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[3]/word[0].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[0]/word[3].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[0]/word[2].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[0]/word[1].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[0]/word[0].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[1]/word[3].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[1]/word[2].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[1]/word[1].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[1]/word[0].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[2]/word[3].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[2]/word[2].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[2]/word[1].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[2]/word[0].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[3]/word[3].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[3]/word[2].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[3]/word[1].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[3]/word[0].wordram.CacheDataMem} hinst:wallypipelinedsoc/uncoregen.uncore/ram.ram/memory[0]... <result is 4097 characters long and printing is truncated to 4096 characters, use 'puts [command]' to view the entire result>
+@genus:root: 18> lindex $module_instances 0
+hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[0]/CacheTagMem/genblk1.sram1
+@genus:root: 19> get_db [lindex $module_instances 0] .module
+module:wallypipelinedsoc/ram1p1rwbe_64x22
+@genus:root: 20> foreach inst $module_instances {
+    puts "Instance: [get_db $inst .name]"
+
+    set inst_module "get_db [lindex $module_instances 0] .module"
+    puts "  Module: [get_db $inst_module .name]"
+    
+    # Access .hdl_parameters via the referenced .module
+    set module_params [get_db $inst_module .hdl_parameters]
+    
+    # Iterate through the returned parameter list tuples
+    foreach param $module_params {
+        set p_name  [lindex $param 0]
+        set p_value [lindex $param 1]
+        puts "  Parameter: $p_name = $p_value"
+    }
+}
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/CacheTagMem/genblk1.sram1
+Error   : <Start> word is not recognized. [TUI-182] [get_db]
+        : 'get_db' is not a recognized object/attribute. Type 'help root:' to get a list of all supported objects and attributes.
+1
+@genus:root: 21> # Iterate through each instance and print its assigned parameters
+@genus:root: 22> foreach inst $module_instances {
+    puts "Instance: [get_db $inst .name]"
+
+    set inst_module [get_db [lindex $module_instances 0] .module]
+    puts "  Module: [get_db $inst_module .name]"
+    
+    # Access .hdl_parameters via the referenced .module
+    set module_params [get_db $inst_module .hdl_parameters]
+    
+    # Iterate through the returned parameter list tuples
+    foreach param $module_params {
+        set p_name  [lindex $param 0]
+        set p_value [lindex $param 1]
+        puts "  Parameter: $p_name = $p_value"
+    }
+}
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/CacheTagMem/genblk1.sram1
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/CacheTagMem/genblk1.sram1
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/CacheTagMem/genblk1.sram1
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/CacheTagMem/genblk1.sram1
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/CacheTagMem/genblk1.sram1
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/CacheTagMem/genblk1.sram1
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/CacheTagMem/genblk1.sram1
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/CacheTagMem/genblk1.sram1
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[3].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[2].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[1].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[0].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[3].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[2].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[1].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[0].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[3].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[2].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[1].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[0].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[3].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[2].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[1].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[0].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/word[3].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/word[2].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/word[1].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/word[0].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/word[3].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/word[2].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/word[1].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/word[0].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/word[3].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/word[2].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/word[1].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/word[0].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/word[3].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/word[2].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/word[1].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/word[0].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: uncoregen.uncore/ram.ram/memory
+  Module: ram1p1rwbe_64x22
+@genus:root: 23> get_db modules $module_name
+module:wallypipelinedsoc/ram1p1rwbe_64x22 module:wallypipelinedsoc/ram1p1rwbe_64x128 module:wallypipelinedsoc/ram1p1rwbe_USE_SRAM1_DEPTH64_WIDTH128 module:wallypipelinedsoc/ram1p1rwbe_1_x0000000000ffffff_32_0
+@genus:root: 24> set module_name "*ram*p1rw*e*"
+*ram*p1rw*e*
+@genus:root: 25> get_db modules $module_name
+module:wallypipelinedsoc/ram1p1rwbe_64x22 module:wallypipelinedsoc/ram1p1rwe_USE_SRAM1h1_DEPTH64_WIDTH22 module:wallypipelinedsoc/ram1p1rwbe_64x128 module:wallypipelinedsoc/ram1p1rwe_USE_SRAM1h1_DEPTH64_WIDTH128 module:wallypipelinedsoc/ram1p1rwbe_USE_SRAM1_DEPTH64_WIDTH128 module:wallypipelinedsoc/ram1p1rwbe_1_x0000000000ffffff_32_0
+@genus:root: 26> # Fetch all instances directly from the module object
+@genus:root: 27> set module_name "*ram*p1rw*e*"
+*ram*p1rw*e*
+@genus:root: 28> set module_instances [get_db [get_db modules $module_name] .instances]
+{hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[0]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[1]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[2]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[3]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[3]/CacheTagMem/genblk1.sram1} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[0]/CacheTagMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[1]/CacheTagMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[2]/CacheTagMem} {hinst:wallypipelinedsoc/core/lsu/bus.dcache.dcache/CacheWays[3]/CacheTagMem} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/CacheTagMem} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/CacheTagMem} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/CacheTagMem} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[3]/CacheTagMem} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/word[3].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/word[2].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/word[1].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/word[0].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/word[3].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/word[2].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/word[1].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/word[0].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/word[3].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/word[2].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/word[1].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/word[0].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[3]/word[3].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[3]/word[2].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[3]/word[1].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[3]/word[0].wordram.CacheDataMem/genblk1.sram1A} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/word[3].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/word[2].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/word[1].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[0]/word[0].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/word[3].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/word[2].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/word[1].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[1]/word[0].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/word[3].wordram.CacheDataMem} {hinst:wallypipelinedsoc/core/ifu/bus.icache.icache/CacheWays[2]/word[2].wordram.CacheDataMem} {hinst:wallypipelinedsoc/c... <result is 6215 characters long and printing is truncated to 4096 characters, use 'puts [command]' to view the entire result>
+@genus:root: 29> 
+@genus:root: 29> # Iterate through each instance and print its assigned parameters
+@genus:root: 30> foreach inst $module_instances {
+    puts "Instance: [get_db $inst .name]"
+
+    set inst_module [get_db [lindex $module_instances 0] .module]
+    puts "  Module: [get_db $inst_module .name]"
+    
+    # Access .hdl_parameters via the referenced .module
+    set module_params [get_db $inst_module .hdl_parameters]
+    
+    # Iterate through the returned parameter list tuples
+    foreach param $module_params {
+        set p_name  [lindex $param 0]
+        set p_value [lindex $param 1]
+        puts "  Parameter: $p_name = $p_value"
+    }
+}
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/CacheTagMem/genblk1.sram1
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/CacheTagMem/genblk1.sram1
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/CacheTagMem/genblk1.sram1
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/CacheTagMem/genblk1.sram1
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/CacheTagMem/genblk1.sram1
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/CacheTagMem/genblk1.sram1
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/CacheTagMem/genblk1.sram1
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/CacheTagMem/genblk1.sram1
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/CacheTagMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/CacheTagMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/CacheTagMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/CacheTagMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/CacheTagMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/CacheTagMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/CacheTagMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/CacheTagMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[3].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[2].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[1].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[0].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[3].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[2].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[1].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[0].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[3].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[2].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[1].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[0].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[3].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[2].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[1].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[0].wordram.CacheDataMem/genblk1.sram1A
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[3].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[2].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[1].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[0]/word[0].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[3].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[2].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[1].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[1]/word[0].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[3].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[2].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[1].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[2]/word[0].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[3].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[2].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[1].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/ifu/bus.icache.icache/CacheWays[3]/word[0].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/word[3].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/word[2].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/word[1].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[0]/word[0].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/word[3].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/word[2].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/word[1].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[1]/word[0].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/word[3].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/word[2].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/word[1].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[2]/word[0].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/word[3].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/word[2].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/word[1].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: core/lsu/bus.dcache.dcache/CacheWays[3]/word[0].wordram.CacheDataMem
+  Module: ram1p1rwbe_64x22
+Instance: uncoregen.uncore/ram.ram/memory
+  Module: ram1p1rwbe_64x22
+@genus:root: 31> foreach inst $module_instances {
+    #puts "Instance: [get_db $inst .name]"
+
+    set inst_module [get_db [lindex $module_instances 0] .module]
+    puts "  Module: [get_db $inst_module .name]"
+    
+    # Access .hdl_parameters via the referenced .module
+    set module_params [get_db $inst_module .hdl_parameters]
+    
+    # Iterate through the returned parameter list tuples
+    foreach param $module_params {
+        set p_name  [lindex $param 0]
+        set p_value [lindex $param 1]
+        puts "  Parameter: $p_name = $p_value"
+    }
+}
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+  Module: ram1p1rwbe_64x22
+@genus:root: 32> exit
+
+Lic Summary:
+[20:54:07.249984] Cdslmd servers: winlicense15
+[20:54:07.250025] Feature usage summary:
+[20:54:07.250026] Genus_Synthesis  
+Normal exit.

@@ -3,7 +3,7 @@
 # Filepath variables
 # TODO: move files to a common area on CLEAR
 source /storage-home/m/mcn5/license_address.csh
-setenv PDK_DIR /storage-home/m/mcn5/asap7_pdk_r1p7/asap7sc7p5t_28
+setenv PDK_DIR /storage-home/m/mcn5/asap7_pdk_r1p7
 
 # Tool setup
 alias genus /clear/apps/cadence-2025/rhel9/DDI251/bin/genus

@@ -4,75 +4,116 @@
 # Define the constraints
 create_constraint_mode -name sdc_constraints -sdc_files { ../constraints.sdc }
 
-# Define timing libraries (.lib) as timing conditions
+# Define LIB lists
 # CCS models instead of CCSA, to save memory and run time
-create_library_set -name slow_lib \
-    -timing {   asap7sc7p5t_AO_LVT_SS_ccs_211120.lib \
-                asap7sc7p5t_AO_RVT_SS_ccs_211120.lib \
-                asap7sc7p5t_AO_SLVT_SS_ccs_211120.lib \
-                asap7sc7p5t_AO_SRAM_SS_ccs_211120.lib \
-                asap7sc7p5t_INVBUF_LVT_SS_ccs_220122.lib \
-                asap7sc7p5t_INVBUF_RVT_SS_ccs_220122.lib \
-                asap7sc7p5t_INVBUF_SLVT_SS_ccs_220122.lib \
-                asap7sc7p5t_INVBUF_SRAM_SS_ccs_220122.lib \
-                asap7sc7p5t_OA_LVT_SS_ccs_211120.lib \
-                asap7sc7p5t_OA_RVT_SS_ccs_211120.lib \
-                asap7sc7p5t_OA_SLVT_SS_ccs_211120.lib \
-                asap7sc7p5t_OA_SRAM_SS_ccs_211120.lib \
-                asap7sc7p5t_SEQ_LVT_SS_ccs_220123.lib \
-                asap7sc7p5t_SEQ_RVT_SS_ccs_220123.lib \
-                asap7sc7p5t_SEQ_SLVT_SS_ccs_220123.lib \
-                asap7sc7p5t_SEQ_SRAM_SS_ccs_220123.lib \
-                asap7sc7p5t_SIMPLE_LVT_SS_ccs_211120.lib \
-                asap7sc7p5t_SIMPLE_RVT_SS_ccs_211120.lib \
-                asap7sc7p5t_SIMPLE_SLVT_SS_ccs_211120.lib \
-                asap7sc7p5t_SIMPLE_SRAM_SS_ccs_211120.lib }
+set slow_list [list asap7sc7p5t_AO_LVT_SS_ccs_211120.lib \
+                    asap7sc7p5t_AO_RVT_SS_ccs_211120.lib \
+                    asap7sc7p5t_AO_SLVT_SS_ccs_211120.lib \
+                    asap7sc7p5t_AO_SRAM_SS_ccs_211120.lib \
+                    asap7sc7p5t_INVBUF_LVT_SS_ccs_220122.lib \
+                    asap7sc7p5t_INVBUF_RVT_SS_ccs_220122.lib \
+                    asap7sc7p5t_INVBUF_SLVT_SS_ccs_220122.lib \
+                    asap7sc7p5t_INVBUF_SRAM_SS_ccs_220122.lib \
+                    asap7sc7p5t_OA_LVT_SS_ccs_211120.lib \
+                    asap7sc7p5t_OA_RVT_SS_ccs_211120.lib \
+                    asap7sc7p5t_OA_SLVT_SS_ccs_211120.lib \
+                    asap7sc7p5t_OA_SRAM_SS_ccs_211120.lib \
+                    asap7sc7p5t_SEQ_LVT_SS_ccs_220123.lib \
+                    asap7sc7p5t_SEQ_RVT_SS_ccs_220123.lib \
+                    asap7sc7p5t_SEQ_SLVT_SS_ccs_220123.lib \
+                    asap7sc7p5t_SEQ_SRAM_SS_ccs_220123.lib \
+                    asap7sc7p5t_SIMPLE_LVT_SS_ccs_211120.lib \
+                    asap7sc7p5t_SIMPLE_RVT_SS_ccs_211120.lib \
+                    asap7sc7p5t_SIMPLE_SLVT_SS_ccs_211120.lib \
+                    asap7sc7p5t_SIMPLE_SRAM_SS_ccs_211120.lib ]
+
+set typical_list [list asap7sc7p5t_AO_LVT_TT_ccs_211120.lib \
+                    asap7sc7p5t_AO_RVT_TT_ccs_211120.lib \
+                    asap7sc7p5t_AO_SLVT_TT_ccs_211120.lib \
+                    asap7sc7p5t_AO_SRAM_TT_ccs_211120.lib \
+                    asap7sc7p5t_INVBUF_LVT_TT_ccs_220122.lib \
+                    asap7sc7p5t_INVBUF_RVT_TT_ccs_220122.lib \
+                    asap7sc7p5t_INVBUF_SLVT_TT_ccs_220122.lib \
+                    asap7sc7p5t_INVBUF_SRAM_TT_ccs_220122.lib \
+                    asap7sc7p5t_OA_LVT_TT_ccs_211120.lib \
+                    asap7sc7p5t_OA_RVT_TT_ccs_211120.lib \
+                    asap7sc7p5t_OA_SLVT_TT_ccs_211120.lib \
+                    asap7sc7p5t_OA_SRAM_TT_ccs_211120.lib \
+                    asap7sc7p5t_SEQ_LVT_TT_ccs_220123.lib \
+                    asap7sc7p5t_SEQ_RVT_TT_ccs_220123.lib \
+                    asap7sc7p5t_SEQ_SLVT_TT_ccs_220123.lib \
+                    asap7sc7p5t_SEQ_SRAM_TT_ccs_220123.lib \
+                    asap7sc7p5t_SIMPLE_LVT_TT_ccs_211120.lib \
+                    asap7sc7p5t_SIMPLE_RVT_TT_ccs_211120.lib \
+                    asap7sc7p5t_SIMPLE_SLVT_TT_ccs_211120.lib \
+                    asap7sc7p5t_SIMPLE_SRAM_TT_ccs_211120.lib ]
+
+set fast_list [list asap7sc7p5t_AO_LVT_FF_ccs_211120.lib \
+                    asap7sc7p5t_AO_RVT_FF_ccs_211120.lib \
+                    asap7sc7p5t_AO_SLVT_FF_ccs_211120.lib \
+                    asap7sc7p5t_AO_SRAM_FF_ccs_211120.lib \
+                    asap7sc7p5t_INVBUF_LVT_FF_ccs_220122.lib \
+                    asap7sc7p5t_INVBUF_RVT_FF_ccs_220122.lib \
+                    asap7sc7p5t_INVBUF_SLVT_FF_ccs_220122.lib \
+                    asap7sc7p5t_INVBUF_SRAM_FF_ccs_220122.lib \
+                    asap7sc7p5t_OA_LVT_FF_ccs_211120.lib \
+                    asap7sc7p5t_OA_RVT_FF_ccs_211120.lib \
+                    asap7sc7p5t_OA_SLVT_FF_ccs_211120.lib \
+                    asap7sc7p5t_OA_SRAM_FF_ccs_211120.lib \
+                    asap7sc7p5t_SEQ_LVT_FF_ccs_220123.lib \
+                    asap7sc7p5t_SEQ_RVT_FF_ccs_220123.lib \
+                    asap7sc7p5t_SEQ_SLVT_FF_ccs_220123.lib \
+                    asap7sc7p5t_SEQ_SRAM_FF_ccs_220123.lib \
+                    asap7sc7p5t_SIMPLE_LVT_FF_ccs_211120.lib \
+                    asap7sc7p5t_SIMPLE_RVT_FF_ccs_211120.lib \
+                    asap7sc7p5t_SIMPLE_SLVT_FF_ccs_211120.lib \
+                    asap7sc7p5t_SIMPLE_SRAM_FF_ccs_211120.lib ]
+
+set sram_list [list srambank_64x4x16_6t122.lib \
+                    srambank_64x4x18_6t122.lib \
+                    srambank_64x4x20_6t122.lib \
+                    srambank_64x4x32_6t122.lib \
+                    srambank_64x4x34_6t122.lib \
+                    srambank_64x4x36_6t122.lib \
+                    srambank_64x4x40_6t122.lib \
+                    srambank_64x4x48_6t122.lib \
+                    srambank_64x4x64_6t122.lib \
+                    srambank_64x4x72_6t122.lib \
+                    srambank_64x4x74_6t122.lib \
+                    srambank_64x4x80_6t122.lib \
+                    srambank_128x4x16_6t122.lib \
+                    srambank_128x4x18_6t122.lib \
+                    srambank_128x4x20_6t122.lib \
+                    srambank_128x4x32_6t122.lib \
+                    srambank_128x4x34_6t122.lib \
+                    srambank_128x4x36_6t122.lib \
+                    srambank_128x4x40_6t122.lib \
+                    srambank_128x4x48_6t122.lib \
+                    srambank_128x4x64_6t122.lib \
+                    srambank_128x4x72_6t122.lib \
+                    srambank_128x4x74_6t122.lib \
+                    srambank_128x4x80_6t122.lib \
+                    srambank_256x4x16_6t122.lib \
+                    srambank_256x4x18_6t122.lib \
+                    srambank_256x4x20_6t122.lib \
+                    srambank_256x4x32_6t122.lib \
+                    srambank_256x4x34_6t122.lib \
+                    srambank_256x4x36_6t122.lib \
+                    srambank_256x4x40_6t122.lib \
+                    srambank_256x4x48_6t122.lib \
+                    srambank_256x4x64_6t122.lib \
+                    srambank_256x4x72_6t122.lib \
+                    srambank_256x4x74_6t122.lib \
+                    srambank_256x4x80_6t122.lib ]
+
+# Define timing libraries as timing conditions
+create_library_set -name slow_lib -timing [concat $slow_list $sram_list]
 create_timing_condition -name slow_condition -library_set slow_lib
 
-create_library_set -name typical_lib \
-    -timing {   asap7sc7p5t_AO_LVT_TT_ccs_211120.lib \
-                asap7sc7p5t_AO_RVT_TT_ccs_211120.lib \
-                asap7sc7p5t_AO_SLVT_TT_ccs_211120.lib \
-                asap7sc7p5t_AO_SRAM_TT_ccs_211120.lib \
-                asap7sc7p5t_INVBUF_LVT_TT_ccs_220122.lib \
-                asap7sc7p5t_INVBUF_RVT_TT_ccs_220122.lib \
-                asap7sc7p5t_INVBUF_SLVT_TT_ccs_220122.lib \
-                asap7sc7p5t_INVBUF_SRAM_TT_ccs_220122.lib \
-                asap7sc7p5t_OA_LVT_TT_ccs_211120.lib \
-                asap7sc7p5t_OA_RVT_TT_ccs_211120.lib \
-                asap7sc7p5t_OA_SLVT_TT_ccs_211120.lib \
-                asap7sc7p5t_OA_SRAM_TT_ccs_211120.lib \
-                asap7sc7p5t_SEQ_LVT_TT_ccs_220123.lib \
-                asap7sc7p5t_SEQ_RVT_TT_ccs_220123.lib \
-                asap7sc7p5t_SEQ_SLVT_TT_ccs_220123.lib \
-                asap7sc7p5t_SEQ_SRAM_TT_ccs_220123.lib \
-                asap7sc7p5t_SIMPLE_LVT_TT_ccs_211120.lib \
-                asap7sc7p5t_SIMPLE_RVT_TT_ccs_211120.lib \
-                asap7sc7p5t_SIMPLE_SLVT_TT_ccs_211120.lib \
-                asap7sc7p5t_SIMPLE_SRAM_TT_ccs_211120.lib }
+create_library_set -name typical_lib -timing [concat $typical_list $sram_list]
 create_timing_condition -name typical_condition -library_set typical_lib
 
-create_library_set -name fast_lib \
-    -timing {   asap7sc7p5t_AO_LVT_FF_ccs_211120.lib \
-                asap7sc7p5t_AO_RVT_FF_ccs_211120.lib \
-                asap7sc7p5t_AO_SLVT_FF_ccs_211120.lib \
-                asap7sc7p5t_AO_SRAM_FF_ccs_211120.lib \
-                asap7sc7p5t_INVBUF_LVT_FF_ccs_220122.lib \
-                asap7sc7p5t_INVBUF_RVT_FF_ccs_220122.lib \
-                asap7sc7p5t_INVBUF_SLVT_FF_ccs_220122.lib \
-                asap7sc7p5t_INVBUF_SRAM_FF_ccs_220122.lib \
-                asap7sc7p5t_OA_LVT_FF_ccs_211120.lib \
-                asap7sc7p5t_OA_RVT_FF_ccs_211120.lib \
-                asap7sc7p5t_OA_SLVT_FF_ccs_211120.lib \
-                asap7sc7p5t_OA_SRAM_FF_ccs_211120.lib \
-                asap7sc7p5t_SEQ_LVT_FF_ccs_220123.lib \
-                asap7sc7p5t_SEQ_RVT_FF_ccs_220123.lib \
-                asap7sc7p5t_SEQ_SLVT_FF_ccs_220123.lib \
-                asap7sc7p5t_SEQ_SRAM_FF_ccs_220123.lib \
-                asap7sc7p5t_SIMPLE_LVT_FF_ccs_211120.lib \
-                asap7sc7p5t_SIMPLE_RVT_FF_ccs_211120.lib \
-                asap7sc7p5t_SIMPLE_SLVT_FF_ccs_211120.lib \
-                asap7sc7p5t_SIMPLE_SRAM_FF_ccs_211120.lib }
+create_library_set -name fast_lib -timing [concat $fast_list $sram_list]
 create_timing_condition -name fast_condition -library_set fast_lib
 
 # Define the corners

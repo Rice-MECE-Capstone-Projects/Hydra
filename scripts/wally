@@ -48,6 +48,7 @@ declare -A FILES=(
   ["wallypipelinedsoc.patch"]="src/wally/wallypipelinedsoc.sv"
   ["ram1p1rwbe.patch"]="src/generic/mem/ram1p1rwbe.sv"
   ["rom1p1r.patch"]="src/generic/mem/rom1p1r.sv"
+  ["spi_apb.patch"]="src/uncore/spi_apb.sv"
 )
 
 cmd_update() {
