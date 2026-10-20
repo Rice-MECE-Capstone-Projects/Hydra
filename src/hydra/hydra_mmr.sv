@@ -30,7 +30,10 @@
 // Offset SRC       : [ADDR_WIDTH-1:0]
 // Offset DST       : [ADDR_WIDTH-1:0]
 // Offset LEN       : [LEN_WIDTH-1:0]
-// Offset STATUS    : [1]=ERROR, [0]=DONE
+// Offset STATUS    : [2]=BUSY, [1]=ERROR, [0]=DONE
+//
+// While BUSY, all writes are ignored so the in-flight descriptor cannot change.
+// Accepting a new START clears DONE and ERROR.
 
 import hydra_pkg::*;
 module hydra_mmr (
@@ -40,6 +43,7 @@ module hydra_mmr (
     // Status input from hydra_transform
     input logic irq,
     input logic error,
+    input logic busy,
 
     // AHB-Lite slave port
     input  logic [ADDR_WIDTH-1:0] HADDR,
@@ -93,7 +97,7 @@ module hydra_mmr (
         SRC: HRDATA = src_addr;
         DST: HRDATA = dst_addr;
         LEN: HRDATA = length;
-        STATUS: HRDATA = {(DATA_WIDTH - 2)'(0), error_reg, irq_reg};
+        STATUS: HRDATA = {(DATA_WIDTH - 3)'(0), busy, error_reg, irq_reg};
 
         default: HRDATA = '0;
       endcase
@@ -126,29 +130,14 @@ module hydra_mmr (
 
       phase_valid_w <= HTRANS[1] && HSEL && HWRITE && HREADY;  // only write during Data Phase
       mmr_offset_w  <= (HTRANS[1] && HSEL && HREADY) ? mmr_offset_r : mmr_offset_w;
-      if (phase_valid_r && HREADY) begin
-        // case (mmr_offset_r)
-        //   CTRL:
-        //   HRDATA <= {
-        //     (DATA_WIDTH - MODE_BITS - DATA_BITS - 5)'(0),
-        //     reduce_op,
-        //     round_en,
-        //     signed_out,
-        //     scale_shift,
-        //     mode,
-        //     start
-        //   };
-        //   SRC: HRDATA <= src_addr;
-        //   DST: HRDATA <= dst_addr;
-        //   LEN: HRDATA <= length;
-        //   STATUS: HRDATA <= {(DATA_WIDTH - 2)'(0), error_reg, irq_reg};
-
-        //   default: HRDATA <= '0;
-        // endcase
-      end else if (phase_valid_w && HREADY) begin
+      // Reads are combinational (above), so a write's data phase is never blocked
+      // by a read address phase that overlaps it
+      if (phase_valid_w && HREADY && !busy) begin
         $display(" [HYDRA]: Writing to MMR offset: %0h with data: %0h", mmr_offset_w, HWDATA);
         case (mmr_offset_w)
           CTRL: begin
+            // Clear-on-start: a new transfer begins with fresh status
+            if (HWDATA[0]) {error_reg, irq_reg} <= '0;
             start       <= HWDATA[0];
             mode        <= hydra_mode'(HWDATA[MODE_BITS:1]);
             scale_shift <= HWDATA[DATA_BITS+MODE_BITS:MODE_BITS+1];
@@ -162,6 +151,8 @@ module hydra_mmr (
           LEN:    length <= (|HWDATA[DATA_WIDTH-1:LEN_WIDTH]) ? '1 : HWDATA[LEN_WIDTH-1:0];
           STATUS: {error_reg, irq_reg} <= '0;
         endcase
+      end else if (phase_valid_w && HREADY && busy) begin
+        $display(" [HYDRA]: Ignored write to MMR offset: %0h while busy", mmr_offset_w);
       end
     end
   end

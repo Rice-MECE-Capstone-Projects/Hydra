@@ -60,6 +60,7 @@
     #define HYDRA_MMR_CTRL_POOL_MAX (0b01 << 11)
     #define HYDRA_MMR_STATUS_DONE  ( 0b1 << 0)
     #define HYDRA_MMR_STATUS_ERROR ( 0b1 << 1)
+    #define HYDRA_MMR_STATUS_BUSY  ( 0b1 << 2) // MMR writes are ignored while set
 
     // ----------------------------Mode B geometry----------------------------
     #define BLOCK_ROWS 8

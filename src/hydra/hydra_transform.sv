@@ -67,7 +67,8 @@ module hydra_transform (
     // Status
     output logic [BEATS_WIDTH-1:0] currBeat,
     output logic                   done,
-    output logic                   error
+    output logic                   error,
+    output logic                   busy
 );
 
   localparam AHB_SIZE = $clog2(DATA_WIDTH / 8);  // AHB size encoding for 32-bit words
@@ -141,6 +142,8 @@ module hydra_transform (
                                                           ((mode == MODE_E) && (length[POOL_BITS-1:0] != '0))  ||
                                                           out_of_bounds);
   assign error = (state == ERROR);
+  // Includes the `start` cycle so there is no gap between accepting START and entering BUSY
+  assign busy = (state == BUSY) || (state == FLUSH) || start;
   always_ff @(posedge clk) begin
     if (rst_n && start) begin
       if (invalid_length) begin
@@ -163,9 +166,13 @@ module hydra_transform (
     else begin
       if (done) $display(" [HYDRA]: Mode %0d finished", mode);
       case (state)
-        IDLE:  next_state = HREADY ? (invalid_length ? ERROR : BUSY) : IDLE;
-        BUSY: begin
+        // Only a new START leaves IDLE. The arbiter can hold the grant (HREADY) for a few
+        // cycles after a transfer, which must not restart the FSM
+        IDLE: begin
           if (start) $display(" [HYDRA]: Mode %0d started", mode);
+          next_state = start ? BUSY : IDLE;
+        end
+        BUSY: begin
           case (mode)
             MODE_A:  next_state = IDLE;
             MODE_B:  next_state = done_read ? FLUSH : BUSY;

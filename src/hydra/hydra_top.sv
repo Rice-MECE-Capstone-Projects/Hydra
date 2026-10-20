@@ -101,6 +101,7 @@ module hydra_top #(
   logic           [BEATS_WIDTH-1:0] hydra_currBeat;
   logic                             hydra_done;
   logic                             hydra_error;
+  logic                             hydra_busy;
   logic                             hydra_HBUSREQ;
   logic                             HSEL_scratch_d, HSEL_scratch_next;
 
@@ -145,6 +146,7 @@ module hydra_top #(
       .rst_n,
       .irq(irq_hydra),
       .error(hydra_error),
+      .busy(hydra_busy),
       .HADDR(HADDR_in),
       .HWDATA(HWDATA_s),
       .HWRITE(HWRITE_s),
@@ -211,7 +213,8 @@ module hydra_top #(
       .SCRATCH_WDATA,
       .currBeat(hydra_currBeat),
       .done    (hydra_done),
-      .error   (hydra_error)
+      .error   (hydra_error),
+      .busy    (hydra_busy)
   );
 
 endmodule
