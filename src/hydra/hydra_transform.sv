@@ -105,6 +105,9 @@ module hydra_transform (
   logic [1:0] next_HTRANS;
   logic       next_HBUSREQ;
   logic       invalid_length;
+  logic       out_of_bounds;
+  logic [ LEN_WIDTH-1:0] out_words;
+  logic [  ADDR_WIDTH:0] out_end;
   logic first_trans, start_fill;
   logic fill_sel, drain_sel;
   logic next_done_read, done_read, next_done;
@@ -121,17 +124,33 @@ module hydra_transform (
   assign HWRITE = 1'b0;
   assign HWDATA = '0;
   assign next_done_read   = (count == length-1) && HREADY && (state == BUSY); // done reading when last word of last column is read from AHB
+  // Scratchpad words written by this transfer must fit between dst_addr and the end of the scratchpad
+  // (dst_addr is relative to SCRATCH_BASE, so a dst below the base wraps large and is also caught)
+  always_comb begin
+    case (mode)
+      MODE_B:  out_words = length;
+      MODE_C:  out_words = length >> QUANT_BITS;
+      MODE_E:  out_words = length >> POOL_BITS;
+      default: out_words = '0;
+    endcase
+  end
+  assign out_end          = dst_addr + out_words * REG_STRIDE;
+  assign out_of_bounds    = out_end > SCRATCH_BYTES;
   assign invalid_length   = start && ((length == '0) || ((mode == MODE_B) && (length[ELEM_WIDTH-1:0] != '0))  ||
                                                           ((mode == MODE_C) && (length[QUANT_BITS-1:0] != '0)) ||
-                                                          ((mode == MODE_E) && (length[POOL_BITS-1:0] != '0)));
+                                                          ((mode == MODE_E) && (length[POOL_BITS-1:0] != '0))  ||
+                                                          out_of_bounds);
   assign error = (state == ERROR);
   always_ff @(posedge clk) begin
     if (rst_n && start) begin
       if (invalid_length) begin
         $display("\t[ERROR] Fatal error occurred in hydra_transform:");
-        $display("\t\tGot `length`: %0d.", length);
-        $display("\t\tExpected: non-zero multiple of %0d.",
-                 mode == MODE_B ? NUM_ELEMS : QUANT_DEPTH);
+        $display("\t\tGot `length`: %0d, `dst_addr`: %0h.", length, dst_addr);
+        if (out_of_bounds)
+          $display("\t\tOutput ends at scratchpad byte %0h, past its %0d-byte size.", out_end, SCRATCH_BYTES);
+        else
+          $display("\t\tExpected: non-zero multiple of %0d.",
+                   mode == MODE_B ? NUM_ELEMS : QUANT_DEPTH);
       end
     end
   end

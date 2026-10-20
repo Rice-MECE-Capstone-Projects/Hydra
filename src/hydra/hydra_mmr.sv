@@ -158,7 +158,8 @@ module hydra_mmr (
           end
           SRC:    src_addr <= HWDATA[ADDR_WIDTH-1:0];
           DST:    dst_addr <= HWDATA[ADDR_WIDTH-1:0];
-          LEN:    length <= HWDATA[LEN_WIDTH-1:0];
+          // Saturate instead of truncating, so an oversized LEN fails the bounds check
+          LEN:    length <= (|HWDATA[DATA_WIDTH-1:LEN_WIDTH]) ? '1 : HWDATA[LEN_WIDTH-1:0];
           STATUS: {error_reg, irq_reg} <= '0;
         endcase
       end
