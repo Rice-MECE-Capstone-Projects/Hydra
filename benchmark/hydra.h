@@ -66,7 +66,9 @@
     #define BLOCK_ROWS 8
     #define BLOCK_COLS 16
     #define NUM_ELEMS  (BLOCK_ROWS * BLOCK_COLS) // from src/hydra_pkg.sv
-    #define POOL_SIZE  4 // from src/hydra_pkg.sv
+    #ifndef POOL_SIZE
+        #define POOL_SIZE  4 // from src/hydra_pkg.sv; must match HYDRA_POOL_SIZE (see modeE/Makefile P=)
+    #endif
 
     // -------------------------Performance counters--------------------------
     typedef struct {

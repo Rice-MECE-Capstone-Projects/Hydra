@@ -66,7 +66,11 @@ package hydra_pkg;
 
   parameter  ahb_burst_type BURST_TYPE  = INCR16;
   parameter  int unsigned   QUANT_DIM   = 8;
-  parameter  int unsigned   POOL_SIZE   = 4;
+  // Mode E window (power of 2). Override at compile time with +define+HYDRA_POOL_SIZE=<n>
+`ifndef HYDRA_POOL_SIZE
+  `define HYDRA_POOL_SIZE 4
+`endif
+  parameter  int unsigned   POOL_SIZE   = `HYDRA_POOL_SIZE;
 
   // Scratchpad has 32 KB at 32-bit words
   parameter  int unsigned   MEM_SIZE    = 8192;
