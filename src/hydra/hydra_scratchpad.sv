@@ -3,9 +3,10 @@
 //
 // Author: Giovanni Sirtori <gs86@rice.edu>
 //
-// Description: Dual-port scratchpad for HYDRA outputs across all modes.
-//   Port A: AHB-Lite slave — CPU read-only access.
-//   Port B: HYDRA private sideband write port.
+// Description: Single-port scratchpad for HYDRA outputs across all modes.
+//   One memory port shared by:
+//   - AHB-Lite slave — CPU read-only access.
+//   - HYDRA private sideband write port (has priority).
 //
 // A component of the HYDRA project.
 // https://github.com/Rice-MECE-Capstone-Projects/Hydra
@@ -28,9 +29,12 @@
 
 // Ordering contract (enforced by software, not hardware):
 //   1. CPU must only read scratchpad after HYDRA asserts STATUS.DONE.
-//   2. Concurrent read/write collisions are not guarded in hardware — if
-//      software violates the contract, the read returns pre-write data
-//      (standard flop read-before-write semantics) but no corruption occurs.
+//   2. If a CPU read collides with a HYDRA write, the write takes the port
+//      and the read is held (HREADYOUT low) until the port is free. The read
+//      then returns post-write data; no corruption occurs.
+//
+// HRDATA/HREADYOUT are combinational and registered once in hydra_top, so
+// they describe the next bus cycle (HREADYOUT=0 stalls the coming data phase).
 
 import hydra_pkg::*;
 module hydra_scratchpad (
@@ -56,36 +60,44 @@ module hydra_scratchpad (
 );
 
   // MEM_SIZE is the word count for a 32-bit DATA_WIDTH baseline. The
-  // MEM_DEPTH localparam rescales this so the memory is always 4 MB
-  // regardless of DATA_WIDTH.
+  // MEM_DEPTH localparam rescales this so capacity stays 32 KB for any
+  // DATA_WIDTH.
   localparam int unsigned MEM_DEPTH  = 32 * MEM_SIZE / DATA_WIDTH;
   localparam int unsigned ADDR_BITS  = $clog2(MEM_DEPTH);
   localparam int unsigned BYTE_SHIFT = $clog2(DATA_WIDTH / 8);
 
   logic [DATA_WIDTH-1:0] mem         [MEM_DEPTH];
   logic                  read_access;
+  logic                  read_pending;
+  logic                  read_stall;
+  logic [ ADDR_BITS-1:0] pending_addr;
+  logic [ ADDR_BITS-1:0] read_addr;
+  logic [ ADDR_BITS-1:0] port_addr;
 
-  assign read_access = HTRANS[1] && HSEL && !HWRITE && HREADY;
+  assign read_access  = HTRANS[1] && HSEL && !HWRITE && HREADY;
 
-  // Scratchpad has no wait states and never signals errors
-  // (matches cvw/src/uncore/ram_ahb.sv convention)
-  assign HREADYOUT   = 1;
-  assign HRESP       = 0;
-  assign HRDATA      = read_access ? mem[HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT]] : '0;
+  // Single port: HYDRA writes win; otherwise serve a held read, then a new read
+  assign read_addr    = read_pending ? pending_addr : HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT];
+  assign port_addr    = SCRATCH_WE ? SCRATCH_WADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT] : read_addr;
+  assign read_stall   = SCRATCH_WE && (read_access || read_pending);
+
+  // Never signals errors
+  assign HREADYOUT    = !read_stall;
+  assign HRESP        = 0;
+  assign HRDATA       = (!SCRATCH_WE && (read_access || read_pending)) ? mem[port_addr] : '0;
 
   always_ff @(posedge clk) begin
     if (!rst_n) begin
-      // nothing happens here
+      read_pending <= 0;
+      pending_addr <= '0;
     end else begin
-      // AHB read
-      if (read_access) begin
-        // $display(" [HYDRA]: Reading: %0h from SCRATCH[%0h]", HRDATA,
-        //          HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT]);
-      end
+      // Hold a read that lost the port until it is served
+      read_pending <= read_stall;
+      if (read_access && SCRATCH_WE) pending_addr <= HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT];
 
       // Sideband write
       if (SCRATCH_WE) begin
-        mem[SCRATCH_WADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT]] <= SCRATCH_WDATA;
+        mem[port_addr] <= SCRATCH_WDATA;
       end
     end
   end

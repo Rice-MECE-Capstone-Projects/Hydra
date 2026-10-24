@@ -32,7 +32,7 @@ module hydra_top #(
     parameter MMR_BASE      = 'h2000_0000,
     parameter MMR_RANGE     = 'h0000_0FFF,
     parameter SCRATCH_BASE  = 'h2001_0000,
-    parameter SCRATCH_RANGE = 'h003F_FFFF
+    parameter SCRATCH_RANGE = 'h0000_7FFF
 ) (
     input logic clk,
     input logic rst_n,
@@ -101,7 +101,9 @@ module hydra_top #(
   logic           [BEATS_WIDTH-1:0] hydra_currBeat;
   logic                             hydra_done;
   logic                             hydra_error;
+  logic                             hydra_busy;
   logic                             hydra_HBUSREQ;
+  logic                             HSEL_scratch_d, HSEL_scratch_next;
 
   assign HPROT_m = 4'b0011;  // privileged, data, non-cacheable, non-bufferable
   assign HMASTLOCK_m = 0;
@@ -114,13 +116,19 @@ module hydra_top #(
   assign hydra_dst_addr = mmr_dst_addr - SCRATCH_BASE[ADDR_WIDTH-1:0];
   assign irq_hydra = hydra_done || hydra_error;
 
-  always_ff @(posedge clk) begin
-    HRDATA_s <= ({DATA_WIDTH{HSEL_mmr}} & HRDATA_mmr) | ({DATA_WIDTH{HSEL_scratch}} & HRDATA_scratch);
+  // While the scratchpad stalls a read (HREADY_s low), HADDR_s already holds the
+  // next transfer, so keep the scratchpad selected until the stalled read completes
+  assign HSEL_scratch_next = HREADY_s ? HSEL_scratch : HSEL_scratch_d;
 
-    // Both slaves are zero-wait-state, so HREADYOUT_s is always 1
+  always_ff @(posedge clk) begin
+    HSEL_scratch_d <= rst_n && HSEL_scratch_next;
+
+    HRDATA_s <= HSEL_scratch_next ? HRDATA_scratch : ({DATA_WIDTH{HSEL_mmr}} & HRDATA_mmr);
+
+    // MMR is zero-wait-state; the scratchpad stalls reads that collide with HYDRA writes
     // HSEL_none ensures HREADYOUT_s=1 during idle cycles to prevent bus lockup
-    HREADYOUT_s <= (HSEL_mmr && HREADYOUT_mmr) || (HSEL_scratch && HREADYOUT_scratch) || HSEL_none;
-    HRESP_s <= (HSEL_mmr && HRESP_mmr) || (HSEL_scratch && HRESP_scratch);
+    HREADYOUT_s <= HSEL_scratch_next ? HREADYOUT_scratch : ((HSEL_mmr && HREADYOUT_mmr) || HSEL_none);
+    HRESP_s <= HSEL_scratch_next ? HRESP_scratch : (HSEL_mmr && HRESP_mmr);
   end
 
   hydra_arbiter arbiter (
@@ -138,6 +146,7 @@ module hydra_top #(
       .rst_n,
       .irq(irq_hydra),
       .error(hydra_error),
+      .busy(hydra_busy),
       .HADDR(HADDR_in),
       .HWDATA(HWDATA_s),
       .HWRITE(HWRITE_s),
@@ -204,7 +213,8 @@ module hydra_top #(
       .SCRATCH_WDATA,
       .currBeat(hydra_currBeat),
       .done    (hydra_done),
-      .error   (hydra_error)
+      .error   (hydra_error),
+      .busy    (hydra_busy)
   );
 
 endmodule

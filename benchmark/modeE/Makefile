@@ -25,16 +25,18 @@
 # and limitations under the License.
 #########################################################################################################
 
-# Usage: make [compile, clean] [T=...] [S=...] [B=...] [O=...]
+# Usage: make [compile, clean] [T=...] [S=...] [B=...] [O=...] [P=...]
 # Examples:
 #	make T="hydra test"	O="-O2 -O3_fun-roll-loops" B="5-20 40-40" S="CICD WICD WIWD"
 # 	make compile T="test1 test2" O=-O1 B=32-64 S=WIWD
+#	make B=1-8 P="4 8 16"
 #	make clean T="hydra test"
 # Defaults:
 #	T=hydra
 #	S=WICD
 #	B=1-MAX_BLOCKS
 #	O=-O3_-funroll-loops
+#	P=4 (pooling window; sets both POOL_SIZE in C and HYDRA_POOL_SIZE in the RTL)
 
 # NOTE: 1. 	for multiple compiler optimization args, concatenate them with '_'
 #			like shown in example above
@@ -50,6 +52,7 @@ T	?= hydra
 S	?= WICD
 B	?= 1-MAX_BLOCKS
 O	?= -O3_-funroll-loops
+P	?= 4
 
 
 .PHONY: all
@@ -60,31 +63,36 @@ all:
 		for s in $(S); do	\
 			for b in $(B); do	\
 				for o in $(O); do 	\
-					o_new=$${o//_/ };	\
-					$(MAKE) --no-print-directory compile						\
-						TARGET=$$t												\
-						SFLAG="-DSTATE=$$s" 									\
-						OFLAG="$$o_new"											\
-						BFLAG="-DMIN_BLOCKS=$${b%%-*} -DBENCH_BLOCKS=$${b#*-}";	\
-					echo "Running file '$$t.c' with S=$$s, B=$$b, O=$$o_new";	\
-					wsim rv32gc --sim questa --elf $$t 							\
-						> "$(OUT_DIR)/$${s}__$${b}__$${o}.log" || exit $$?;			\
-					echo "Output saved to $(OUT_DIR)/$${s}__$${b}__$${o}.log";	\
+					for p in $(P); do	\
+						o_new=$${o//_/ };	\
+						$(MAKE) --no-print-directory compile						\
+							TARGET=$$t												\
+							SFLAG="-DSTATE=$$s" 									\
+							OFLAG="$$o_new"											\
+							PFLAG="-DPOOL_SIZE=$$p"									\
+							BFLAG="-DMIN_BLOCKS=$${b%%-*} -DBENCH_BLOCKS=$${b#*-}";	\
+						echo "Running file '$$t.c' with S=$$s, B=$$b, O=$$o_new, P=$$p";	\
+						wsim rv32gc --sim questa --elf $$t 							\
+							--define "+define+HYDRA_POOL_SIZE=$$p"					\
+							> "$(OUT_DIR)/$${s}__$${b}__$${o}__P$${p}.log" || exit $$?;	\
+						echo "Output saved to $(OUT_DIR)/$${s}__$${b}__$${o}__P$${p}.log";	\
+					done; \
 				done; \
 			done; \
 		done; \
 	done
-	
+
 TARGET	?= 	$(T)
 SFLAG	?= 	"-DSTATE=$(S)"
 BFLAG	?=	-DMIN_BLOCKS=$(word 1, $(subst -, ,$(B))) \
 			-DBENCH_BLOCKS=$(word 2, $(subst -, ,$(B)))
 OFLAG	?= 	$(subst _, ,$(O))
+PFLAG	?=	-DPOOL_SIZE=$(P)
 compile:
 	@for t in $(TARGET); do	\
-		echo ">>> Compiling file '$$t.c' with $(SFLAG), $(BFLAG), $(OFLAG)";	\
+		echo ">>> Compiling file '$$t.c' with $(SFLAG), $(BFLAG), $(OFLAG), $(PFLAG)";	\
 		riscv64-unknown-elf-gcc -o $$t -gdwarf-2							\
-			$(SFLAG) $(BFLAG) $(OFLAG) 												\
+			$(SFLAG) $(BFLAG) $(OFLAG) $(PFLAG)										\
 			-march=rv32gc_zba_zbb_zbs_zicbom -mabi=ilp32d -mcmodel=medany			\
 			-nostdlib -static -lm -fno-tree-loop-distribute-patterns				\
 			-T$(WALLY_DIR)/common/test.ld -I$(WALLY_DIR)/common						\

@@ -60,12 +60,15 @@
     #define HYDRA_MMR_CTRL_POOL_MAX (0b01 << 11)
     #define HYDRA_MMR_STATUS_DONE  ( 0b1 << 0)
     #define HYDRA_MMR_STATUS_ERROR ( 0b1 << 1)
+    #define HYDRA_MMR_STATUS_BUSY  ( 0b1 << 2) // MMR writes are ignored while set
 
     // ----------------------------Mode B geometry----------------------------
     #define BLOCK_ROWS 8
     #define BLOCK_COLS 16
     #define NUM_ELEMS  (BLOCK_ROWS * BLOCK_COLS) // from src/hydra_pkg.sv
-    #define POOL_SIZE  4 // from src/hydra_pkg.sv
+    #ifndef POOL_SIZE
+        #define POOL_SIZE  4 // from src/hydra_pkg.sv; must match HYDRA_POOL_SIZE (see modeE/Makefile P=)
+    #endif
 
     // -------------------------Performance counters--------------------------
     typedef struct {

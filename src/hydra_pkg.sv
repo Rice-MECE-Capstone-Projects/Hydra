@@ -66,14 +66,24 @@ package hydra_pkg;
 
   parameter  ahb_burst_type BURST_TYPE  = INCR16;
   parameter  int unsigned   QUANT_DIM   = 8;
-  parameter  int unsigned   POOL_SIZE   = 4;
+  // Mode E window (power of 2). Override at compile time with +define+HYDRA_POOL_SIZE=<n>
+`ifndef HYDRA_POOL_SIZE
+  `define HYDRA_POOL_SIZE 4
+`endif
+  parameter  int unsigned   POOL_SIZE   = `HYDRA_POOL_SIZE;
 
-  // Scratchpad has 4 MB at 32-bit words
-  parameter  int unsigned   MEM_SIZE    = 1048576;
+  // Scratchpad has 32 KB at 32-bit words
+  parameter  int unsigned   MEM_SIZE    = 8192;
 
   localparam int unsigned   REG_STRIDE  = DATA_WIDTH / 8;
   localparam int unsigned   DATA_BITS   = $clog2(DATA_WIDTH);
-  localparam int unsigned   LEN_WIDTH   = $clog2(MEM_SIZE);
+  localparam int unsigned   SCRATCH_BYTES = 4 * MEM_SIZE;
+
+  // LEN counts source words. The largest useful LEN fills the scratchpad in the
+  // mode with the biggest source-to-output reduction (B: 1, C: DATA_WIDTH/QUANT_DIM, E: POOL_SIZE)
+  localparam int unsigned   MAX_REDUCE  = (POOL_SIZE > DATA_WIDTH / QUANT_DIM) ? POOL_SIZE : DATA_WIDTH / QUANT_DIM;
+  localparam int unsigned   MAX_LEN     = MEM_SIZE * MAX_REDUCE;
+  localparam int unsigned   LEN_WIDTH   = $clog2(MAX_LEN + 1);
   localparam int unsigned   NUM_BEATS   = getLen_fn(BURST_TYPE);
   localparam int unsigned   BEATS_WIDTH = $clog2(NUM_BEATS);
   localparam int unsigned   POOL_BITS   = $clog2(POOL_SIZE);
