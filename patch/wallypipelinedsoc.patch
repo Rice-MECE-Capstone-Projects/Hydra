@@ -1,17 +1,18 @@
 diff --git a/src/wally/wallypipelinedsoc.sv b/src/wally/wallypipelinedsoc.sv
-index 51d2f6124..3a6cc14a4 100644
+index 51d2f6124..a3647dedc 100644
 --- a/src/wally/wallypipelinedsoc.sv
 +++ b/src/wally/wallypipelinedsoc.sv
-@@ -2,7 +2,7 @@
+@@ -2,7 +2,8 @@
  // wally-pipelinedsoc.sv
  //
  // Written: David_Harris@hmc.edu 6 November 2020
 -// Modified:
 +// Modified: Giovanni Sirtori <gs86@rice.edu> (HYDRA integration), 3 May 2026
++// Modified: Matthew Nutt <mcn5@rice.edu> (synthesis revisions), 26 Oct 2026
  //
  // Purpose: System on chip including pipelined processor and uncore memories/peripherals
  //
-@@ -27,7 +27,7 @@
+@@ -27,7 +28,7 @@
  // and limitations under the License.
  ////////////////////////////////////////////////////////////////////////////////////////////////
  
@@ -20,7 +21,7 @@ index 51d2f6124..3a6cc14a4 100644
    input  logic                clk,
    input  logic                reset_ext,        // external asynchronous reset pin
    output logic                reset,            // reset synchronized to clk to prevent races on release
-@@ -72,6 +72,48 @@ module wallypipelinedsoc import cvw::*; #(parameter cvw_t P)  (
+@@ -72,6 +73,48 @@ module wallypipelinedsoc import cvw::*; #(parameter cvw_t P)  (
    logic                       MTimerInt, MSwInt;// timer and software interrupts from CLINT
    logic [63:0]                MTIME_CLINT;      // from CLINT to CSRs
    logic                       MExtInt,SExtInt;  // from PLIC
@@ -69,7 +70,7 @@ index 51d2f6124..3a6cc14a4 100644
  
    // synchronize reset to SOC clock domain
    synchronizer resetsync(.clk, .d(reset_ext), .q(reset));
-@@ -79,19 +121,59 @@ module wallypipelinedsoc import cvw::*; #(parameter cvw_t P)  (
+@@ -79,19 +122,59 @@ module wallypipelinedsoc import cvw::*; #(parameter cvw_t P)  (
    // instantiate processor and internal memories
    wallypipelinedcore #(P) core(.clk, .reset,
      .MTimerInt, .MExtInt, .SExtInt, .MSwInt, .MTIME_CLINT,

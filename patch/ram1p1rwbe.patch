@@ -1,8 +1,16 @@
 diff --git a/src/generic/mem/ram1p1rwbe.sv b/src/generic/mem/ram1p1rwbe.sv
-index 500524042..8cd0996a6 100644
+index 500524042..9f45ad571 100644
 --- a/src/generic/mem/ram1p1rwbe.sv
 +++ b/src/generic/mem/ram1p1rwbe.sv
-@@ -101,7 +101,7 @@ module ram1p1rwbe import cvw::*; #(parameter USE_SRAM=0, DEPTH=64, WIDTH=44, PRE
+@@ -5,6 +5,7 @@
+ // Written: rose@rosethompson.net
+ // Created: 3 May 2021
+ // Modified: 20 January 2023
++// Modified: Matthew Nutt <mcn5@rice.edu> (synthesis revisions), 26 Oct 2026
+ //
+ // Purpose: Storage and read/write access to data cache data, tag valid, dirty, and replacement.
+ //          Basic sram with 1 read write port.
+@@ -101,7 +102,7 @@ module ram1p1rwbe import cvw::*; #(parameter USE_SRAM=0, DEPTH=64, WIDTH=44, PRE
              string       WALLY_DIR = getenvval("WALLY");
              $readmemh({WALLY_DIR,"/fpga/src/data.mem"}, RAM, 0);  // load boot RAM for FPGA
            `else

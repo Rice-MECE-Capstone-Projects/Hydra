@@ -1,8 +1,16 @@
 diff --git a/src/generic/mem/rom1p1r.sv b/src/generic/mem/rom1p1r.sv
-index 9e170e120..26f34ee76 100644
+index 9e170e120..0ac65b47a 100644
 --- a/src/generic/mem/rom1p1r.sv
 +++ b/src/generic/mem/rom1p1r.sv
-@@ -59,7 +59,7 @@ module rom1p1r #(parameter ADDR_WIDTH = 8, DATA_WIDTH = 32, PRELOAD_ENABLED = 0)
+@@ -2,6 +2,7 @@
+ // rom1p1r
+ //
+ // Written: David_Harris@hmc.edu 8/24/22
++// Modified: Matthew Nutt <mcn5@rice.edu> (synthesis revisions), 26 Oct 2026
+ //
+ // Purpose: Single-ported ROM
+ //
+@@ -59,7 +60,7 @@ module rom1p1r #(parameter ADDR_WIDTH = 8, DATA_WIDTH = 32, PRELOAD_ENABLED = 0)
              string       WALLY_DIR = getenvval("WALLY");
              $readmemh({WALLY_DIR,"/fpga/src/boot.mem"}, ROM, 0);  // load boot ROM for FPGA
          `else

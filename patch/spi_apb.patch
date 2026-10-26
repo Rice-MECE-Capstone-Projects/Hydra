@@ -1,8 +1,16 @@
 diff --git a/src/uncore/spi_apb.sv b/src/uncore/spi_apb.sv
-index 7c0826edb..a3df65be1 100644
+index 7c0826edb..d3744b554 100644
 --- a/src/uncore/spi_apb.sv
 +++ b/src/uncore/spi_apb.sv
-@@ -307,7 +307,16 @@ module spi_apb import cvw::*; #(parameter cvw_t P) (
+@@ -4,6 +4,7 @@
+ // Written: Naiche Whyte-Aguayo nwhyteaguayo@g.hmc.edu
+ //          Jacob Pease jacobpease@protonmail.com (October 29th, 2024)
+ // Created: November 16th, 2022
++// Modified: Matthew Nutt <mcn5@rice.edu> (synthesis revisions), 26 Oct 2026
+ //
+ // Purpose: SPI peripheral
+ //
+@@ -307,7 +308,16 @@ module spi_apb import cvw::*; #(parameter cvw_t P) (
    // Shift Registers --------------------------------------------------
    // Transmit shift register
    assign TransmitLoad = TransmitStart | (EndOfFrame & ~TransmitFIFOEmpty);
@@ -15,12 +23,12 @@ index 7c0826edb..a3df65be1 100644
 +                                            TransmitReadData[4],
 +                                            TransmitReadData[5],
 +                                            TransmitReadData[6],
-+                                            TransmitReadData[7] } 
++                                            TransmitReadData[7] }
 +                                      : TransmitReadData[7:0];
    always_ff @(posedge PCLK)
      if(~PRESETn)            TransmitReg <= 8'b0;
      else if (TransmitLoad)  TransmitReg <= TransmitDataEndian;
-@@ -332,7 +341,16 @@ module spi_apb import cvw::*; #(parameter cvw_t P) (
+@@ -332,7 +342,16 @@ module spi_apb import cvw::*; #(parameter cvw_t P) (
    // Aligns received data and reverses if little-endian
    assign LeftShiftAmount = 4'h8 - FrameLength;
    assign ASR = ReceiveShiftReg << LeftShiftAmount[2:0];
