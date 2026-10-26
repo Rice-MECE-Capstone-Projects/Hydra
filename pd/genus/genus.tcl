@@ -10,7 +10,6 @@ set_db init_lib_search_path [list   $PDK_DIR/asap7sc7p5t_28/LIB/CCS/ \
                                     $PDK_DIR/asap7_sram_0p0/generated/LIB/ \
                                     $PDK_DIR/asap7_sram_0p0/generated/LEF/4xLEF/ ]
 set_db init_hdl_search_path [list   ../../src/ \
-                                    ../../src/hydra/ \
                                     ../../wally/src/ \
                                     ../../wally/config/shared/ \
                                     ../../wally/config/rv32gc/ ]
@@ -19,14 +18,16 @@ set_db init_hdl_search_path [list   ../../src/ \
 read_mmmc ./mmmc.tcl
 
 # Read LEFs, using the 4x scaled versions
-# The cell LEFs will evoke a warning about duplicated sites - ignore this
+# read_physical will emit a warning about duplicated sites in the cell LEFs - ignore this
 # The sites should be identical, and it's still necessary to read all files for other information
-# TODO: add specific SRAM LEFs here?
-read_physical -lefs [list   asap7_tech_4x_201209.lef \
-                            asap7sc7p5t_28_R_4x_220121a.lef \
-                            asap7sc7p5t_28_L_4x_220121a.lef \
-                            asap7sc7p5t_28_SL_4x_220121a.lef \
-                            asap7sc7p5t_28_SRAM_4x_220121a.lef ]
+# Note that the SRAM cell lef refers to cells with SRAM threshold voltage, not the SRAM LEFs
+set cell_lef_list [list asap7_tech_4x_201209.lef \
+                        asap7sc7p5t_28_R_4x_220121a.lef \
+                        asap7sc7p5t_28_L_4x_220121a.lef \
+                        asap7sc7p5t_28_SL_4x_220121a.lef \
+                        asap7sc7p5t_28_SRAM_4x_220121a.lef ]
+set sram_lef_list [glob -nocomplain -directory "$PDK_DIR/asap7_sram_0p0/generated/LEF/4xLEF/" -type f *]
+read_physical -lefs [concat $cell_lef_list $sram_lef_list]
 
 # Read RTL and elaborate
 read_hdl -language sv -f rtl_list.f

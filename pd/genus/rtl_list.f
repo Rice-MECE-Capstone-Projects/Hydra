@@ -227,8 +227,9 @@ uncore/uncore.sv
 wally/wallypipelinedcore.sv
 wally/wallypipelinedsoc.sv
 
-hydra_arbiter.sv
-hydra_mmr.sv
-hydra_scratchpad.sv
-hydra_top.sv
-hydra_transform.sv
+hydra/hydra_arbiter.sv
+hydra/hydra_mmr.sv
+hydra/hydra_scratchpad.sv
+hydra/hydra_top.sv
+hydra/hydra_transform.sv
+sram/sram_wrapper_8192x32.sv

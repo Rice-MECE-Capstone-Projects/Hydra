@@ -89,9 +89,8 @@ module hydra_scratchpad (
   // If config matches SRAM macro, use it instead of regs ======================
   if (DATA_WIDTH == 32 && MEM_SIZE == 8192) begin
 
-    // REPLACE WITH CUSTOM MACRO
-    srambank_256x4x32_6t122 sram_8kiB(.clk(clk), .ADDRESS(port_addr), .wd(SCRATCH_WDATA),
-      .banksel(1'b1), .read(read_serve), .write(SCRATCH_WE), .dataout(HRDATA));
+    sram_wrapper_8192x32 sram_32KiB(.clk(clk), .address(port_addr), .write_data(SCRATCH_WDATA),
+      .bank_en(1'b1), .read_en(read_serve), .write_en(SCRATCH_WE), .dataout(HRDATA));
 
     always_ff @(posedge clk) begin
       if (!rst_n) begin
