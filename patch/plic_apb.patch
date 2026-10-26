@@ -1,7 +1,16 @@
 diff --git a/src/uncore/plic_apb.sv b/src/uncore/plic_apb.sv
-index bf95dd51f..2044f1c56 100644
+index bf95dd51f..de3733280 100644
 --- a/src/uncore/plic_apb.sv
 +++ b/src/uncore/plic_apb.sv
+@@ -2,7 +2,7 @@
+ // plic_apb.sv
+ //
+ // Written: bbracker@hmc.edu 18 January 2021
+-// Modified:
++// Modified: Giovanni Sirtori <gs86@rice.edu> (HYDRA integration), 26 Sep 2026
+ //
+ // Purpose: Platform-Level Interrupt Controller
+ //   Based on RISC-V spec (https://github.com/riscv/riscv-plic-spec/blob/master/riscv-plic.adoc)
 @@ -50,7 +50,7 @@ module plic_apb import cvw::*;  #(parameter cvw_t P) (
    input  logic                PENABLE,
    output logic [P.XLEN-1:0]   PRDATA,

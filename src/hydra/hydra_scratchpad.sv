@@ -3,9 +3,10 @@
 //
 // Author: Giovanni Sirtori <gs86@rice.edu>
 //
-// Description: Dual-port scratchpad for HYDRA outputs across all modes.
-//   Port A: AHB-Lite slave — CPU read-only access.
-//   Port B: HYDRA private sideband write port.
+// Description: Single-port scratchpad for HYDRA outputs across all modes.
+//   One memory port shared by:
+//   - AHB-Lite slave — CPU read-only access.
+//   - HYDRA private sideband write port (has priority).
 //
 // A component of the HYDRA project.
 // https://github.com/Rice-MECE-Capstone-Projects/Hydra
@@ -27,120 +28,104 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Ordering contract (enforced by software, not hardware):
-    //   1. CPU must only read scratchpad after HYDRA asserts STATUS.DONE.
-    //   2. Concurrent read/write collisions are not guarded in hardware — if
-    //      software violates the contract, the read returns pre-write data
-    //      (standard flop read-before-write semantics) but no corruption occurs.
+//   1. CPU must only read scratchpad after HYDRA asserts STATUS.DONE.
+//   2. If a CPU read collides with a HYDRA write, the write takes the port
+//      and the read is held (HREADYOUT low) until the port is free. The read
+//      then returns post-write data; no corruption occurs.
+//
+// HRDATA/HREADYOUT are combinational and registered once in hydra_top, so
+// they describe the next bus cycle (HREADYOUT=0 stalls the coming data phase).
 
 import hydra_pkg::*;
 module hydra_scratchpad (
-    input  logic                   clk,
-    input  logic                   rst_n,
+    input logic clk,
+    input logic rst_n,
 
     // AHB-Lite slave port — CPU read
-    input  logic [ADDR_WIDTH-1:0]  HADDR,
+    input  logic [ADDR_WIDTH-1:0] HADDR,
     // input  logic [2:0]             HBURST,   // unused (non-cacheable region)
     // input  logic [2:0]             HSIZE,    // unused (LSU handles sub-word)
-    input  logic                   HWRITE,
-    input  logic [1:0]             HTRANS,
-    input  logic                   HSEL,
-    input  logic                   HREADY,
-    output logic [DATA_WIDTH-1:0]  HRDATA,
-    output logic                   HREADYOUT,
-    output logic                   HRESP,
+    input  logic                  HWRITE,
+    input  logic [           1:0] HTRANS,
+    input  logic                  HSEL,
+    input  logic                  HREADY,
+    output logic [DATA_WIDTH-1:0] HRDATA,
+    output logic                  HREADYOUT,
+    output logic                  HRESP,
 
     // Sideband write port — HYDRA private write
-    input  logic                   SCRATCH_WE,
-    input  logic [ADDR_WIDTH-1:0]  SCRATCH_WADDR,
-    input  logic [DATA_WIDTH-1:0]  SCRATCH_WDATA
+    input logic                  SCRATCH_WE,
+    input logic [ADDR_WIDTH-1:0] SCRATCH_WADDR,
+    input logic [DATA_WIDTH-1:0] SCRATCH_WDATA
 );
 
-    // MEM_SIZE is the word count for a 32-bit DATA_WIDTH baseline. The
-    // MEM_DEPTH localparam rescales this so capacity stays 4 KB for any
-    // DATA_WIDTH.
-    localparam int unsigned MEM_DEPTH  = 32 * MEM_SIZE / DATA_WIDTH;
-    localparam int unsigned ADDR_BITS  = $clog2(MEM_DEPTH); // = 10 for 1024 words
-    localparam int unsigned BYTE_SHIFT = $clog2(DATA_WIDTH/8);
+  // MEM_SIZE is the word count for a 32-bit DATA_WIDTH baseline. The
+  // MEM_DEPTH localparam rescales this so capacity stays 32 KB for any
+  // DATA_WIDTH.
+  localparam int unsigned MEM_DEPTH  = 32 * MEM_SIZE / DATA_WIDTH;
+  localparam int unsigned ADDR_BITS  = $clog2(MEM_DEPTH);
+  localparam int unsigned BYTE_SHIFT = $clog2(DATA_WIDTH / 8);
 
-    logic                   read_access;
-    logic                   read_pending;
-    logic                   read_response_valid;
-    logic [ADDR_BITS-1:0]   pending_read_addr;
+  logic                  read_access;
+  logic                  read_pending;
+  logic                  read_stall;
+  logic                  read_serve;
+  logic [ ADDR_BITS-1:0] pending_addr;
+  logic [ ADDR_BITS-1:0] read_addr;
+  logic [ ADDR_BITS-1:0] port_addr;
 
-    assign read_access      = HTRANS[1] && HSEL && !HWRITE && HREADY;
+  assign read_access  = HTRANS[1] && HSEL && !HWRITE && HREADY;
 
-    // A pending read is held until the single memory port is free. The
-    // response-ready flag allows the registered read data to settle first.
-    assign HREADYOUT        = !read_pending || read_response_valid;
-    assign HRESP            = 0;
-    
-    // If config matches SRAM macro, use it instead of regs
-    // Adopt the same surrounding collision logic
-    if (DATA_WIDTH == 32 && MEM_DEPTH == 1024) begin
+  // Single port: HYDRA writes win; otherwise serve a held read, then a new read
+  assign read_addr    = read_pending ? pending_addr : HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT];
+  assign port_addr    = SCRATCH_WE ? SCRATCH_WADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT] : read_addr;
+  assign read_stall   = SCRATCH_WE && (read_access || read_pending);
+  assign read_serve   = !SCRATCH_WE && (read_access || read_pending);
 
-        logic sram_read;
-        logic [9:0] sram_addr; // Word address
-        assign sram_read = !SCRATCH_WE && (read_pending || read_access);
-        assign sram_addr = SCRATCH_WE ? SCRATCH_WADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT] :
-            (read_pending ? pending_read_addr : HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT]);
+  // Never signals errors
+  assign HREADYOUT    = !read_stall;
+  assign HRESP        = 0;
 
-        srambank_256x4x32_6t122 sram_macro(.clk(clk), .ADDRESS(sram_addr), .wd(SCRATCH_WDATA),
-            .banksel(1'b1), .read(sram_read), .write(SCRATCH_WE), .dataout(HRDATA));
+  // If config matches SRAM macro, use it instead of regs ======================
+  if (DATA_WIDTH == 32 && MEM_SIZE == 8192) begin
 
-        always_ff @(posedge clk) begin
-            if (!rst_n) begin
-                read_pending       <= 1'b0;
-                read_response_valid <= 1'b0;
-                pending_read_addr  <= '0;
-            end else begin
-                if (read_response_valid && HREADY) begin
-                    read_response_valid <= 1'b0;
-                end
-                if (SCRATCH_WE) begin
-                    if(read_access) begin
-                        pending_read_addr <= HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT];
-                        read_pending      <= 1'b1;
-                    end
-                end else if (read_pending) begin
-                    read_pending        <= 1'b0;
-                    read_response_valid <= 1'b1;
-                end
-            end
-        end
+    // REPLACE WITH CUSTOM MACRO
+    srambank_256x4x32_6t122 sram_8kiB(.clk(clk), .ADDRESS(port_addr), .wd(SCRATCH_WDATA),
+      .banksel(1'b1), .read(read_serve), .write(SCRATCH_WE), .dataout(HRDATA));
 
-    // Original reg-based code
-    end else begin
-
-        logic [DATA_WIDTH-1:0]  mem [0:MEM_DEPTH-1];
-        always_ff @(posedge clk) begin
-            if (!rst_n) begin
-                HRDATA              <= '0;
-                read_pending       <= 1'b0;
-                read_response_valid <= 1'b0;
-                pending_read_addr  <= '0;
-            end else begin
-                if (read_response_valid && HREADY) begin
-                    read_response_valid <= 1'b0;
-                end
-
-                if (SCRATCH_WE) begin
-                    // HYDRA writes have priority; save a colliding CPU read for
-                    // service once the port is free.
-                    mem[SCRATCH_WADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT]] <= SCRATCH_WDATA;
-                    if (read_access) begin
-                        pending_read_addr <= HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT];
-                        read_pending      <= 1'b1;
-                    end
-                end else if (read_pending) begin
-                    HRDATA               <= mem[pending_read_addr];
-                    read_pending        <= 1'b0;
-                    read_response_valid <= 1'b1;
-                end else if (read_access) begin
-                    HRDATA <= mem[HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT]];
-                end
-            end
-        end
-
+    always_ff @(posedge clk) begin
+      if (!rst_n) begin
+        read_pending <= 0;
+        pending_addr <= '0;
+      end else begin
+        // Hold a read that lost the port until it is served
+        read_pending <= read_stall;
+        if (read_access && SCRATCH_WE) pending_addr <= HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT];
+      end
     end
+  
+  // Original reg-based code ===================================================
+  end else begin
+    
+    logic [DATA_WIDTH-1:0] mem [MEM_DEPTH];
+    assign HRDATA = read_serve ? mem[port_addr] : '0;
+
+    always_ff @(posedge clk) begin
+      if (!rst_n) begin
+        read_pending <= 0;
+        pending_addr <= '0;
+      end else begin
+        // Hold a read that lost the port until it is served
+        read_pending <= read_stall;
+        if (read_access && SCRATCH_WE) pending_addr <= HADDR[ADDR_BITS+BYTE_SHIFT-1:BYTE_SHIFT];
+
+        // Sideband write
+        if (SCRATCH_WE) begin
+          mem[port_addr] <= SCRATCH_WDATA;
+        end
+      end
+    end
+
+  end
 
 endmodule

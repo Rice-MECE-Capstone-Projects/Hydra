@@ -9,7 +9,8 @@ set_db init_lib_search_path [list   $PDK_DIR/asap7sc7p5t_28/LIB/CCS/ \
                                     $PDK_DIR/asap7sc7p5t_28/techlef_misc/ \
                                     $PDK_DIR/asap7_sram_0p0/generated/LIB/ \
                                     $PDK_DIR/asap7_sram_0p0/generated/LEF/4xLEF/ ]
-set_db init_hdl_search_path [list   ../../src/hydra/ \
+set_db init_hdl_search_path [list   ../../src/ \
+                                    ../../src/hydra/ \
                                     ../../wally/src/ \
                                     ../../wally/config/shared/ \
                                     ../../wally/config/rv32gc/ ]

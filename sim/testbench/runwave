@@ -1,6 +1,6 @@
 #!/bin/sh
 
-vlog ../../src/hydra/hydra_pkg.sv           \
+vlog ../../src/hydra_pkg.sv                 \
      ../../src/hydra/hydra_arbiter.sv       \
      ../../src/hydra/hydra_scratchpad.sv    \
      ../../src/hydra/hydra_transform.sv     \

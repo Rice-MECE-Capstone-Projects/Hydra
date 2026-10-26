@@ -305,7 +305,7 @@ module hydra_tb;
 
   task automatic wait_done ();
     for (int i = 0; i < TIMEOUT; i++) begin
-      @(posedge clk); #1;
+      @(posedge clk);
       if (done || error) return;
     end
     $display("\t[TIMEOUT] T%0d: done never asserted after %0d cycles", test_id, TIMEOUT);
@@ -552,7 +552,7 @@ module hydra_tb;
     length_x  = NUM_ELEMS / 2;
     $display("[T%0d] Mode B, length=%0d (invalid) => expect ERROR_HALT", test_id, length_x);
     launch(MODE_B, '0, '0, length_x, '0, '0, '0);
-    repeat (10) @(posedge clk); #1;
+    wait_done();
     if (!error) begin
       $display("\t[FAIL] T%0d: ERROR_HALT not asserted", test_id); errors++;
     end
@@ -563,7 +563,7 @@ module hydra_tb;
     length_x  = 0;
     $display("[T%0d] Mode B, length=%0d => expect ERROR_HALT", test_id, length_x);
     launch(MODE_B, '0, '0, length_x, '0, '0, '0);
-    repeat (10) @(posedge clk); #1;
+    wait_done();
     if (!error) begin
       $display("\t[FAIL] T%0d: ERROR_HALT not asserted", test_id); errors++;
     end
