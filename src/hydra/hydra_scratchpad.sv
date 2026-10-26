@@ -87,7 +87,7 @@ module hydra_scratchpad (
   assign HRESP        = 0;
 
   // SRAM-adapted logic ========================================================
-  if (1) begin
+  if (SCRATCH_USE_SRAM) begin
 
     sram_auto_wrapper #(.TOTAL_DEPTH(MEM_DEPTH), .TOTAL_WIDTH(DATA_WIDTH)) sram_wrapper_inst (
       .clk(clk), .address(port_addr), .write_data(SCRATCH_WDATA),

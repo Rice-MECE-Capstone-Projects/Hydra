@@ -74,6 +74,7 @@ package hydra_pkg;
 
   // Scratchpad has 32 KB at 32-bit words
   parameter  int unsigned   MEM_SIZE    = 8192;
+  parameter  int unsigned   SCRATCH_USE_SRAM = 1;
 
   localparam int unsigned   REG_STRIDE  = DATA_WIDTH / 8;
   localparam int unsigned   DATA_BITS   = $clog2(DATA_WIDTH);
