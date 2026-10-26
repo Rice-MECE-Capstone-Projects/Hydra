@@ -232,4 +232,4 @@ hydra/hydra_mmr.sv
 hydra/hydra_scratchpad.sv
 hydra/hydra_top.sv
 hydra/hydra_transform.sv
-sram/sram_wrapper_8192x32.sv
+hydra/sram_auto_wrapper.sv

@@ -86,10 +86,11 @@ module hydra_scratchpad (
   assign HREADYOUT    = !read_stall;
   assign HRESP        = 0;
 
-  // If config matches SRAM macro, use it instead of regs ======================
-  if (DATA_WIDTH == 32 && MEM_SIZE == 8192) begin
+  // SRAM-adapted logic ========================================================
+  if (1) begin
 
-    sram_wrapper_8192x32 sram_32KiB(.clk(clk), .address(port_addr), .write_data(SCRATCH_WDATA),
+    sram_auto_wrapper #(.TOTAL_DEPTH(MEM_DEPTH), .TOTAL_WIDTH(DATA_WIDTH)) sram_wrapper_inst (
+      .clk(clk), .address(port_addr), .write_data(SCRATCH_WDATA),
       .bank_en(1'b1), .read_en(read_serve), .write_en(SCRATCH_WE), .dataout(HRDATA));
 
     always_ff @(posedge clk) begin

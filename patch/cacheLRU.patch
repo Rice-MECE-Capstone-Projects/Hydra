@@ -1,0 +1,13 @@
+diff --git a/src/cache/cacheLRU.sv b/src/cache/cacheLRU.sv
+index 76bb38fd7..a6cbbc19f 100644
+--- a/src/cache/cacheLRU.sv
++++ b/src/cache/cacheLRU.sv
+@@ -72,7 +72,7 @@ module cacheLRU
+   ///// Update replacement bits.
+   // coverage off
+   // Excluded from coverage b/c it is untestable without varying NUMWAYS.
+-  function integer log2 (integer value);
++  function automatic integer log2 (integer value);
+     int val;
+     val = value;
+     for (log2 = 0; val > 0; log2 = log2+1)

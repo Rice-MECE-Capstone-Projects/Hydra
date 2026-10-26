@@ -52,6 +52,7 @@ declare -A FILES=(
   ["ram1p1rwbe.patch"]="src/generic/mem/ram1p1rwbe.sv"
   ["rom1p1r.patch"]="src/generic/mem/rom1p1r.sv"
   ["spi_apb.patch"]="src/uncore/spi_apb.sv"
+  ["cacheLRU.patch"]="src/cache/cacheLRU.sv"
 )
 
 cmd_update() {
