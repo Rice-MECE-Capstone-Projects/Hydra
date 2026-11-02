@@ -40,6 +40,13 @@
 //   T9  Mode C, length=NUM_ELEMS,    unsigned, scale_shift=NUM_ELEMS/8,  round_en=0
 //   T10 Mode C, saturation corners,  signed,   scale_shift=0,            round_en=0
 //
+//   T11 Mode E, sum,  incrementing positive inputs
+//   T12 Mode E, max,  mixed-sign inputs
+//   T13 Mode E, min,  mixed-sign inputs
+//   T14 Mode E, avg,  incrementing positive inputs
+//   T15 Mode E, avg,  negative window sums (arithmetic shift)
+//   T16 Mode E, length=POOL_SIZE+1 (invalid)    => ERROR_HALT
+//
 // Usage:
 //   `run`      executable for log printing only
 //   `runwave`  executable for waveform viewing in Questa
@@ -570,7 +577,7 @@ module hydra_tb;
     else begin $display("\t[FAIL] unexpected error"); errors++; end
     report();
 
-    // T12: Mode E, signed maximum and minimum
+    // T12/T13: Mode E, signed maximum and minimum
     test_id = test_id + 1;
     length_x = 2 * POOL_SIZE;
     for (int i = 0; i < length_x; i++)
@@ -592,7 +599,7 @@ module hydra_tb;
     else begin $display("\t[FAIL] unexpected error"); errors++; end
     report();
 
-    // T13: Mode E, average reduction
+    // T14: Mode E, average reduction
     test_id = test_id + 1;
     length_x = 4 * POOL_SIZE;
     fill_ram_incr(0, length_x, 'h20);
@@ -604,7 +611,20 @@ module hydra_tb;
     else begin $display("\t[FAIL] unexpected error"); errors++; end
     report();
 
-    // T14: Mode E rejects a non-multiple window length
+    // T15: Mode E, average of negative windows (needs an arithmetic shift, rounds toward -inf)
+    test_id = test_id + 1;
+    length_x = 4 * POOL_SIZE;
+    for (int i = 0; i < length_x; i++)
+      ahb_ram[i] = (i % POOL_SIZE == 0) ? 32'sd3 + i : -32'sd37 - 5*i;
+    clear_scratch(0, length_x / POOL_SIZE);
+    do_reset();
+    launch(MODE_E, '0, '0, length_x, '0, '0, '0, POOL_AVG);
+    wait_done();
+    if (!error) check_mode_e(0, 0, length_x, POOL_AVG);
+    else begin $display("\t[FAIL] unexpected error"); errors++; end
+    report();
+
+    // T16: Mode E rejects a non-multiple window length
     test_id = test_id + 1;
     do_reset();
     launch(MODE_E, '0, '0, POOL_SIZE + 1, '0, '0, '0, POOL_SUM);

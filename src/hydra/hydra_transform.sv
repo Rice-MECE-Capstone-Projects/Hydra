@@ -102,6 +102,7 @@ module hydra_transform (
   logic [ LEN_WIDTH-1:0] pool_idx;
   logic [DATA_WIDTH-1:0] accum;
   logic [DATA_WIDTH-1:0] next_accum;
+  logic signed [DATA_WIDTH-1:0] avg_out;  // separate signed signal so >>> stays arithmetic
   logic [2:0] next_HBURST, next_HSIZE;
   logic [1:0] next_HTRANS;
   logic       next_HBUSREQ;
@@ -216,6 +217,7 @@ module hydra_transform (
     SCRATCH_WDATA = '0;
     next_done     = 0;
     next_accum    = accum;
+    avg_out       = '0;
 
     case (mode)
       MODE_B: begin
@@ -240,7 +242,9 @@ module hydra_transform (
         next_accum    = reduce_fn(accum, HRDATA, reduce_op, pool_count == 0);
         SCRATCH_WADDR = dst_addr + (pool_idx << 2);
         SCRATCH_WE    = (state == BUSY) && HREADY && (pool_count == POOL_SIZE - 1);
-        SCRATCH_WDATA = (reduce_op == POOL_AVG) ? (next_accum >>> POOL_BITS) : next_accum;
+        // Inside the ternary the unsigned branch would turn $signed(...) >>> into a logical shift
+        avg_out       = $signed(next_accum) >>> POOL_BITS;
+        SCRATCH_WDATA = (reduce_op == POOL_AVG) ? avg_out : next_accum;
         next_done     = next_done_read;
       end
     endcase
