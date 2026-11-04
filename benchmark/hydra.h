@@ -57,7 +57,10 @@
     #define HYDRA_MMR_CTRL_MODEB   (0b10 << 1)
     #define HYDRA_MMR_CTRL_MODEC   (0b11 << 1)
     #define HYDRA_MMR_CTRL_MODEE   (0b100 << 1)
+    #define HYDRA_MMR_CTRL_POOL_SUM (0b00 << 11)
     #define HYDRA_MMR_CTRL_POOL_MAX (0b01 << 11)
+    #define HYDRA_MMR_CTRL_POOL_MIN (0b10 << 11)
+    #define HYDRA_MMR_CTRL_POOL_AVG (0b11 << 11)
     #define HYDRA_MMR_STATUS_DONE  ( 0b1 << 0)
     #define HYDRA_MMR_STATUS_ERROR ( 0b1 << 1)
     #define HYDRA_MMR_STATUS_BUSY  ( 0b1 << 2) // MMR writes are ignored while set
