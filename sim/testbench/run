@@ -4,6 +4,5 @@ vlog ../../src/hydra_pkg.sv                 \
      ../../src/hydra/hydra_arbiter.sv       \
      ../../src/hydra/hydra_scratchpad.sv    \
      ../../src/hydra/hydra_transform.sv     \
-     ../../src/hydra/hydra_mmr.sv           \
      hydra_tb.sv
 vsim -c -quiet +questa_mvc_core+wlf_disable hydra_tb -nostdout -l hydra_tb.log -do "run -all; quit"
