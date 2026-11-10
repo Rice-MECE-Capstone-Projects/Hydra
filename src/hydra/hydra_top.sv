@@ -81,6 +81,8 @@ module hydra_top #(
   logic                             mmr_signed_out;
   logic                             mmr_round_en;
   hydra_reduce_op                   mmr_reduce_op;
+  logic                             mmr_pool_2d;
+  logic           [  LEN_WIDTH-1:0] mmr_pool_cols;
   logic           [ ADDR_WIDTH-1:0] mmr_src_addr;
   logic           [ ADDR_WIDTH-1:0] mmr_dst_addr;
   logic           [  LEN_WIDTH-1:0] mmr_length;
@@ -163,6 +165,8 @@ module hydra_top #(
       .signed_out (mmr_signed_out),
       .round_en   (mmr_round_en),
       .reduce_op  (mmr_reduce_op),
+      .pool_2d    (mmr_pool_2d),
+      .pool_cols  (mmr_pool_cols),
       .src_addr   (mmr_src_addr),
       .dst_addr   (mmr_dst_addr),
       .length     (mmr_length)
@@ -192,6 +196,8 @@ module hydra_top #(
       .signed_out (mmr_signed_out),
       .round_en   (mmr_round_en),
       .reduce_op  (mmr_reduce_op),
+      .pool_2d    (mmr_pool_2d),
+      .pool_cols  (mmr_pool_cols),
       .start      (mmr_start),
       .mode       (mmr_mode),
       .src_addr   (mmr_src_addr),

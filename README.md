@@ -20,6 +20,8 @@ HYDRA implements three operation modes:
 
 - **Mode E — Reduction/pooling:** streaming signed sum, max, min, or average
   over configurable-size windows for CNN pooling and related DSP workloads.
+  1D pools consecutive words; 2D (`CTRL.POOL_2D`, row width in the `COLS`
+  register) pools k×k windows of a row-major or CHW feature map in one pass.
 
 HYDRA is integrated into Wally's uncore as an AHB slave (MMR at
 `0x2000_0000`) and AHB master (data-plane transfers from main RAM at

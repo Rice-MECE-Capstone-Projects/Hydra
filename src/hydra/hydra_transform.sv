@@ -36,6 +36,9 @@ module hydra_transform (
     input logic                           signed_out,
     input logic                           round_en,
     input hydra_reduce_op                 reduce_op,
+    // MODE E 2D pooling: k x k windows (k = POOL_SIZE) over a row-major image pool_cols wide
+    input logic                           pool_2d,
+    input logic           [LEN_WIDTH-1:0] pool_cols,
 
 
     // Control from MMR
@@ -103,6 +106,15 @@ module hydra_transform (
   logic [DATA_WIDTH-1:0] accum;
   logic [DATA_WIDTH-1:0] next_accum;
   logic signed [DATA_WIDTH-1:0] avg_out;  // separate signed signal so >>> stays arithmetic
+  // MODE E 2D: the input streams row by row, so the W/k windows of a band of k rows are all
+  // open at once. pool_line keeps one partial result per window; pool_count is the column
+  // within the window, win_col the window, row_k the row within the band.
+  logic [DATA_WIDTH-1:0] pool_line[0:MAX_POOL_COLS-1];
+  logic [  WIN_BITS-1:0] win_col;
+  logic [ POOL_BITS-1:0] row_k;
+  logic [ LEN_WIDTH-1:0] cols_k;          // windows per row = pool_cols / k
+  logic                  win_last_col;    // current word is in the last window of its row
+  logic                  pool2d_bad_end;  // stream ended mid-band: rows not a multiple of k
   logic [2:0] next_HBURST, next_HSIZE;
   logic [1:0] next_HTRANS;
   logic       next_HBUSREQ;
@@ -132,16 +144,29 @@ module hydra_transform (
     case (mode)
       MODE_B:  out_words = length;
       MODE_C:  out_words = length >> QUANT_BITS;
-      MODE_E:  out_words = length >> POOL_BITS;
+      MODE_E:  out_words = pool_2d ? (length >> (2 * POOL_BITS)) : (length >> POOL_BITS);
       default: out_words = '0;
     endcase
   end
   assign out_end          = dst_addr + out_words * REG_STRIDE;
   assign out_of_bounds    = out_end > SCRATCH_BYTES;
+  assign cols_k           = pool_cols >> POOL_BITS;
+  assign win_last_col     = (LEN_WIDTH'(win_col) == cols_k - 1);
+  // 2D needs whole windows across (W % k == 0), at most MAX_POOL_COLS windows per row, and
+  // whole k x k windows overall. LEN % (k*W) would need a divider, so a final band with fewer
+  // than k rows is instead caught when the last word arrives (pool2d_bad_end)
   assign invalid_length   = start && ((length == '0) || ((mode == MODE_B) && (length[ELEM_WIDTH-1:0] != '0))  ||
                                                           ((mode == MODE_C) && (length[QUANT_BITS-1:0] != '0)) ||
                                                           ((mode == MODE_E) && (length[POOL_BITS-1:0] != '0))  ||
+                                                          ((mode == MODE_E) && pool_2d &&
+                                                           ((length[2*POOL_BITS-1:0] != '0) || (pool_cols == '0) ||
+                                                            (pool_cols[POOL_BITS-1:0] != '0) ||
+                                                            (cols_k > MAX_POOL_COLS)))                         ||
                                                           out_of_bounds);
+  // Checked only on the last word itself: the arbiter can hold the grant after it, and then
+  // next_done_read repeats in the next cycle with the counters already wrapped
+  assign pool2d_bad_end   = (mode == MODE_E) && pool_2d && next_done_read && !done_read &&
+                            !((pool_count == POOL_SIZE - 1) && (row_k == POOL_SIZE - 1) && win_last_col);
   assign error = (state == ERROR);
   // Includes the `start` cycle so there is no gap between accepting START and entering BUSY
   assign busy = (state == BUSY) || (state == FLUSH) || start;
@@ -152,6 +177,9 @@ module hydra_transform (
         $display("\t\tGot `length`: %0d, `dst_addr`: %0h.", length, dst_addr);
         if (out_of_bounds)
           $display("\t\tOutput ends at scratchpad byte %0h, past its %0d-byte size.", out_end, SCRATCH_BYTES);
+        else if (mode == MODE_E && pool_2d)
+          $display("\t\tExpected: COLS a non-zero multiple of %0d and at most %0d, LEN a multiple of %0d (got COLS = %0d).",
+                   POOL_SIZE, POOL_SIZE * MAX_POOL_COLS, POOL_SIZE * POOL_SIZE, pool_cols);
         else
           $display("\t\tExpected: non-zero multiple of %0d.",
                    mode == MODE_B ? NUM_ELEMS : QUANT_DEPTH);
@@ -162,7 +190,7 @@ module hydra_transform (
   always_comb begin : NEXT_STATE_SIGNALS
     next_state = state;
 
-    if (HRESP || invalid_length)
+    if (HRESP || invalid_length || pool2d_bad_end)
       next_state = ERROR;  // if any AHB error response is received, go to error halt
     else begin
       if (done) $display(" [HYDRA]: Mode %0d finished", mode);
@@ -239,11 +267,21 @@ module hydra_transform (
         next_done = next_done_read;
       end
       MODE_E: begin
-        next_accum    = reduce_fn(accum, HRDATA, reduce_op, pool_count == 0);
+        if (pool_2d) begin
+          // Fold the word into its window's partial result; a window's first word restarts it
+          next_accum = reduce_fn(pool_line[win_col], HRDATA, reduce_op,
+                                 (row_k == 0) && (pool_count == 0));
+          SCRATCH_WE = (state == BUSY) && HREADY && (pool_count == POOL_SIZE - 1) &&
+                       (row_k == POOL_SIZE - 1);
+          // Inside the ternary the unsigned branch would turn $signed(...) >>> into a logical shift
+          avg_out    = $signed(next_accum) >>> (2 * POOL_BITS);
+        end else begin
+          next_accum = reduce_fn(accum, HRDATA, reduce_op, pool_count == 0);
+          SCRATCH_WE = (state == BUSY) && HREADY && (pool_count == POOL_SIZE - 1);
+          avg_out    = $signed(next_accum) >>> POOL_BITS;
+        end
+        // Windows complete in output order in both cases, so outputs are packed contiguously
         SCRATCH_WADDR = dst_addr + (pool_idx << 2);
-        SCRATCH_WE    = (state == BUSY) && HREADY && (pool_count == POOL_SIZE - 1);
-        // Inside the ternary the unsigned branch would turn $signed(...) >>> into a logical shift
-        avg_out       = $signed(next_accum) >>> POOL_BITS;
         SCRATCH_WDATA = (reduce_op == POOL_AVG) ? avg_out : next_accum;
         next_done     = next_done_read;
       end
@@ -268,6 +306,8 @@ module hydra_transform (
       pool_count    <= '0;
       pool_idx      <= '0;
       accum         <= '0;
+      win_col       <= '0;
+      row_k         <= '0;
       quant         <= '0;
       pos_mat       <= '0;
       beat          <= '0;
@@ -303,6 +343,8 @@ module hydra_transform (
         pool_count    <= '0;
         pool_idx      <= '0;
         accum         <= '0;
+        win_col       <= '0;
+        row_k         <= '0;
         quant         <= '0;
         pos_mat       <= '0;
         beat          <= '0;
@@ -339,8 +381,17 @@ module hydra_transform (
                 );  // function quant_fn() defined in hydra_pkg.sv
               end else if (mode == MODE_E) begin
                 pool_count <= (pool_count == POOL_SIZE - 1) ? '0 : pool_count + 1'b1;
-                pool_idx   <= (pool_count == POOL_SIZE - 1) ? pool_idx + 1'b1 : pool_idx;
-                accum      <= next_accum;
+                if (pool_2d) begin
+                  pool_line[win_col] <= next_accum;
+                  pool_idx <= SCRATCH_WE ? pool_idx + 1'b1 : pool_idx;
+                  if (pool_count == POOL_SIZE - 1) begin
+                    win_col <= win_last_col ? '0 : win_col + 1'b1;
+                    if (win_last_col) row_k <= (row_k == POOL_SIZE - 1) ? '0 : row_k + 1'b1;
+                  end
+                end else begin
+                  pool_idx <= (pool_count == POOL_SIZE - 1) ? pool_idx + 1'b1 : pool_idx;
+                  accum    <= next_accum;
+                end
               end
             end
           end

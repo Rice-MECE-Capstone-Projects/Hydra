@@ -71,6 +71,13 @@ package hydra_pkg;
   `define HYDRA_POOL_SIZE 4
 `endif
   parameter  int unsigned   POOL_SIZE   = `HYDRA_POOL_SIZE;
+  // Mode E 2D pooling: most output columns per row (W / POOL_SIZE). Sizes the row of
+  // partial accumulators, so the input row width W can be at most POOL_SIZE * MAX_POOL_COLS.
+  // Override at compile time with +define+HYDRA_MAX_POOL_COLS=<n>
+`ifndef HYDRA_MAX_POOL_COLS
+  `define HYDRA_MAX_POOL_COLS 64
+`endif
+  parameter  int unsigned   MAX_POOL_COLS = `HYDRA_MAX_POOL_COLS;
 
   // Scratchpad has 32 KB at 32-bit words
   parameter  int unsigned   MEM_SIZE    = 8192;
@@ -80,13 +87,16 @@ package hydra_pkg;
   localparam int unsigned   SCRATCH_BYTES = 4 * MEM_SIZE;
 
   // LEN counts source words. The largest useful LEN fills the scratchpad in the
-  // mode with the biggest source-to-output reduction (B: 1, C: DATA_WIDTH/QUANT_DIM, E: POOL_SIZE)
-  localparam int unsigned   MAX_REDUCE  = (POOL_SIZE > DATA_WIDTH / QUANT_DIM) ? POOL_SIZE : DATA_WIDTH / QUANT_DIM;
+  // mode with the biggest source-to-output reduction (B: 1, C: DATA_WIDTH/QUANT_DIM,
+  // E: POOL_SIZE in 1D and POOL_SIZE^2 in 2D)
+  localparam int unsigned   MAX_REDUCE  = (POOL_SIZE * POOL_SIZE > DATA_WIDTH / QUANT_DIM) ?
+                                          POOL_SIZE * POOL_SIZE : DATA_WIDTH / QUANT_DIM;
   localparam int unsigned   MAX_LEN     = MEM_SIZE * MAX_REDUCE;
   localparam int unsigned   LEN_WIDTH   = $clog2(MAX_LEN + 1);
   localparam int unsigned   NUM_BEATS   = getLen_fn(BURST_TYPE);
   localparam int unsigned   BEATS_WIDTH = $clog2(NUM_BEATS);
   localparam int unsigned   POOL_BITS   = $clog2(POOL_SIZE);
+  localparam int unsigned   WIN_BITS    = (MAX_POOL_COLS > 1) ? $clog2(MAX_POOL_COLS) : 1;
 
   // -------------------------HYDRA Typedefs-------------------------
   typedef enum logic [2:0] {
@@ -109,7 +119,8 @@ package hydra_pkg;
     SRC    = 8'(1 * REG_STRIDE),
     DST    = 8'(2 * REG_STRIDE),
     LEN    = 8'(3 * REG_STRIDE),
-    STATUS = 8'(4 * REG_STRIDE)
+    STATUS = 8'(4 * REG_STRIDE),
+    COLS   = 8'(5 * REG_STRIDE)   // Mode E 2D: input row width W in words
   } hydra_mmr_map;
 
   // -------------------------Constants Declarations-------------------------

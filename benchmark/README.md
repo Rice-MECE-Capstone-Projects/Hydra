@@ -95,6 +95,31 @@ The software baseline was built at `-O1`, `-O2`, `-O3`, and `-O3 -funroll-loops`
 ## MODE C
 
 
+## MODE E: 2D pooling on LeNet-5 (`modeE_pool2d/`)
+
+This benchmark times the two pooling layers of a LeNet-5 trained on MNIST. The network is LeNet-5 with ReLU and 2×2 max pooling, reaching 98.49% test accuracy. The input is real activations from MNIST test digit #0, a 7, which the network classifies correctly.
+
+| Layer | Shape | HYDRA cycles | CPU cycles | Speedup (MAX) | Speedup (AVG) |
+|---|---|---|---|---|---|
+| pool1 | 6×28×28 → 6×14×14 | 4,755 | 20,941 | **4.40×** | 4.67× |
+| pool2 | 16×10×10 → 16×5×5 | 1,651 | 7,806 | **4.73×** | 5.02× |
+
+- **Correctness.** HYDRA and the CPU both match the exported reference bit for bit.
+- **HYDRA throughput.** About one cycle per input word.
+- **conv1 in context.** conv1 (integer C on the CPU) takes 579,781 cycles, so pool1 is 3.4% of conv1 + pool1 in software. Offloading pool1 speeds up that layer pair by 1.03×.
+- **Setup.** WICD, `-O3 -funroll-loops`, MAX unless stated.
+
+To reproduce:
+```bash
+cd modeE_pool2d
+python3 lenet/train_export.py   # optional: retrain or pick another digit (--index N); writes lenet_data.h
+make OP="MAX AVG"               # logs in log/
+make DUMP=1 && cp log/WICD__-O3_-funroll-loops__MAX.log log/WICD__-O3_-funroll-loops__MAX_DUMP.log && make
+python3 plot_lenet.py           # writes ../hydra_modeE_lenet_pooling.png
+```
+
+`train_export.py` needs only numpy. It downloads MNIST into `lenet/mnist/`, which is git-ignored, and caches the trained weights in `lenet/lenet_weights.npz`.
+
 # Setup
 In order to compile and run C code into Wally, you need to have installed the [**RISC-V GNU Toolchain**](https://github.com/riscv-collab/riscv-gnu-toolchain). Once installed:
 1. Edit `wally/setup.sh` (specifically lines 26-29) to include the path to your toolchain installation. For example, at Rice, that is under `/clear/apps/riscv`. Note that you might also want to move line 39 (`export PATH=$WALLY/bin:$PATH`) to the bottom of the script to avoid conflicts with RISC-V site paths.

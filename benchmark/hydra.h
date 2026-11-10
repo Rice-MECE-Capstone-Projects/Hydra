@@ -44,6 +44,7 @@
         volatile uint32_t DST;    // Offset 0x08
         volatile uint32_t LEN;    // Offset 0x0C
         volatile uint32_t STATUS; // Offset 0x10
+        volatile uint32_t COLS;   // Offset 0x14, Mode E 2D input row width W in words
     } hydra_regs_t;
 
     #define HYDRA_MMR ((hydra_regs_t *)HYDRA_MMR_BASE)
@@ -61,6 +62,7 @@
     #define HYDRA_MMR_CTRL_POOL_MAX (0b01 << 11)
     #define HYDRA_MMR_CTRL_POOL_MIN (0b10 << 11)
     #define HYDRA_MMR_CTRL_POOL_AVG (0b11 << 11)
+    #define HYDRA_MMR_CTRL_POOL_2D  ( 0b1 << 13) // Mode E: POOL_SIZE x POOL_SIZE windows over rows of COLS words
     #define HYDRA_MMR_STATUS_DONE  ( 0b1 << 0)
     #define HYDRA_MMR_STATUS_ERROR ( 0b1 << 1)
     #define HYDRA_MMR_STATUS_BUSY  ( 0b1 << 2) // MMR writes are ignored while set

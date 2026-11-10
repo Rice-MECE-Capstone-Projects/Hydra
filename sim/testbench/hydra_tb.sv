@@ -46,6 +46,17 @@
 //   T14 Mode E, avg,  incrementing positive inputs
 //   T15 Mode E, avg,  negative window sums (arithmetic shift)
 //   T16 Mode E, length=POOL_SIZE+1 (invalid)    => ERROR_HALT
+//   T17 Mode E 2D, max,  8k x 8k image (k = POOL_SIZE), mixed-sign inputs
+//   T18 Mode E 2D, avg,  4k x 4k image, negative window sums (arithmetic shift)
+//   T19 Mode E 2D, sum,  W = 6k (rows end mid-burst), 2k rows
+//   T20 Mode E 2D, max,  3 channels of 2k x 2k (CHW, pooled as one 6k x 2k image)
+//   T21 Mode E 2D, min,  widest row W = k * MAX_POOL_COLS, k rows
+//   T22 Mode E 2D, sum,  back-to-back transfer reuses the accumulator row
+//   T23 Mode E 2D, COLS=0                        => ERROR_HALT
+//   T24 Mode E 2D, COLS=k+1 (not a multiple of k) => ERROR_HALT
+//   T25 Mode E 2D, COLS=k*(MAX_POOL_COLS+1)      => ERROR_HALT
+//   T26 Mode E 2D, LEN not a multiple of k*k     => ERROR_HALT
+//   T27 Mode E 2D, rows not a multiple of k      => ERROR_HALT (at the last word)
 //
 // Usage:
 //   `run`      executable for log printing only
@@ -56,7 +67,7 @@ module hydra_tb;
   localparam int unsigned NUM_ELEMS    = BLOCK_ROWS * BLOCK_COLS;   // 128
   localparam int unsigned QUANT_DEPTH  = DATA_WIDTH / QUANT_DIM;    // 4 words => 1 packed
   localparam int unsigned RAM_WORDS    = 16384;                     // 64 KB AHB slave RAM
-  localparam int unsigned TIMEOUT      = 2000;                      // max clock cycles per test
+  localparam int unsigned TIMEOUT      = 4000;                      // max clock cycles per test
 
   // -------------------------SIGNALS-------------------------
   // Clock and Reset
@@ -80,6 +91,8 @@ module hydra_tb;
   logic [DATA_BITS-1:0]   scale_shift;
   logic                   signed_out, round_en;
   hydra_reduce_op         reduce_op;
+  logic                   pool_2d;
+  logic [LEN_WIDTH-1:0]   pool_cols;
 
   // Arbiter
   logic                   HBUSREQ;
@@ -118,6 +131,15 @@ module hydra_tb;
   end
 
   assign HRDATA_m = ahb_ram[haddr_lat[$clog2(RAM_WORDS)+1:2]];    // word-aligned
+
+  // ERROR lasts one cycle and can follow `done` (wait_done returns on whichever comes first),
+  // so remember any error since the last START. The CPU sees the same thing through the
+  // MMR's sticky STATUS.ERROR bit
+  logic err_seen;
+  always_ff @(posedge clk) begin
+    if (!rst_n || start) err_seen <= 0;
+    else if (error)      err_seen <= 1;
+  end
   assign HREADY_m = bus_grant;
   assign HRESP_m  = HRESP_ctrl;
 
@@ -134,6 +156,8 @@ module hydra_tb;
     .signed_out    (signed_out),
     .round_en      (round_en),
     .reduce_op     (reduce_op),
+    .pool_2d       (pool_2d),
+    .pool_cols     (pool_cols),
     .HBUSREQ       (HBUSREQ),
     .HADDR         (HADDR_m),
     .HBURST        (HBURST_m),
@@ -228,6 +252,34 @@ module hydra_tb;
     return value;
   endfunction
 
+  // k x k window (k = POOL_SIZE) of a row-major image `width` words wide. Output out_idx is
+  // window (out_idx / (width/k), out_idx % (width/k)), so outputs are packed in row-major order
+  function automatic logic [DATA_WIDTH-1:0] golden_pool2d (
+    input int out_idx,
+    input int src_base,
+    input int width,
+    input hydra_reduce_op op
+  );
+    logic signed [DATA_WIDTH-1:0] value, elem;
+    int out_r, out_c;
+    out_r = out_idx / (width / POOL_SIZE);
+    out_c = out_idx % (width / POOL_SIZE);
+    for (int dy = 0; dy < POOL_SIZE; dy++) begin
+      for (int dx = 0; dx < POOL_SIZE; dx++) begin
+        elem = $signed(ahb_ram[src_base + (out_r*POOL_SIZE + dy)*width + out_c*POOL_SIZE + dx]);
+        if (dy == 0 && dx == 0) value = elem;
+        else case (op)
+          POOL_MAX: if (elem > value) value = elem;
+          POOL_MIN: if (elem < value) value = elem;
+          default:  value = value + elem;
+        endcase
+      end
+    end
+    if (op == POOL_AVG)
+      value = value >>> (2 * POOL_BITS);
+    return value;
+  endfunction
+
   // -------------------------TASKS-------------------------
   task automatic do_reset ();
     rst_n       = 0;
@@ -240,6 +292,8 @@ module hydra_tb;
     signed_out  = 0;
     round_en    = 0;
     reduce_op   = POOL_SUM;
+    pool_2d     = 0;
+    pool_cols   = 0;
     cpu_HBUSREQ = 0;
     HRESP_ctrl  = 0;
     repeat (4) @(posedge clk);
@@ -252,7 +306,9 @@ module hydra_tb;
     input logic [ADDR_WIDTH-1:0]  src, dst, len,
     input logic [DATA_BITS-1:0]   sc,
     input logic                   s_out, r_en,
-    input hydra_reduce_op         r_op = POOL_SUM
+    input hydra_reduce_op         r_op = POOL_SUM,
+    input logic                   p2d  = 0,
+    input logic [LEN_WIDTH-1:0]   cols = '0
   );
     @(negedge clk);
     mode        = m;
@@ -263,6 +319,8 @@ module hydra_tb;
     signed_out  = s_out;
     round_en    = r_en;
     reduce_op   = r_op;
+    pool_2d     = p2d;
+    pool_cols   = cols;
     start       = 1;
     @(posedge clk);
     @(negedge clk);
@@ -373,6 +431,53 @@ module hydra_tb;
         errors++;
       end
     end
+  endtask
+
+  task automatic check_mode_e2d (
+    input int src_base,
+    input int dst_base,
+    input int len_words,
+    input int width,
+    input hydra_reduce_op op
+  );
+    logic [DATA_WIDTH-1:0] exp, got;
+    for (int i = 0; i < len_words / (POOL_SIZE * POOL_SIZE); i++) begin
+      exp = golden_pool2d(i, src_base, width, op);
+      got = scratchpad.mem[dst_base + i];
+      if (got !== exp) begin
+        $display("\t[FAIL] T%0d Mode E 2D: scratch[%03d] (out row %0d, col %0d) = %h, expected %h",
+                 test_id, dst_base + i, i / (width / POOL_SIZE), i % (width / POOL_SIZE), got, exp);
+        errors++;
+      end
+    end
+    // The word after the last output must be untouched
+    if (scratchpad.mem[dst_base + len_words / (POOL_SIZE * POOL_SIZE)] !== '0) begin
+      $display("\t[FAIL] T%0d Mode E 2D: wrote past the last output", test_id);
+      errors++;
+    end
+  endtask
+
+  // Run one 2D pooling transfer from RAM word 0 to scratchpad word 0 and check it
+  task automatic run_pool2d (input int width, input int rows, input hydra_reduce_op op);
+    length_x = width * rows;
+    clear_scratch(0, length_x / (POOL_SIZE * POOL_SIZE) + 1);
+    do_reset();
+    launch(MODE_E, '0, '0, length_x, '0, '0, '0, op, 1, width);
+    wait_done();
+    repeat (4) @(posedge clk);
+    if (!err_seen) check_mode_e2d(0, 0, length_x, width, op);
+    else begin $display("\t[FAIL] unexpected error"); errors++; end
+    report();
+  endtask
+
+  // Launch a 2D transfer that must end in ERROR_HALT
+  task automatic expect_pool2d_error (input int width, input int len);
+    do_reset();
+    launch(MODE_E, '0, '0, len, '0, '0, '0, POOL_SUM, 1, width);
+    wait_done();
+    repeat (4) @(posedge clk);
+    if (!err_seen) begin $display("\t[FAIL] expected an error (COLS=%0d, LEN=%0d)", width, len); errors++; end
+    report();
   endtask
 
   int prev_errors;
@@ -631,6 +736,86 @@ module hydra_tb;
     wait_done();
     if (!error) begin $display("\t[FAIL] expected invalid length error"); errors++; end
     report();
+
+
+    // -------------------------MODE E 2D-------------------------
+    // Data patterns use i (the word index) so every window gets distinct values
+
+    // T17: 2D max on an 8k x 8k image, mixed signs
+    test_id = test_id + 1;
+    $display("[T%0d] Mode E 2D, max, %0dx%0d", test_id, 8*POOL_SIZE, 8*POOL_SIZE);
+    for (int i = 0; i < 64*POOL_SIZE*POOL_SIZE; i++)
+      ahb_ram[i] = (i % 3 == 0) ? -32'sd500 + i : 32'sd7 * ((i * 37) % 101) - 32'sd350;
+    run_pool2d(8*POOL_SIZE, 8*POOL_SIZE, POOL_MAX);
+
+    // T18: 2D average with negative window sums
+    test_id = test_id + 1;
+    $display("[T%0d] Mode E 2D, avg, %0dx%0d, negative sums", test_id, 4*POOL_SIZE, 4*POOL_SIZE);
+    for (int i = 0; i < 16*POOL_SIZE*POOL_SIZE; i++)
+      ahb_ram[i] = (i % 5 == 0) ? 32'sd3 + i : -32'sd37 - 5*i;
+    run_pool2d(4*POOL_SIZE, 4*POOL_SIZE, POOL_AVG);
+
+    // T19: 2D sum, W = 6k is not a multiple of the 16-beat burst, so rows end mid-burst
+    test_id = test_id + 1;
+    $display("[T%0d] Mode E 2D, sum, W=%0d, %0d rows", test_id, 6*POOL_SIZE, 2*POOL_SIZE);
+    fill_ram_incr(0, 12*POOL_SIZE*POOL_SIZE, 'h40);
+    run_pool2d(6*POOL_SIZE, 2*POOL_SIZE, POOL_SUM);
+
+    // T20: 3 channels of 2k x 2k in CHW layout are one (3*2k) x 2k image
+    test_id = test_id + 1;
+    $display("[T%0d] Mode E 2D, max, 3 channels of %0dx%0d", test_id, 2*POOL_SIZE, 2*POOL_SIZE);
+    for (int i = 0; i < 12*POOL_SIZE*POOL_SIZE; i++)
+      ahb_ram[i] = (i * 40503) ^ (i << 9);  // scrambled, non-monotonic
+    run_pool2d(2*POOL_SIZE, 6*POOL_SIZE, POOL_MAX);
+
+    // T21: widest supported row uses every accumulator slot
+    test_id = test_id + 1;
+    $display("[T%0d] Mode E 2D, min, W=%0d (k * MAX_POOL_COLS)", test_id, POOL_SIZE*MAX_POOL_COLS);
+    for (int i = 0; i < MAX_POOL_COLS*POOL_SIZE*POOL_SIZE; i++)
+      ahb_ram[i] = (i % 7 == 3) ? -32'sd1 * i : 32'sd1000 - (i % 13);
+    run_pool2d(POOL_SIZE*MAX_POOL_COLS, POOL_SIZE, POOL_MIN);
+
+    // T22: a second transfer must not pick up partial results left by the first
+    test_id = test_id + 1;
+    $display("[T%0d] Mode E 2D, sum, back-to-back transfers", test_id);
+    fill_ram_incr(0, 4*POOL_SIZE*POOL_SIZE, 'h1000);
+    length_x = 4*POOL_SIZE*POOL_SIZE;
+    do_reset();
+    launch(MODE_E, '0, '0, length_x, '0, '0, '0, POOL_SUM, 1, 2*POOL_SIZE);
+    wait_done();
+    repeat (4) @(posedge clk);
+    if (err_seen) begin $display("\t[FAIL] unexpected error in first transfer"); errors++; end
+    fill_ram_incr(0, 4*POOL_SIZE*POOL_SIZE, 'h5);
+    clear_scratch(0, 5);
+    repeat (4) @(posedge clk);
+    launch(MODE_E, '0, '0, length_x, '0, '0, '0, POOL_SUM, 1, 2*POOL_SIZE);
+    wait_done();
+    repeat (4) @(posedge clk);
+    if (!err_seen) check_mode_e2d(0, 0, length_x, 2*POOL_SIZE, POOL_SUM);
+    else begin $display("\t[FAIL] unexpected error"); errors++; end
+    report();
+
+    // T23-T27: invalid 2D shapes
+    test_id = test_id + 1;
+    $display("[T%0d] Mode E 2D, COLS=0 => expect ERROR_HALT", test_id);
+    expect_pool2d_error(0, POOL_SIZE*POOL_SIZE);
+
+    test_id = test_id + 1;
+    $display("[T%0d] Mode E 2D, COLS=%0d => expect ERROR_HALT", test_id, POOL_SIZE+1);
+    expect_pool2d_error(POOL_SIZE+1, (POOL_SIZE+1)*POOL_SIZE*POOL_SIZE);
+
+    test_id = test_id + 1;
+    $display("[T%0d] Mode E 2D, COLS=%0d (too wide) => expect ERROR_HALT", test_id, POOL_SIZE*(MAX_POOL_COLS+1));
+    expect_pool2d_error(POOL_SIZE*(MAX_POOL_COLS+1), POOL_SIZE*POOL_SIZE*(MAX_POOL_COLS+1));
+
+    test_id = test_id + 1;
+    $display("[T%0d] Mode E 2D, LEN=%0d (not a multiple of k*k) => expect ERROR_HALT", test_id, POOL_SIZE*POOL_SIZE + POOL_SIZE);
+    expect_pool2d_error(POOL_SIZE, POOL_SIZE*POOL_SIZE + POOL_SIZE);
+
+    // COLS = k*k and LEN = k*k pass the up-front checks but give a single row
+    test_id = test_id + 1;
+    $display("[T%0d] Mode E 2D, 1 row of %0d (rows not a multiple of k) => expect ERROR_HALT", test_id, POOL_SIZE*POOL_SIZE);
+    expect_pool2d_error(POOL_SIZE*POOL_SIZE, POOL_SIZE*POOL_SIZE);
 
 
     // SUMMARY

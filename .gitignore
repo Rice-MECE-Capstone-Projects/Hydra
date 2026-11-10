@@ -53,6 +53,10 @@ benchmark/*/*
 !benchmark/*/*.h
 !benchmark/*/*.md
 !benchmark/*/*.py
+!benchmark/modeE_pool2d/lenet/
+benchmark/modeE_pool2d/lenet/*
+!benchmark/modeE_pool2d/lenet/*.py
+!benchmark/modeE_pool2d/lenet/*.npz
 
 # Patch
 patch/*SH.patch

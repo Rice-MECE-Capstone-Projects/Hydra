@@ -26,11 +26,13 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Register map:
-// Offset CTRL      : [0]=START, [3:1]=MODE[2:0], [8:4]=SCALE_SHIFT[4:0], [9]=SIGNED_OUT, [10]=ROUND_EN, [12:11]=REDUCE_OP
+// Offset CTRL      : [0]=START, [3:1]=MODE[2:0], [8:4]=SCALE_SHIFT[4:0], [9]=SIGNED_OUT, [10]=ROUND_EN, [12:11]=REDUCE_OP,
+//                    [13]=POOL_2D (Mode E: k x k pooling over rows of COLS words)
 // Offset SRC       : [ADDR_WIDTH-1:0]
 // Offset DST       : [ADDR_WIDTH-1:0]
 // Offset LEN       : [LEN_WIDTH-1:0]
 // Offset STATUS    : [2]=BUSY, [1]=ERROR, [0]=DONE
+// Offset COLS      : [LEN_WIDTH-1:0] Mode E 2D input row width W in words
 //
 // While BUSY, all writes are ignored so the in-flight descriptor cannot change.
 // Accepting a new START clears DONE and ERROR.
@@ -63,6 +65,8 @@ module hydra_mmr (
     output logic                            signed_out,
     output logic                            round_en,
     output hydra_reduce_op                  reduce_op,
+    output logic                            pool_2d,
+    output logic           [ LEN_WIDTH-1:0] pool_cols,
     output logic           [ADDR_WIDTH-1:0] src_addr,
     output logic           [ADDR_WIDTH-1:0] dst_addr,
     output logic           [ LEN_WIDTH-1:0] length
@@ -86,7 +90,8 @@ module hydra_mmr (
       case (mmr_offset_r)
         CTRL:
         HRDATA = {
-          (DATA_WIDTH - MODE_BITS - DATA_BITS - 5)'(0),
+          (DATA_WIDTH - MODE_BITS - DATA_BITS - 6)'(0),
+          pool_2d,
           reduce_op,
           round_en,
           signed_out,
@@ -98,6 +103,7 @@ module hydra_mmr (
         DST: HRDATA = dst_addr;
         LEN: HRDATA = length;
         STATUS: HRDATA = {(DATA_WIDTH - 3)'(0), busy, error_reg, irq_reg};
+        COLS: HRDATA = pool_cols;
 
         default: HRDATA = '0;
       endcase
@@ -116,6 +122,8 @@ module hydra_mmr (
       signed_out    <= 0;
       round_en      <= 0;
       reduce_op     <= POOL_SUM;
+      pool_2d       <= 0;
+      pool_cols     <= '0;
       src_addr      <= '0;
       dst_addr      <= '0;
       length        <= '0;
@@ -144,12 +152,15 @@ module hydra_mmr (
             signed_out  <= HWDATA[DATA_BITS+MODE_BITS+1];
             round_en    <= HWDATA[DATA_BITS+MODE_BITS+2];
             reduce_op   <= hydra_reduce_op'(HWDATA[DATA_BITS+MODE_BITS+4:DATA_BITS+MODE_BITS+3]);
+            pool_2d     <= HWDATA[DATA_BITS+MODE_BITS+5];
           end
           SRC:    src_addr <= HWDATA[ADDR_WIDTH-1:0];
           DST:    dst_addr <= HWDATA[ADDR_WIDTH-1:0];
           // Saturate instead of truncating, so an oversized LEN fails the bounds check
           LEN:    length <= (|HWDATA[DATA_WIDTH-1:LEN_WIDTH]) ? '1 : HWDATA[LEN_WIDTH-1:0];
           STATUS: {error_reg, irq_reg} <= '0;
+          // Saturate like LEN, so an oversized width fails the 2D width check
+          COLS:   pool_cols <= (|HWDATA[DATA_WIDTH-1:LEN_WIDTH]) ? '1 : HWDATA[LEN_WIDTH-1:0];
         endcase
       end else if (phase_valid_w && HREADY && busy) begin
         $display(" [HYDRA]: Ignored write to MMR offset: %0h while busy", mmr_offset_w);
