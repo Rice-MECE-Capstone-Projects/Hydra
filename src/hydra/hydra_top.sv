@@ -101,14 +101,27 @@ module hydra_top #(
     logic                   hydra_done;
     logic                   hydra_error;
     logic                   hydra_HBUSREQ;
+    logic                   read_mmr_q;
+    logic                   read_scratch_q;
 
     assign HPROT_m          = 4'b0011;      // privileged, data, non-cacheable, non-bufferable
     assign HMASTLOCK_m      = 0;
     assign HWSTRB_m         = '1;       // word write
     assign HSEL_mmr         = hydra_HSEL && &((MMR_BASE[ADDR_WIDTH-1:0]     ~^ HADDR_s) | MMR_RANGE[ADDR_WIDTH-1:0]);
-    assign HSEL_scratch     = hydra_HSEL && &((SCRATCH_BASE[ADDR_WIDTH-1:0] ~^ HADDR_s) | SCRATCH_RANGE[ADDR_WIDTH-1:0]);
+    assign HSEL_scratch     = hydra_HSEL && !HSEL_mmr && &((SCRATCH_BASE[ADDR_WIDTH-1:0] ~^ HADDR_s) | SCRATCH_RANGE[ADDR_WIDTH-1:0]);
     assign HSEL_none        = !(HSEL_mmr || HSEL_scratch);
-    assign HRDATA_s         = ({DATA_WIDTH{HSEL_mmr}} & HRDATA_mmr) | ({DATA_WIDTH{HSEL_scratch}} & HRDATA_scratch);
+    
+    always_ff @(posedge clk) begin
+        if(!rst_n)begin
+            read_mmr_q<=1'b0;
+            read_scratch_q<=1'b0;
+        end
+        else if (HREADY_s)begin
+            read_mmr_q<=HSEL_mmr && HTRANS_s[1] && !HWRITE_s;
+            read_scratch_q<=HSEL_scratch && HTRANS_s[1] && !HWRITE_s;
+        end
+    end
+    assign HRDATA_s         = ({DATA_WIDTH{read_mmr_q}} & HRDATA_mmr) | ({DATA_WIDTH{read_scratch_q}} & HRDATA_scratch);
     // Both slaves are zero-wait-state, so HREADYOUT_s is always 1
     // HSEL_none ensures HREADYOUT_s=1 during idle cycles to prevent bus lockup
     assign HREADYOUT_s      = (HSEL_mmr && HREADYOUT_mmr) || (HSEL_scratch && HREADYOUT_scratch) || HSEL_none;

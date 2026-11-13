@@ -33,6 +33,7 @@ class transform_env extends uvm_env;
 
         // give the RAM driver access to this same model
         uvm_config_db#(transform_ram_model)::set(this,"m_ram_agent.m_driver","ram_model",ram_model);
+        uvm_config_db#(transform_ram_model)::set(this,"m_scoreboard","ram_model",ram_model);
 
         // both agents actively drive their respective interfaces
         uvm_config_db#(uvm_active_passive_enum)::set(this,"m_ctrl_agent","is_active",UVM_ACTIVE);

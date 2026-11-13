@@ -101,9 +101,11 @@ module hydra_transform (
     logic                   first_trans, start_fill;
     logic                   fill_sel, drain_sel;
     logic                   next_done_read, done_read, next_done;
-    //
+    
     logic                   mode_c_read_accepted;
     logic [LEN_WIDTH:0]     mode_c_read_count;
+    logic                   mode_b_read_accepted;
+    logic [LEN_WIDTH:0]     mode_b_read_count;
 
     typedef enum logic [1:0] {IDLE, BUSY, FLUSH, ERROR} bus_state_type;
     bus_state_type state, next_state;
@@ -111,6 +113,7 @@ module hydra_transform (
     assign currBeat         = beat;
     // once accepted mode c ram read address at this rising edge
     assign mode_c_read_accepted = (state == BUSY) && (mode == MODE_C) && HREADY && HTRANS[1] && !HWRITE;
+    assign mode_b_read_accepted = (state == BUSY) && (mode == MODE_B) && HREADY && HTRANS[1] && !HWRITE;
 
     assign next_done_read   = (count == length-1) && HREADY && (state == BUSY); // done reading when last word of last column is read from AHB
     assign invalid_length   = (length == '0) || ((mode == MODE_B) && (length[ELEM_WIDTH-1:0] != '0)) ||
@@ -129,11 +132,10 @@ module hydra_transform (
     always_comb
     begin : NEXT_STATE_SIGNALS
         next_state = state;
-
-        if (HRESP || invalid_length) next_state = ERROR;     // if any AHB error response is received, go to error halt
+        if ((state==IDLE && start && invalid_length)||(state == BUSY && HRESP))
+            next_state=ERROR;
         else begin
             case (state)
-            //
                 IDLE        : next_state = (HBUSREQ && HREADY) ? (invalid_length ? ERROR : BUSY) : IDLE;
                 BUSY        : next_state = (mode == MODE_B) ? (done_read ? FLUSH : BUSY) : ((mode == MODE_C) ? (done_read ? IDLE : BUSY) : IDLE);
                 FLUSH       : next_state = done             ? IDLE          : FLUSH;
@@ -168,16 +170,19 @@ module hydra_transform (
                     end
                 end
             end else begin
-            // Keep the existing Mode B behavior unchanged.
-                if (first_trans) begin
-                    next_HADDR  = src_addr;
-                    next_HTRANS = AHB_NONSEQ;
-                end else if (!done_read) begin
-                    next_HADDR  = src_addr + (burst << (COLS_WIDTH+2))
-                                      + (beat << 2) + 4;
-                    next_HTRANS = (beat == NUM_BEATS-1)
-                            ? ((count == length-1) ? AHB_IDLE : AHB_NONSEQ)
-                            : AHB_SEQ;
+                // launch the first Mode B read
+                if((mode_b_read_count==0)&&(HTRANS==AHB_IDLE))begin
+                    next_HADDR=src_addr;
+                    next_HTRANS=AHB_NONSEQ;
+                end
+                // Advance only after the current read address is accepted
+                else if (mode_b_read_accepted)begin
+                    if(mode_b_read_count+1'b1<{1'b0,length})begin
+                        next_HADDR=src_addr+((mode_b_read_count+1'b1)<<2);
+                        next_HTRANS=(mode_b_read_count[BEATS_WIDTH-1:0]==NUM_BEATS-1)?AHB_NONSEQ:AHB_SEQ;
+                    end else begin
+                        next_HTRANS=AHB_IDLE;
+                    end
                 end
             end
         end
@@ -245,6 +250,7 @@ module hydra_transform (
             done_read       <= 0;
             done            <= 0;
             mode_c_read_count <= '0;
+            mode_b_read_count <= '0;
         end else begin
             state       <= next_state;
             HBUSREQ     <= next_HBUSREQ;
@@ -276,10 +282,14 @@ module hydra_transform (
                 SCRATCH_row     <= '0;
                 SCRATCH_col     <= '0;
                 mode_c_read_count <= '0;
+                mode_b_read_count <= '0;
 
             end else begin
                 if (mode_c_read_accepted)
                 mode_c_read_count <= mode_c_read_count + 1'b1;
+
+                if (mode_b_read_accepted)
+                mode_b_read_count <= mode_b_read_count + 1'b1;
                 // to be reviewed
                 first_trans <= (HTRANS == AHB_NONSEQ)       ? 0 : first_trans;
                 start_fill  <= (HTRANS == AHB_SEQ)          ? 1 : start_fill;

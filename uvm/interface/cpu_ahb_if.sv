@@ -19,6 +19,7 @@ interface cpu_ahb_if(
     logic        HREADYOUT;
     logic        HRESP;
 
+    logic        irq_hydra;
     // Driver clocking block
     clocking driver_cb @(posedge clk);
         default input #1step output #0;

@@ -26,6 +26,8 @@ class transform_ram_driver extends uvm_component;
     virtual transform_ram_if vif;
     transform_ram_model ram_model;
     int unsigned wait_cycles_after_first_read = 0; // wait cycles the test requests
+    int unsigned stall_on_read_number = 1; // 1-based; default preserves Mode C test
+    int unsigned accepted_read_count = 0;
     int unsigned stall_remaining = 0; // wait cycles left in the current stall
     bit wait_injected = 0; // whether the driver has inserted the wait states
 
@@ -61,8 +63,9 @@ class transform_ram_driver extends uvm_component;
                 vif.driver_cb.HREADY<=1'b1;
                 vif.driver_cb.HRESP<=1'b0;
                 vif.driver_cb.HRDATA<='0;
-                stall_remaining = 0;
-                wait_injected = 0;
+                stall_remaining = 0; 
+                wait_injected = 0; 
+                accepted_read_count = 0;
             end
             else if(vif.driver_cb.HREADY === 1'b0)begin
                 // the current data phase is stalled
@@ -97,9 +100,11 @@ class transform_ram_driver extends uvm_component;
                     // provide data for the following data phase
                     vif.driver_cb.HRDATA<=read_data;
                     `uvm_info("RAM_READ",$sformatf("Address=0x%08h data=0x%08h", vif.driver_cb.HADDR,read_data),UVM_MEDIUM)
-
+                    
+                    accepted_read_count++;
+                    
                     // stall the data phase of the first accepted read
-                    if(!wait_injected && wait_cycles_after_first_read>0)begin
+                    if(!wait_injected && wait_cycles_after_first_read>0 && accepted_read_count == stall_on_read_number)begin
                         wait_injected=1;
                         stall_remaining=wait_cycles_after_first_read;
                         vif.driver_cb.HREADY<=1'b0;

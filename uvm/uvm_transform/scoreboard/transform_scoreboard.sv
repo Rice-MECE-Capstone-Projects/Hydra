@@ -4,12 +4,14 @@
 // Author: Yulia Zhou
 //
 // Description:
-// Receives configuration, RAM read, and scratchpad write transactions.
-// Stores copies of the observed transactions for Mode C checking.
+// Collects control configurations, completed RAM reads, and scratchpad writes.
+// Checks Mode C quantization and packing, and Mode B matrix transposition.
+// Uses the shared preloaded RAM model to check Mode B input and output data.
 //
 // Scope:
-// Reception framework for one operation per simulation.
-// Reference calculations and result comparisons will be added next.
+// Supports multiple valid Mode B or Mode C operations per simulation.
+// Checks transaction counts, addresses, RAM responses, and output data.
+// Invalid-length no-traffic checking currently covers Mode C only.
 //
 // Project: HYDRA UVM Verification
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,6 +40,8 @@ class transform_scoreboard extends uvm_scoreboard;
     transform_ram_transaction ram_queue[$];
     transform_scratch_transaction scratch_queue[$];
 
+    transform_ram_model ram_model;
+
     `uvm_component_utils(transform_scoreboard)
 
     function new(string name="transform_scoreboard", uvm_component parent=null);
@@ -46,10 +50,13 @@ class transform_scoreboard extends uvm_scoreboard;
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
+        if(!uvm_config_db#(transform_ram_model)::get(this,"","ram_model",ram_model))
+            `uvm_fatal("NO_RAM_MODEL","Scoreboard can't access the shared RAM model")
 
         ctrl_imp = new("ctrl_imp",this);
         ram_imp = new("ram_imp",this);
         scratch_imp = new("scratch_imp",this);
+
     endfunction
 
     // receive one operation's configuration
@@ -136,6 +143,7 @@ class transform_scoreboard extends uvm_scoreboard;
         int unsigned write_base;
         int unsigned expected_reads;
         int unsigned expected_writes;
+        int unsigned block_idx, elem_idx, row_idx, col_idx;
 
         logic [hydra_pkg::ADDR_WIDTH-1:0] expected_address;
         logic [31:0] expected_word;
@@ -156,8 +164,24 @@ class transform_scoreboard extends uvm_scoreboard;
         end
 
         if(expect_invalid_length)begin
-            if(cfg_queue.size()!=1||cfg_queue[0].mode!=hydra_pkg::MODE_C||(cfg_queue[0].length!=0&&cfg_queue[0].length%4==0))begin
-                `uvm_error("EXPECTED_INVALID_LENGTH","Expected exactly one invalid Mode C configuration")
+            if(cfg_queue.size()!=1)begin
+                `uvm_error("EXPECTED_INVALID_LENGTH","Expected exactly one invalid configuration")
+            end
+            else begin
+                case(cfg_queue[0].mode)
+                    hydra_pkg::MODE_C:begin
+                        if(cfg_queue[0].length!=0 && cfg_queue[0].length%4==0)
+                            `uvm_error("EXPECTED_INVALID_LENGTH","Expected an invalid Mode C length")
+                    end
+
+                    hydra_pkg::MODE_B:begin
+                        if(cfg_queue[0].length!=0 && cfg_queue[0].length%(hydra_pkg::BLOCK_ROWS*hydra_pkg::BLOCK_COLS)==0)
+                            `uvm_error("EXPECTED_INVALID_LENGTH","Expected an invalid Mode B length")
+                    end
+
+                    default:
+                        `uvm_error("EXPECTED_INVALID_LENGTH","Unexpected mode")
+                endcase
             end
 
             if(ram_queue.size()!=0||scratch_queue.size()!=0)begin
@@ -169,18 +193,32 @@ class transform_scoreboard extends uvm_scoreboard;
         end
 
         // first calculate totals, so no queue entry is accessed if traffic is missing
-        foreach(cfg_queue[op])begin
-            if(cfg_queue[op].mode!=hydra_pkg::MODE_C)begin
-                `uvm_error("UNSUPPORTED_MODE",$sformatf("Operation %0d is not MODE C",op))
-                return;
-            end
-            if(cfg_queue[op].length==0||cfg_queue[op].length%4!=0)begin
-                `uvm_error("INVALID_LENGTH",$sformatf("Operation %0d has invalid length=%0d",op,cfg_queue[op].length))
-                return;
-        end
+        foreach (cfg_queue[op]) begin
+            case (cfg_queue[op].mode)
+                hydra_pkg::MODE_C:begin
+                    if(cfg_queue[op].length==0||cfg_queue[op].length%4!=0)begin
+                        `uvm_error("INVALID_LENGTH",$sformatf("Operation %0d has invalid Mode C length=%0d",op,cfg_queue[op].length))
+                    return;
+                    end
+                    total_reads += cfg_queue[op].length;
+                    total_writes += cfg_queue[op].length/4;
+                end
 
-        total_reads+=cfg_queue[op].length;
-        total_writes+=cfg_queue[op].length/4;
+                hydra_pkg::MODE_B:begin
+                    if(cfg_queue[op].length==0||cfg_queue[op].length%
+                        (hydra_pkg::BLOCK_ROWS*hydra_pkg::BLOCK_COLS)!=0)begin
+                            `uvm_error("INVALID_LENGTH", $sformatf("Operation %0d has invalid Mode B length=%0d",op,cfg_queue[op].length))
+                            return;
+                        end
+                        total_reads += cfg_queue[op].length;
+                        total_writes += cfg_queue[op].length;
+                end
+
+                default:begin
+                    `uvm_error("UNSUPPORTED_MODE",$sformatf("Operation %0d has unsupported mode=%0d",op,cfg_queue[op].mode))
+                    return;
+                end
+            endcase
         end
 
         // check transaction counts
@@ -200,7 +238,7 @@ class transform_scoreboard extends uvm_scoreboard;
 
         foreach (cfg_queue[op]) begin
         expected_reads = cfg_queue[op].length;
-        expected_writes = expected_reads / 4;
+        expected_writes = (cfg_queue[op].mode==hydra_pkg::MODE_C)?expected_reads/4:expected_reads;
 
         // check RAM read addresses, responses, and data validity
         for(int i=0; i<expected_reads; i++)begin
@@ -220,39 +258,71 @@ class transform_scoreboard extends uvm_scoreboard;
                 `uvm_error("RAM_DATA_UNKNOWN",$sformatf("Operation %0d Read %0d contains X or Z",op,i))
                 failed=1'b1;
             end
+
+            if(cfg_queue[op].mode == hydra_pkg::MODE_B)begin
+                expected_word=ram_model.read_word(expected_address);
+                if(ram_queue[read_base+i].read_data!==expected_word)begin
+                    `uvm_error("RAM_DATA",$sformatf("Operation %0d read %0d: expected data=0x%08h, actual=0x%08h",op,i,expected_word,ram_queue[read_base+i].read_data))
+                    failed=1'b1;
+                end
+            end
         end
 
         // predict and check each packed output word
-        for(int w=0; w<expected_writes; w++)begin // word
-            expected_word='0;
-            for(int b=0;b<4;b++)begin //byte
-                expected_byte=predict_mode_c_byte(
-                    ram_queue[read_base+w*4+b].read_data,
-                    cfg_queue[op].scale_shift,
-                    cfg_queue[op].signed_out,
-                    cfg_queue[op].round_en
-                );
-                expected_word[b*8+:8]=expected_byte;
-            end
-            expected_address=cfg_queue[op].dst_addr+w*4;
+        if(cfg_queue[op].mode==hydra_pkg::MODE_C)begin
+            for(int w=0; w<expected_writes; w++)begin // word
+                expected_word='0;
+                for(int b=0;b<4;b++)begin //byte
+                    expected_byte=predict_mode_c_byte(
+                        ram_queue[read_base+w*4+b].read_data,
+                        cfg_queue[op].scale_shift,
+                        cfg_queue[op].signed_out,
+                        cfg_queue[op].round_en
+                    );
+                    expected_word[b*8+:8]=expected_byte;
+                end
+                expected_address=cfg_queue[op].dst_addr+w*4;
 
-            if(scratch_queue[write_base+w].address!==expected_address)begin
-                `uvm_error("SCRATCH_ADDRESS",$sformatf("Operation %0d Wirte %0d:expected address=0x%08h, actual=0x%08h",op,w,expected_address,scratch_queue[write_base+w].address))
-                failed=1'b1;
-            end
+                if(scratch_queue[write_base+w].address!==expected_address)begin
+                    `uvm_error("SCRATCH_ADDRESS",$sformatf("Operation %0d Wirte %0d:expected address=0x%08h, actual=0x%08h",op,w,expected_address,scratch_queue[write_base+w].address))
+                    failed=1'b1;
+                end
 
-            if(scratch_queue[write_base+w].write_data!==expected_word)begin
-                `uvm_error("MODE_C_DATA",$sformatf("Operation %0d Write %0d:expected data=0x%08h,actual=0x%08h",op,w,expected_word,scratch_queue[write_base+w].write_data))
-                failed=1'b1;
-            end
-        end
+                if(scratch_queue[write_base+w].write_data!==expected_word)begin
+                    `uvm_error("MODE_C_DATA",$sformatf("Operation %0d Write %0d:expected data=0x%08h,actual=0x%08h",op,w,expected_word,scratch_queue[write_base+w].write_data))
+                    failed=1'b1;
+                end
+            end 
+        end else begin //MODE B
+                for(int w=0;w<expected_writes;w++)begin
+                    block_idx=w/(hydra_pkg::BLOCK_ROWS*hydra_pkg::BLOCK_COLS);
+                    elem_idx=w%(hydra_pkg::BLOCK_ROWS*hydra_pkg::BLOCK_COLS);
+                    row_idx=elem_idx/hydra_pkg::BLOCK_COLS;
+                    col_idx=elem_idx%hydra_pkg::BLOCK_COLS;
 
-        read_base+=expected_reads;
-        write_base+=expected_writes;
+                    expected_address = cfg_queue[op].dst_addr 
+                        + block_idx * hydra_pkg::BLOCK_ROWS * hydra_pkg::BLOCK_COLS * 4
+                        + (col_idx * hydra_pkg::BLOCK_ROWS + row_idx) * 4;
+
+                    expected_word = ram_model.read_word(cfg_queue[op].src_addr+w*4);
+
+                    if(scratch_queue[write_base+w].address!==expected_address)begin
+                        `uvm_error("MODE_B_ADDRESS",$sformatf("Operation %0d write %0d: expected address=0x%08h, actual=0x%08h",op,w,expected_address,scratch_queue[write_base+w].address))
+                        failed=1'b1;
+                    end
+
+                    if(scratch_queue[write_base+w].write_data!==expected_word)begin
+                        `uvm_error("MODE_B_DATA",$sformatf("Operation %0d write %0d: expected data=0x%08h, actual=0x%08h",op,w,expected_word,scratch_queue[write_base+w].write_data))
+                        failed=1'b1;
+                    end
+                end
+            end
+            read_base+=expected_reads;
+            write_base+=expected_writes;
         end
 
         if(!failed)begin
-            `uvm_info("MODE_C_MATCH",$sformatf("Checked %0d operations, %0d RAM reads and %0d scratchpad writes",cfg_queue.size(),total_reads,total_writes),UVM_LOW)
+            `uvm_info("TRANSFORM_MATCH",$sformatf("Checked %0d operations, %0d RAM reads and %0d scratchpad writes",cfg_queue.size(),total_reads,total_writes),UVM_LOW)
         end
         
     endfunction

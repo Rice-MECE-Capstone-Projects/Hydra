@@ -129,7 +129,7 @@ package hydra_pkg;
         logic signed [DATA_WIDTH:0] val, rounded, scaled; // 33 bit to avoid overflowing
         logic                       neg, ovf_signed, ovf_unsigned;
 
-        val     = {src[DATA_WIDTH-1], src};     // sign-extend
+        val     = {src[DATA_WIDTH-1], src};     // sign-extend 
         // if rounded is enabled, add half of target scale to improve accuracy
         rounded = (round_en && |scale_shift)
                     ? val + ({{DATA_WIDTH{1'b0}}, 1'b1} << (scale_shift - 1))
