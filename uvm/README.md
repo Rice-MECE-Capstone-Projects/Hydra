@@ -7,8 +7,8 @@ This directory contains the UVM testbenches for HYDRA's memory-mapped registers 
 - `agent/`, `driver/`, `monitor/`, `sequence/`, `test/`, and related directories: CPU AHB/MMR unit verification.
 - `uvm_transform/`: Mode B and Mode C unit verification, including a RAM responder and a reference scoreboard.
 - `uvm_integration/`: top-level tests, functional coverage, and the regression script.
-- [`../doc/Test_Plan.md`](../doc/Test_Plan.md): scenarios, expected results, and coverage details.
-- [`../doc/proj.log`](../doc/proj.log): project log.
+- [`doc/Test_Plan.md`](doc/Test_Plan.md): scenarios, expected results, and coverage details.
+- [`doc/proj.log`](doc/proj.log): project log.
 
 ## Run the integration regression
 
