@@ -1,0 +1,79 @@
+09/01/2026: Reviewed MMR code, reran rtl testbench and finished cpu_ahb interface.
+09/02/2026: Finished cpu_ahb transaction, sequencer and driver components.
+09/03/2026: Completed cpu_ahb read/write sequence.
+09/04/2026: 
+09/05/2026:
+09/06/2026:
+09/07/2026: Implemented cpu_ahb monitor component and compiled successfully.
+09/08/2026: Implemented cpu_ahb scoreboard, agent and env components, and then started writing tests.
+09/09/2026: Passed two mmr tests -- a basic SRC write/read test and a multi-register test checking SRC, DST, and LEN readback and independence. 
+09/10/2026: Wrote and passed different data patterns test successfully. 
+09/11/2026: Wrote and passed the last testcase of MMR block -- reset status and values.
+09/12/2026:
+09/13/2026:
+09/14/2026: Read Mode C RTL code in transition block for the next stage.
+09/15/2026:
+09/16/2026: Wrote control, RAM, scratchpad interfaces, along with control transactions.
+09/17/2026: Completed sequencer, sequence and driver components then compiled successfully.
+09/18/2026: Wrote transform monitor for configuration only and compiled successfully.
+09/19/2026:
+09/20/2026: Complemented control agent connecting sequencer, driver and monitor.
+09/21/2026: Wrote a RAM model to store data associated with RAM address.
+09/22/2026: Built RAM driver automatically responding to the RAM read request.
+09/23/2026: Wrote RAM monitor which records RAM output data and request address then packed into RAM transaction.
+09/24/2026: Wrote scratch monitor and scratch transaction to record the real output of Mode C.
+09/25/2026: Started writing transform scoreboard.
+09/26/2026:
+09/27/2026: Started building the first version of transform scoreboard without results checking function.
+09/28/2026: Added Mode C scoreboard checks and the transform environment connecting all the components.
+09/29/2026: Wrote first basic Mode C test and transform top_tb.
+09/30/2026: Made a detailed test plan for Mode C in transform block.
+10/01/2026: Tried to run the basic Mode C test but found RTL read request fatal error.
+10/02/2026:
+10/03/2026:
+10/04/2026: Tried to figure out what caused duplicated first address and additional address.
+10/05/2026: Talked with RTL team member about the read request issue and tried to fix it.
+10/06/2026:
+10/07/2026:
+10/08/2026:
+10/09/2026:
+10/10/2026:
+10/11/2026: Fixed the rtl bug of basic Mode C read issue and pushed the .md to uvm git branch.
+10/12/2026: Passed the scale shifting test.
+10/13/2026: Passed the round enable and (un)signed saturation tests.
+10/14/2026: Passed the wait state test and bus arbitration test (cpu mid request & first delay grant)
+10/15/2016: Passed the invalid length test.
+10/16/2026: Passed Back-to-Back test and combined arithmetic corner cases test.
+10/17/2026:
+10/18/2026:
+10/19/2026: 
+10/20/2026: 
+10/21/2026: 
+10/22/2026:
+10/23/2026: Reviewed the RTL code of Mode B and Mode C env for reuse.
+10/24/2026:
+10/25/2026: 
+10/26/2026: Updated the transform scoreboard for Mode B and made a test plan initially.
+10/27/2026: Debugged the same timing issue in Mode B transform and passed the basic Mode B test.
+10/28/2026: Passed Ping-Pong buffer switching test and three-block buffer reuse test.
+10/29/2026: Passed RAM wait-state test and bus arbitration test.
+10/30/2026: Passed invalid-length test and Back-to-Back operation test, and did regression tests for Mode C.
+10/31/2026:
+11/01/2026:
+11/02/2026: Began the integration of HYDRA verification env, and built the hydra_top_tb.
+11/03/2026: Added the integration env and package for HYDRA.
+11/04/2026: Wrote the Mode C basic sequence and test for hydra, but caught an error showing lost data from scratchpad to cpu.
+11/05/2026: Debugged the code error then passed the hydra Mode C basic test and did the regression test of invalid length tests in unit-level env.
+11/06/2026: Wrote Mode B basic sequence and end-to-end test for hydra and passed.
+11/07/2026: Passed top-level Mode C shifting, rounding, and multiple outputs test.
+11/08/2026: Passed random test cases for unit-level Mode B/C, Mode C (un)signed outputs test and Mode B Ping-Pong operation test.
+11/09/2026: Passed invalid length test and consecutive operations across modes test for Mode B/C.
+11/10/2026: Passed Mode B/C random tests.
+11/11/2026: Added different combinations of arithmetic settings in Mode C and got the functional coverage from 94.44% to 100%.
+11/12/2026: Added tests for a longer Mode C transfer and clearing the STATUS error bit, then raised code coverage from 92.75% to 93.33%.
+11/13/2026: Added mmr configuration register readback, top-level cpu bus contention and top-level ram wait state tests, finally raised code coverage from 93.33% to 94.49%.
+11/14/2026: Documented the remaining code coverage.
+
+
+
+
