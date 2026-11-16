@@ -22,4 +22,4 @@ The script compiles the integration package and testbench, runs directed and see
 
 ## Results
 
-The documented unit and integration tests passed. The merged integration regression reached **100% functional configuration coverage** and **94.49% filtered RTL code coverage**. See the test plan for the coverage scope and remaining uncovered paths.
+The documented unit and integration tests passed. The merged integration regression reached **100% functional configuration coverage** and **96.58% filtered RTL code coverage**. See the test plan for the coverage scope and remaining uncovered paths.
