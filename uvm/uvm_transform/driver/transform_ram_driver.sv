@@ -10,8 +10,7 @@
 // Does not use get_next_item() or require a RAM sequencer.
 //
 // Scope:
-// Initial implementation supports zero-wait-state, successful read responses.
-// Wait-state insertion and error injection will be added later.
+// Implementation supports zero-wait-state, successful read responses, wait-state insertion and error injection.
 //
 // Project: HYDRA UVM Verification
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,6 +29,19 @@ class transform_ram_driver extends uvm_component;
     int unsigned accepted_read_count = 0;
     int unsigned stall_remaining = 0; // wait cycles left in the current stall
     bit wait_injected = 0; // whether the driver has inserted the wait states
+
+    // 0 disables error injection; otherwise use a 1-based read number
+    int unsigned error_on_read_number = 0;
+    bit error_injected = 0;
+    bit error_response_complete = 0;
+
+    typedef enum bit [1:0] {
+        RESP_OKAY,
+        RESP_ERROR_WAIT,
+        RESP_ERROR_COMPLETE
+    } response_state_e;
+
+    response_state_e response_state = RESP_OKAY;
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
@@ -66,15 +78,30 @@ class transform_ram_driver extends uvm_component;
                 stall_remaining = 0; 
                 wait_injected = 0; 
                 accepted_read_count = 0;
+                error_injected=0;
+                error_response_complete=0;
+                response_state=RESP_OKAY;
             end
-            else if(vif.driver_cb.HREADY === 1'b0)begin
-                // the current data phase is stalled
-                // do not accept a new address or change HRDATA during the wait
+            else if(response_state == RESP_ERROR_WAIT)begin
+                // second cycle of the AHB ERROR response
+                vif.driver_cb.HRESP <=1'b1;
+                vif.driver_cb.HREADY <=1'b1;
+                response_state = RESP_ERROR_COMPLETE;
+            end
+            else if (response_state == RESP_ERROR_COMPLETE)begin
+                // Return to normal responses after the error completes
+                vif.driver_cb.HRESP <=1'b0;
+                vif.driver_cb.HREADY <=1'b1;
+                response_state = RESP_OKAY;
+                error_response_complete =1;
+            end
+            else if (vif.HREADY===1'b0)begin
+                // Preserve the existing wait_state behavior
                 if(stall_remaining>1)begin
                     stall_remaining--;
                 end
                 else begin
-                    stall_remaining=0;
+                    stall_remaining =0;
                     vif.driver_cb.HREADY<=1'b1;
                 end
             end
@@ -104,7 +131,16 @@ class transform_ram_driver extends uvm_component;
                     accepted_read_count++;
                     
                     // stall the data phase of the first accepted read
-                    if(!wait_injected && wait_cycles_after_first_read>0 && accepted_read_count == stall_on_read_number)begin
+                    if(!error_injected && error_on_read_number!=0 && accepted_read_count == error_on_read_number)begin
+                        error_injected=1;
+                        response_state = RESP_ERROR_WAIT;
+
+                        // first cycle of the AHB ERROR response
+                        vif.driver_cb.HREADY<=1'b0;
+                        vif.driver_cb.HRESP<=1'b1;
+                        `uvm_info("RAM_ERROR_INJECTED", $sformatf("Injecting ERROR on read %0d at address 0x%08h", accepted_read_count, vif.driver_cb.HADDR),UVM_LOW)
+                    end
+                    else if (!wait_injected && wait_cycles_after_first_read>0 && accepted_read_count==stall_on_read_number)begin
                         wait_injected=1;
                         stall_remaining=wait_cycles_after_first_read;
                         vif.driver_cb.HREADY<=1'b0;

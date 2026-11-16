@@ -253,11 +253,22 @@ The integration regression also collects statement, branch, and FSM coverage for
 - **Expected:** Exactly four ordered RAM reads and one correctly packed scratchpad output (`0x04030201`), with no UVM errors or fatals.
 - **Result:** The first and second RAM-read log entries were 30 ns apart, versus 10 ns for subsequent reads. The output check passed with zero UVM errors and fatals. The Transform `HREADY=0` branch count increased from one to two, but overall filtered RTL code coverage remained **94.49%** because this branch was already covered.
 
+#### CV06: Top-level RAM error response — Passed
+
+- **Configuration:** Run the Mode C basic end-to-end test with `length=4`. Inject a two-cycle AHB ERROR response on the fourth RAM read.
+- **Expected:** Four ordered RAM read responses, with `HRESP=0` for the first three and `HRESP=1` for the fourth. CPU STATUS reports an error, and no scratchpad write occurs.
+- **Coverage result:** The Transform `BUSY → ERROR` transition was hit once, raising its state-transition coverage from 6/7 to **7/7 (100%)**. Overall filtered RTL code coverage rose from **94.49% to 96.58%**.
+
 ### Remaining code coverage review
 
-- The final merged RTL code coverage is **94.49%**; arbiter and scratchpad branch coverage reached **100%**.
-- Remaining uncovered branches mainly involve unmapped MMR addresses, unsupported operating modes, and redundant RTL conditions.
-- One top-level branch requires a CPU-side wait state, which the current zero-wait-state testbench does not generate.
-- The planned MMR, Mode B, Mode C, and top-level verification is complete; the remaining uncovered branches do not affect the results of these tests.
+The planned MMR, Mode B, Mode C, and top-level tests have passed. Functional coverage reached **100%**, and filtered RTL code coverage reached **96.58%**. The remaining gaps were reviewed before deciding to stop adding tests:
 
+| Uncovered path | Reason no further test was added |
+|---|---|
+| Undefined MMR register offsets | All defined registers were exercised. Reads and writes to undefined offsets are reachable negative cases, but they are outside the programming interface used by the planned Mode B/C tests. They remain reported as uncovered. |
+| CPU-side `HREADY_s=0` | The current top-level testbench uses a zero-wait CPU-side interface and does not generate an upstream stall. Covering this path would require additional CPU/interconnect stimulus beyond the current integration setup. RAM-side wait states were tested separately. |
+| Transform's repeated condition and guarded mode fall-throughs | One inner condition repeats its outer condition; two other fall-throughs sit inside logic already restricted to Mode B or C. These paths cannot be reached by adding normal stimulus. |
+| Other Transform mode and invalid-length branches | The planned verification targets Modes B and C. Invalid starts are handled by an earlier error check; the remaining inner branch was not reached by the tested configuration sequence. These bins are left visible rather than claimed unreachable in every possible situation. |
+| `HTRANS: NONSEQ → IDLE` | Valid Mode B/C operations contain multiple reads, so the first `NONSEQ` transfer normally proceeds to `SEQ`. A direct transition would require a different early-termination scenario, which was not part of the completed test plan. |
 
+**No coverage exclusions were applied.**

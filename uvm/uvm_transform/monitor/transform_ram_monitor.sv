@@ -43,12 +43,14 @@ class transform_ram_monitor extends uvm_monitor;
         logic [hydra_pkg::ADDR_WIDTH-1:0] held_address;
         logic [1:0] held_transfer;
         bit was_waiting;
+        bit was_error_wait;
 
         pending_address='0; // last read request address
         pending_valid=1'b0; // read request waiting for returned data
         held_address='0;
         held_transfer='0;
         was_waiting=1'b0;
+        was_error_wait=1'b0;
 
         forever begin
             @(vif.monitor_cb);
@@ -57,19 +59,22 @@ class transform_ram_monitor extends uvm_monitor;
                 pending_address = '0;
                 pending_valid = 1'b0;
                 was_waiting=1'b0;
+                was_error_wait=1'b0;
             end
             else begin
-                if(was_waiting&&(vif.monitor_cb.HADDR!==held_address || vif.monitor_cb.HTRANS!==held_transfer))begin
+                if(was_waiting&&!was_error_wait&&(vif.monitor_cb.HADDR!==held_address || vif.monitor_cb.HTRANS!==held_transfer))begin
                     `uvm_error("RAM_WAIT_HOLD","RAM read address or transfer type changed during a wait")
                 end
 
                 was_waiting=(vif.monitor_cb.HREADY===1'b0);
+                was_error_wait=was_waiting&&(vif.monitor_cb.HRESP===1'b1);
+
                 if(was_waiting)begin
                     held_address=vif.monitor_cb.HADDR;
                     held_transfer=vif.monitor_cb.HTRANS;
                 end
 
-                if (vif.monitor_cb.HREADY === 1'b1 && vif.monitor_cb.hydra_grant === 1'b1) begin
+                if (vif.monitor_cb.HREADY === 1'b1) begin
 
                 // Complete the previous read's data phase
                 if (pending_valid) begin

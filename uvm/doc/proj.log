@@ -71,8 +71,10 @@
 11/10/2026: Passed Mode B/C random tests.
 11/11/2026: Added different combinations of arithmetic settings in Mode C and got the functional coverage from 94.44% to 100%.
 11/12/2026: Added tests for a longer Mode C transfer and clearing the STATUS error bit, then raised code coverage from 92.75% to 93.33%.
-11/13/2026: Added mmr configuration register readback, top-level cpu bus contention and top-level ram wait state tests, finally raised code coverage from 93.33% to 94.49%.
-11/14/2026: Documented the remaining code coverage.
+11/13/2026: Added mmr configuration register readback, top-level cpu bus contention and top-level ram wait state tests, raised code coverage from 93.33% to 94.49%.
+11/14/2026: Added top-level mode c ram error test and finally raised the code coverage from 94.49% to 96.58%.
+11/15/2026:
+11/16/2026: Documented the remaining uncovered paths in my test plan.
 
 
 

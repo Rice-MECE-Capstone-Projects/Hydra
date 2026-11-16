@@ -6,7 +6,11 @@ mkdir -p "$run_dir"
 ucdbs=()
 fail_count=0
 
-# Recompile the integration package and top testbench.
+# Recompile the Transform and integration packages, then the top testbench.
+vlog +incdir+../../uvm_transform/package ../../uvm_transform/package/transform_pkg.sv > "$run_dir/transform_compile.log" 2>&1 || {
+    cat "$run_dir/transform_compile.log"
+    exit 1
+}
 vlog +incdir+../package ../package/hydra_integration_pkg.sv \
     > "$run_dir/compile.log" 2>&1 || {
     cat "$run_dir/compile.log"
@@ -75,8 +79,9 @@ run_case I08_c_length132    hydra_mode_c_random_test 404 +C_LENGTH=132 +C_SHIFT=
 run_case I09_b_seed_101    hydra_mode_b_random_test 101
 run_case I09_b_seed_202    hydra_mode_b_random_test 202
 run_case I09_b_seed_303    hydra_mode_b_random_test 303
-run_case I10_b_contention hydra_mode_b_basic_test 1 +CPU_CONTENTION
-run_case I11_c_ram_wait hydra_mode_c_basic_test 1 +RAM_WAIT
+run_case I10_b_contention  hydra_mode_b_basic_test 1 +CPU_CONTENTION
+run_case I11_c_ram_wait    hydra_mode_c_basic_test 1 +RAM_WAIT
+run_case I10_c_ram_error   hydra_mode_c_ram_error_test 1
 
 
 if (( fail_count != 0 )); then

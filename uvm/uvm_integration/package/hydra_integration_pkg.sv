@@ -17,6 +17,7 @@ package hydra_integration_pkg;
     `include "../sequence/hydra_mode_c_to_b_seq.sv"
     `include "../sequence/hydra_mode_c_random_seq.sv"
     `include "../sequence/hydra_mode_b_random_seq.sv"
+    `include "../sequence/hydra_mode_c_ram_error_seq.sv"
     
     `include "../test/hydra_mode_c_basic_test.sv"
     `include "../test/hydra_mode_b_basic_test.sv"
@@ -27,4 +28,5 @@ package hydra_integration_pkg;
     `include "../test/hydra_mode_c_to_b_test.sv"
     `include "../test/hydra_mode_c_random_test.sv"
     `include "../test/hydra_mode_b_random_test.sv"
+    `include "../test/hydra_mode_c_ram_error_test.sv"
 endpackage
