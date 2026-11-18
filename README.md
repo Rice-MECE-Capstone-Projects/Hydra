@@ -20,7 +20,7 @@ flowchart TB
     end
 
     MEM["<b>Main Memory</b>"]
-    SP["<b>&quot;Scratchpad&quot; SRAM</b>"]
+    SP["<b>#quot;Scratchpad#quot; SRAM</b>"]
     REG["<b>Programming Registers</b>"]
 
     CPU  <--> ARB
