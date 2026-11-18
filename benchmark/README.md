@@ -92,9 +92,6 @@ Each dirty writeback costs about 18 cycles, the same as a 64 B line fill. The wr
 
 The software baseline was built at `-O1`, `-O2`, `-O3`, and `-O3 -funroll-loops`. HYDRA's driver and cycle counts do not change with the optimization level. Better software code lowers the speedup, with a small step from `-O1` to `-O2` and a larger one from `-O2` to `-O3`, but the kernel is memory-bound (≥ 2 instructions per element: one load and one store), so code quality can only reduce its cost by a limited amount. `-O3` and `-O3 -funroll-loops` are indistinguishable (≤ 0.01×) at every length, because the only loops left to unroll at `-O3` carry little overhead. The headline numbers use `-O3 -funroll-loops`.
 
-## MODE C
-
-
 ## MODE E: 2D pooling on LeNet-5 (`modeE_pool2d/`)
 
 This benchmark times the two pooling layers of a LeNet-5 trained on MNIST. The network is LeNet-5 with ReLU and 2×2 max pooling, reaching 98.49% test accuracy. The input is real activations from MNIST test digit #0, a 7, which the network classifies correctly.
