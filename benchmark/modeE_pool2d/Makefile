@@ -58,6 +58,16 @@ DUMP	?= 0
 P	= 2
 
 
+# M=1: memory-traffic build. Adds D$ counter reads and bus-monitor markers (-DPERF_MEM) and
+#      enables the simulation-only AHB monitor (+define+HYDRA_BUSMON). Cycle counts from these
+#      builds include the extra counter reads, so keep using M=0 runs for published speedups.
+M	?= 0
+ifeq ($(M),1)
+	MEM_CFLAG	= -DPERF_MEM
+	MEM_DEFINE	= +define+HYDRA_BUSMON
+	MEM_SUFFIX	= __MEM
+endif
+
 .PHONY: all
 
 all:
@@ -74,9 +84,9 @@ all:
 						PFLAG="-DPOOL_SIZE=$(P) -DOP=$$op -DDUMP=$(DUMP)";	\
 					echo "Running file '$$t.c' with S=$$s, O=$$o_new, OP=$$op, DUMP=$(DUMP)";	\
 					wsim rv32gc --sim questa --elf $$t 					\
-						--define "+define+HYDRA_POOL_SIZE=$(P)"			\
-						> "$(OUT_DIR)/$${s}__$${o}__$${op}.log" || exit $$?;	\
-					echo "Output saved to $(OUT_DIR)/$${s}__$${o}__$${op}.log";	\
+						--define "+define+HYDRA_POOL_SIZE=$(P) $(MEM_DEFINE)"			\
+						> "$(OUT_DIR)/$${s}__$${o}__$${op}$(MEM_SUFFIX).log" || exit $$?;	\
+					echo "Output saved to $(OUT_DIR)/$${s}__$${o}__$${op}$(MEM_SUFFIX).log";	\
 				done; \
 			done; \
 		done; \
@@ -90,7 +100,7 @@ compile:
 	@for t in $(TARGET); do	\
 		echo ">>> Compiling file '$$t.c' with $(SFLAG), $(OFLAG), $(PFLAG)";	\
 		riscv64-unknown-elf-gcc -o $$t -gdwarf-2							\
-			$(SFLAG) $(OFLAG) $(PFLAG)												\
+			$(SFLAG) $(MEM_CFLAG) $(OFLAG) $(PFLAG)												\
 			-march=rv32gc_zba_zbb_zbs_zicbom -mabi=ilp32d -mcmodel=medany			\
 			-nostdlib -static -lm -fno-tree-loop-distribute-patterns				\
 			-T$(WALLY_DIR)/common/test.ld -I$(WALLY_DIR)/common						\

@@ -1,5 +1,5 @@
 diff --git a/src/wally/wallypipelinedsoc.sv b/src/wally/wallypipelinedsoc.sv
-index 51d2f6124..fc7f7c498 100644
+index 51d2f6124..d63a94f17 100644
 --- a/src/wally/wallypipelinedsoc.sv
 +++ b/src/wally/wallypipelinedsoc.sv
 @@ -2,7 +2,7 @@
@@ -60,7 +60,7 @@ index 51d2f6124..fc7f7c498 100644
  
    // synchronize reset to SOC clock domain
    synchronizer resetsync(.clk, .d(reset_ext), .q(reset));
-@@ -79,19 +121,59 @@ module wallypipelinedsoc import cvw::*; #(parameter cvw_t P)  (
+@@ -79,19 +121,70 @@ module wallypipelinedsoc import cvw::*; #(parameter cvw_t P)  (
    // instantiate processor and internal memories
    wallypipelinedcore #(P) core(.clk, .reset,
      .MTimerInt, .MExtInt, .SExtInt, .MSwInt, .MTIME_CLINT,
@@ -107,6 +107,17 @@ index 51d2f6124..fc7f7c498 100644
 +    .HPROT_m      (HPROT_hydra),      // from hydra to ram
 +    .HMASTLOCK_m  (HMASTLOCK_hydra)   // from hydra to ram
 +  );
++
++`ifdef HYDRA_BUSMON
++  // simulation-only AHB traffic counter for benchmarks (see src/hydra/hydra_busmon.sv)
++  hydra_busmon #(
++    .ADDR_WIDTH (P.PA_BITS),
++    .DATA_WIDTH (P.AHBW),
++    .MARK_ADDR  (P.HYDRA_MMR_BASE + 64'h18)
++  ) busmon (
++    .clk, .reset, .hydra_grant, .hydra_HSEL, .HADDR_bus, .HTRANS_bus, .HWRITE_bus, .HWDATA_bus, .HREADY
++  );
++`endif
 +
    // instantiate uncore if a bus interface exists
    if (P.BUS_SUPPORTED) begin : uncoregen // Hack to work around Verilator bug https://github.com/verilator/verilator/issues/4769

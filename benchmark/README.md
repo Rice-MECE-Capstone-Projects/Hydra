@@ -120,6 +120,34 @@ python3 plot_lenet.py           # writes ../hydra_modeE_lenet_pooling.png
 
 `train_export.py` needs only numpy. It downloads MNIST into `lenet/mnist/`, which is git-ignored, and caches the trained weights in `lenet/lenet_weights.npz`.
 
+## MODE E: Memory traffic
+Speedup counts only cycles. These measurements show where the data goes. All three Mode E benchmarks report, for each timed kernel:
+- **AHB beats on the shared bus, split by master and direction.** These come from a simulation-only monitor, `src/hydra/hydra_busmon.sv`. One beat is one 32-bit word.
+- **CPU-side work.** This comes from Wally's HPM counters: instructions retired, D$ accesses, and D$ misses.
+
+| Benchmark | Input words | HYDRA bus words (HYDRA / CPU) | SW bus words | SW / HYDRA | CPU instr (HYDRA / SW) | D$ accesses (HYDRA / SW) |
+|---|---|---|---|---|---|---|
+| 1D max-pool, P = 4 | 512 | 522 (516 / 6) | 640 | 1.23× | 21 / 1,141 | 0 / 640 |
+| Decimation, R = 4 (AVG) | 1024 | 1,034 (1,028 / 6) | 1,280 | 1.24× | 21 / 2,517 | 0 / 1,280 |
+| LeNet pool2 (2×2 MAX) | 1600 | 1,611 (1,604 / 7) | 2,000 | 1.24× | 22 / 5,059 | 0 / 2,008 |
+| LeNet pool1 (2×2 MAX) | 4704 | 4,715 (4,708 / 7) | 6,208 | 1.32× | 22 / 12,451 | 0 / 5,888 |
+
+Instruction counts come from the normal (`M=0`) runs above. `M=1` adds about 16–18 instructions of instrumentation inside the window. Both include the 8-instruction counter-read overhead.
+
+- **The CPU never touches the data.** With HYDRA, the CPU makes 0 D$ accesses and retires a constant 21–22 instructions at every size. 13–14 of them are the offload itself (MMR writes and two passes through the poll loop); the rest is counter-read overhead. Its only bus traffic is the 4–5 MMR writes plus **2 STATUS polls**: while HYDRA owns the bus the CPU's polling load stalls, so polling costs no bandwidth.
+- **HYDRA reads each input word once, plus a constant 4 beats** (L + 4), and writes nothing to the shared bus. Its output goes to the scratchpad.
+- **Software moves more data than it reads.** The D$ is write-allocate, so every output line is first *fetched* from RAM (1D: L + L/P words in). Those dirty lines must also be written back later; that write-back falls outside the timed window and is not in the table, so the SW numbers are a lower bound. pool1 (18.4 KiB of input) overflows the 16 KiB D$, so 19 dirty lines are already evicted inside the window. That gives it the largest ratio.
+- **The ratio is modest because both sides must read the input once.** The real gain is that this traffic no longer passes through the CPU or its cache: 2.3–3.2 instructions per input word, and the whole input footprint of D$ pollution, disappear.
+
+To reproduce (a separate build; the extra counter reads perturb cycle counts slightly, so published speedups use the default `M=0`, whose binaries are byte-identical to builds without this feature):
+```bash
+(cd modeE && make B=1-4 M=1)
+(cd modeE_decim && make B=1-8 P=4 OP=AVG M=1)
+(cd modeE_pool2d && make M=1)
+python3 summarize_mem.py        # reads */log/*__MEM.log, prints the full table
+```
+`M=1` compiles the C with `-DPERF_MEM` and the RTL with `+define+HYDRA_BUSMON`. Each timed kernel brackets itself with two writes to the unused MMR offset `0x18`, and the monitor prints a counter snapshot on each one. `summarize_mem.py` takes the difference between the snapshots and subtracts the marker beat.
+
 # Setup
 In order to compile and run C code into Wally, you need to have installed the [**RISC-V GNU Toolchain**](https://github.com/riscv-collab/riscv-gnu-toolchain). Once installed:
 1. Edit `wally/setup.sh` (specifically lines 26-29) to include the path to your toolchain installation. For example, at Rice, that is under `/clear/apps/riscv`. Note that you might also want to move line 39 (`export PATH=$WALLY/bin:$PATH`) to the bottom of the script to avoid conflicts with RISC-V site paths.

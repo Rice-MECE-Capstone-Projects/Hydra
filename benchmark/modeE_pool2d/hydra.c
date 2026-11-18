@@ -178,6 +178,7 @@ uint32_t hydra_modeE_pool2d(uint32_t src, uint32_t dst, uint32_t len, uint32_t c
 
     // 1. Program memory addresses, transfer size and row width
     t0 = perf_begin();
+    BUSMON_MARK(1); // PERF_MEM only: bus-monitor window start
     HYDRA_MMR->SRC  = src;
     HYDRA_MMR->DST  = dst;
     HYDRA_MMR->LEN  = len;
@@ -190,6 +191,7 @@ uint32_t hydra_modeE_pool2d(uint32_t src, uint32_t dst, uint32_t len, uint32_t c
     do {
         status = HYDRA_MMR->STATUS;
     } while (!(status & (HYDRA_MMR_STATUS_DONE | HYDRA_MMR_STATUS_ERROR)));
+    BUSMON_MARK(2); // PERF_MEM only: bus-monitor window end
     t1 = perf_end();
 
     // 4. Clear error and done register after completion
@@ -207,6 +209,7 @@ void pool2d_software(const int32_t *restrict src, int32_t *restrict dst,
     perf_t t0, t1;
 
     t0 = perf_begin();
+    BUSMON_MARK(3); // PERF_MEM only: bus-monitor window start
     for (uint32_t oy = 0; oy < rows / K; oy++) {
         const int32_t *r = src + oy * K * w;
         for (uint32_t ox = 0; ox < w / K; ox++) {
@@ -227,6 +230,7 @@ void pool2d_software(const int32_t *restrict src, int32_t *restrict dst,
             *dst++ = acc;
         }
     }
+    BUSMON_MARK(4); // PERF_MEM only: bus-monitor window end
     t1 = perf_end();
 
     *out = perf_delta(t1, t0);
@@ -342,6 +346,8 @@ static uint32_t run_layer(const layer_t *l, perf_t *hw, perf_t *sw) {
     printf("%s: MATCHES REFERENCE, ", l->name);
     print_x100("SPEEDUP = ", sw->cycles, hw->cycles);
     printf(", CPU reads %" PRIu32 " input words with SW, 0 with HYDRA\n\r", len);
+    print_perf_mem("HYDRA", len, *hw);
+    print_perf_mem("SW", len, *sw);
     return 0;
 }
 

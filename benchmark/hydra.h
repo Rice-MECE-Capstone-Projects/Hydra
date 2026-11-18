@@ -81,6 +81,10 @@
         uint64_t instret;
         uint64_t icacheMiss;
         uint64_t dcacheMiss;
+    #ifdef PERF_MEM // keep perf_t's layout unchanged otherwise, so published cycle counts reproduce
+        uint64_t dcacheAccess;
+        uint64_t dcacheStall;  // D$ miss cycles
+    #endif
     } perf_t;
 
     // Use "memory" clobber as compiler barrier
@@ -107,12 +111,28 @@
     // HPM counter index from wally/src/privileged/csrc.sv
     static inline uint64_t rd_icacheMiss(void) { return READ_CSR64(mhpmcounter17h, mhpmcounter17); }
     static inline uint64_t rd_dcacheMiss(void) { return READ_CSR64(mhpmcounter14h, mhpmcounter14); }
+    static inline uint64_t rd_dcacheAccess(void) { return READ_CSR64(mhpmcounter13h, mhpmcounter13); }
+    static inline uint64_t rd_dcacheStall(void)  { return READ_CSR64(mhpmcounter15h, mhpmcounter15); }
+
+    // PERF_MEM (make M=1): read the extra D$ counters and emit bus-monitor markers.
+    // Off by default, because the extra CSR reads change the timed cycle counts.
+    // BUSMON_MARK writes an id to an unused MMR offset; the simulation-only bus monitor
+    // (src/hydra/hydra_busmon.sv, +define+HYDRA_BUSMON) prints its counters on that write.
+    #ifdef PERF_MEM
+        #define BUSMON_MARK(id) (*(volatile uint32_t *)(HYDRA_MMR_BASE + 0x18) = (uint32_t)(id))
+    #else
+        #define BUSMON_MARK(id) ((void)0)
+    #endif
 
     // Keep cycle reads innermost
     static inline perf_t perf_begin(void) {
         perf_t p = {
-            // .dcacheMiss = rd_dcacheMiss(),
             // .icacheMiss = rd_icacheMiss(),
+        #ifdef PERF_MEM
+            .dcacheAccess = rd_dcacheAccess(),
+            .dcacheMiss   = rd_dcacheMiss(),
+            .dcacheStall  = rd_dcacheStall(),
+        #endif
             .instret    = rd_instret(),
             .cycles     = rd_cycle(),
         };
@@ -123,7 +143,11 @@
             .cycles     = rd_cycle(),
             .instret    = rd_instret(),
             // .icacheMiss = rd_icacheMiss(),
-            // .dcacheMiss = rd_dcacheMiss(),
+        #ifdef PERF_MEM
+            .dcacheMiss   = rd_dcacheMiss(),
+            .dcacheAccess = rd_dcacheAccess(),
+            .dcacheStall  = rd_dcacheStall(),
+        #endif
         };
         return p;
     }
@@ -132,9 +156,24 @@
             .cycles     = t1.cycles - t0.cycles,
             .instret    = t1.instret - t0.instret,
             // .icacheMiss = t1.icacheMiss - t0.icacheMiss,
-            // .dcacheMiss = t1.dcacheMiss - t0.dcacheMiss,
+        #ifdef PERF_MEM
+            .dcacheMiss   = t1.dcacheMiss   - t0.dcacheMiss,
+            .dcacheAccess = t1.dcacheAccess - t0.dcacheAccess,
+            .dcacheStall  = t1.dcacheStall  - t0.dcacheStall,
+        #endif
         };
         return d;
+    }
+
+    // One parseable line per kernel, for summarize_mem.py
+    static inline void print_perf_mem(const char *who, uint32_t len, perf_t p) {
+    #ifdef PERF_MEM
+        printf("MEM %s len=%" PRIu32 ": instr=%" PRIu64 " dacc=%" PRIu64 " dmiss=%" PRIu64
+               " dstall=%" PRIu64 "\n\r", who, len, p.instret, p.dcacheAccess, p.dcacheMiss,
+               p.dcacheStall);
+    #else
+        (void)who; (void)len; (void)p;
+    #endif
     }
 
 

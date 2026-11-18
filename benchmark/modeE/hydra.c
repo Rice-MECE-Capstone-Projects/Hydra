@@ -138,6 +138,7 @@ uint32_t hydra_modeE_max(uint32_t src, uint32_t dst, uint32_t len, perf_t *out) 
 
     // 1. Program memory addresses and transfer size
     t0 = perf_begin();
+    BUSMON_MARK(1); // PERF_MEM only: bus-monitor window start
     HYDRA_MMR->SRC  = src;
     HYDRA_MMR->DST  = dst;
     HYDRA_MMR->LEN  = len;
@@ -149,6 +150,7 @@ uint32_t hydra_modeE_max(uint32_t src, uint32_t dst, uint32_t len, perf_t *out) 
     do {
         status = HYDRA_MMR->STATUS;
     } while (!(status & (HYDRA_MMR_STATUS_DONE | HYDRA_MMR_STATUS_ERROR)));
+    BUSMON_MARK(2); // PERF_MEM only: bus-monitor window end
     t1 = perf_end();
 
     // 4. Clear error and done register after completion
@@ -165,6 +167,7 @@ void modeE_max_software(const uint32_t *restrict src, uint32_t *restrict dst,
     perf_t t0, t1;
 
     t0 = perf_begin();
+    BUSMON_MARK(3); // PERF_MEM only: bus-monitor window start
     for (uint32_t i = 0; i < len; i += POOL_SIZE) {
         uint32_t max = src[i];
         for (uint32_t j = 1; j < POOL_SIZE; j++)
@@ -172,6 +175,7 @@ void modeE_max_software(const uint32_t *restrict src, uint32_t *restrict dst,
                 max = src[i + j];
         dst[i / POOL_SIZE] = max;
     }
+    BUSMON_MARK(4); // PERF_MEM only: bus-monitor window end
     t1 = perf_end();
 
     *out = perf_delta(t1, t0);
@@ -257,6 +261,8 @@ static uint32_t run_point(uint32_t len) {
             len, hw.cycles, hw.instret, sw.cycles, sw.instret);
     printf("len = %" PRIu32 ": SPEEDUP = %" PRIu64 ".%02" PRIu64 "X\n\r",
             len, speedup_x100 / 100, speedup_x100 % 100);
+    print_perf_mem("HYDRA", len, hw);
+    print_perf_mem("SW", len, sw);
 
     return 0;
 }
